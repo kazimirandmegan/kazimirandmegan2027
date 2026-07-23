@@ -8,25 +8,39 @@ This README is for people helping build or edit the site (you don’t need to be
 
 ## Run it on your computer
 
-You need [Node.js](https://nodejs.org/) installed (version 18 or newer is fine).
+### Easiest: double-click the launcher
 
-1. Open a terminal in this project folder.
-2. Install dependencies (only needed the first time, or after dependencies change):
+Use the file for your computer (no terminal knowledge needed):
+
+| Your computer | Double-click this |
+|---------------|-------------------|
+| **Windows** | [`Start Wedding Site.bat`](Start%20Wedding%20Site.bat) |
+| **Mac** | [`Start Wedding Site.command`](Start%20Wedding%20Site.command) |
+| **Linux** | [`Start Wedding Site.sh`](Start%20Wedding%20Site.sh) |
+
+The first run may take a few minutes: it installs anything missing (Node.js if needed, project packages, Cloudflare Tunnel), starts the site, then prints a **public HTTPS link** (`*.trycloudflare.com`) you can open on your phone or any device.
+
+- Keep the window open while you test.
+- Close the window or press `Ctrl+C` to stop.
+- The public link changes each time you start.
+- Sign in with an invitation password from [`src/config/settings.js`](src/config/settings.js).
+
+Or from a terminal in this folder:
+
+```bash
+npm start
+```
+
+### Manual (developers)
+
+You need [Node.js](https://nodejs.org/) 18+ if you are not using the launcher.
 
 ```bash
 npm install
-```
-
-3. Start the local site:
-
-```bash
 npm run dev
 ```
 
-4. Open the address Vite prints (usually `http://localhost:5173`).
-5. Sign in at the gate with your name and a guest password. The three passwords live in [`src/config/settings.js`](src/config/settings.js) — look for `passwords` near the top. (We don’t list them here on purpose.)
-
-To stop the local server, press `Ctrl+C` in the terminal.
+Then open `http://localhost:5173`. Passwords live in [`src/config/settings.js`](src/config/settings.js).
 
 ---
 

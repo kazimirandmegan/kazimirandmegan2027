@@ -41,6 +41,11 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    host: true,
+    port: 5173,
+    strictPort: false,
     open: false,
+    // Allow Cloudflare Tunnel hostnames (*.trycloudflare.com)
+    allowedHosts: true,
   },
 });

@@ -23,6 +23,13 @@ globs:
 - Three guest tiers: `full`, `vinko`, `afterparty`. Elements with `data-tier` are removed if the unlocked tier is not listed.
 - Optional backend: `backend/Code.gs` (Google Apps Script). `SETTINGS.cloudKey` must match `SECRET_KEY`.
 
+## Local demo with a public URL
+
+Double-click `Start Wedding Site.bat` / `.command` / `.sh` (or run `npm start`).
+That script installs deps if needed, starts Vite, and opens a Cloudflare
+quick tunnel (`*.trycloudflare.com`). Keep the process running while testing
+from phones or other devices. See root README.
+
 ## Do not
 
 - Do not treat gate passwords as real security; do not add secrets beyond the existing gate/cloud-key model without an explicit request.

@@ -3,11 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Kazimir & Megan wedding website — 29 May 2027, St Albans",
+  "description": "Kazimir & Megan wedding website \u2014 29 May 2027, St Albans",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start:local": "node scripts/start-local.mjs",
+    "start": "node scripts/start-local.mjs"
   },
   "devDependencies": {
     "vite": "^6.3.5"
