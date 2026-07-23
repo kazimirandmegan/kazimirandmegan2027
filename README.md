@@ -10,37 +10,57 @@ This README is for people helping build or edit the site (you don’t need to be
 
 ### Easiest: double-click the launcher
 
-Use the file for your computer (no terminal knowledge needed):
+Pick the file that matches your computer and open it (double-click):
 
-| Your computer | Double-click this |
-|---------------|-------------------|
+| Your computer | Open this file |
+|---------------|----------------|
 | **Windows** | [`Start Wedding Site.bat`](Start%20Wedding%20Site.bat) |
 | **Mac** | [`Start Wedding Site.command`](Start%20Wedding%20Site.command) |
 | **Linux** | [`Start Wedding Site.sh`](Start%20Wedding%20Site.sh) |
 
-The first run may take a few minutes: it installs anything missing (Node.js if needed, project packages, Cloudflare Tunnel), starts the site, then prints a **public HTTPS link** (`*.trycloudflare.com`) you can open on your phone or any device.
+**Mac tip:** the first time, Finder may block it. Right-click the file → **Open** → confirm **Open**. After that, double-click works normally.
 
-- Keep the window open while you test.
-- Close the window or press `Ctrl+C` to stop.
-- The public link changes each time you start.
-- Sign in with an invitation password from [`src/config/settings.js`](src/config/settings.js).
+A terminal window opens and does the rest for you. The first run can take a few minutes.
 
-Or from a terminal in this folder:
+#### What it does
+
+1. Checks for Node.js (downloads a private copy into `.tools/` if you don’t have it)
+2. Installs the project packages (`npm install`)
+3. Starts the website on your computer
+4. Opens a **Cloudflare Tunnel** so the same site gets a public HTTPS link you can use on your phone or any other device
+5. Tries to open that link in your browser
+
+When it’s ready you’ll see two addresses:
+
+- **This computer** — something like `http://127.0.0.1:5173` (only works on the machine that’s running the launcher)
+- **Phone / any device** — something like `https://….trycloudflare.com` (works anywhere with internet)
+
+The public link is also saved in [`.tools/public-url.txt`](.tools/public-url.txt) while the launcher is running.
+
+#### While it’s running
+
+- **Leave the window open** — closing it (or pressing `Ctrl+C`) stops the site and the public link.
+- The Cloudflare link **changes every time** you start the launcher.
+- You still need an invitation password to get past the gate — see [`src/config/settings.js`](src/config/settings.js) (look for `passwords`). We don’t print those passwords in this README.
+- You need an internet connection for the public Cloudflare link. The local address works offline once packages are installed.
+- This is for **testing**, not the final wedding website. For the real hosted site, see **Publishing the site** below.
+
+From a terminal in this folder you can do the same thing with:
 
 ```bash
 npm start
 ```
 
-### Manual (developers)
+### Manual start (developers only)
 
-You need [Node.js](https://nodejs.org/) 18+ if you are not using the launcher.
+If you already have [Node.js](https://nodejs.org/) 18+ and only want the site on this computer (no public link):
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open `http://localhost:5173`. Passwords live in [`src/config/settings.js`](src/config/settings.js).
+Then open `http://localhost:5173`.
 
 ---
 
@@ -62,6 +82,8 @@ Search the project for `PLACEHOLDER` to find details that still need filling in.
 
 ## How the project is organised
 
+- **`Start Wedding Site.*`** — double-click launchers (Windows / Mac / Linux) that start the site and a Cloudflare test link
+- **`scripts/`** — the automatic setup behind those launchers
 - **`src/pages/`** — each page of the site (Home, RSVP, Ceremony, and so on)
 - **`src/config/`** — settings you edit often (passwords, links, dates)
 - **`src/css/`** — look and feel (colours, layout, components)
