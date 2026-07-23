@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Cross-platform bootstrap used by the double-click launchers (macOS + Linux).
-# Finds or downloads Node, then runs scripts/start-local.mjs
+# Finds or downloads Node, then runs the friendly start-local launcher.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -10,7 +9,7 @@ NODE_VERSION="20.18.1"
 mkdir -p "$TOOLS"
 
 say() { printf '%s\n' "$*"; }
-err() { printf 'ERROR: %s\n' "$*" >&2; }
+err() { printf '%s\n' "$*" >&2; }
 
 pause() {
   printf '\nPress Enter to close…\n'
@@ -46,7 +45,7 @@ download() {
   elif need_cmd wget; then
     wget -qO "$dest" "$url"
   else
-    err "Need curl or wget to download tools."
+    err "  We need curl or wget to finish setup."
     return 1
   fi
 }
@@ -58,7 +57,7 @@ ensure_portable_node() {
   case "$os" in
     darwin) dist="node-v${NODE_VERSION}-darwin-${arch}" ;;
     linux) dist="node-v${NODE_VERSION}-linux-${arch}" ;;
-    *) err "Unsupported OS: $os"; return 1 ;;
+    *) err "  This computer’s system isn’t supported yet ($os)."; return 1 ;;
   esac
 
   NODE_BIN="$TOOLS/$dist/bin/node"
@@ -67,7 +66,7 @@ ensure_portable_node() {
     return 0
   fi
 
-  say "Downloading portable Node.js ${NODE_VERSION} (one-time)…"
+  say "  … Borrowing a little toolkit for this computer (one-time setup)"
   url="https://nodejs.org/dist/v${NODE_VERSION}/${dist}.tar.gz"
   archive="$TOOLS/${dist}.tar.gz"
   download "$url" "$archive"
@@ -82,24 +81,24 @@ ensure_portable_node() {
   chmod +x "$TOOLS/$dist/bin/node" || true
   export PATH="$TOOLS/$dist/bin:$PATH"
   NODE_BIN="$TOOLS/$dist/bin/node"
+  say "  ✓ Toolkit ready"
 }
 
 main() {
-  say "Starting Kazimir & Megan wedding site…"
+  say ""
+  say "  ♡  Kazimir & Megan — wedding site launcher"
   if system_node_ok; then
-    say "Found system Node $(node -v)"
+    :
   else
-    say "No suitable Node.js on PATH — installing a portable copy into .tools/"
     ensure_portable_node
   fi
 
   if ! need_cmd node; then
-    err "Node.js is still unavailable."
+    err "  We still couldn’t find Node.js. Install it from https://nodejs.org and try again."
     pause
     exit 1
   fi
 
-  # Run the full orchestrator (npm install + Vite + Cloudflare Tunnel)
   exec node "$ROOT/scripts/start-local.mjs"
 }
 

@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 /**
- * Fully automatic local launcher:
- *  1. Ensure Node 18+ (system or portable under .tools/)
- *  2. npm install
- *  3. Start Vite on a free port
- *  4. Start a Cloudflare quick tunnel → public https://*.trycloudflare.com URL
- *
- * Keep this window open while testing. Ctrl+C (or close the window) stops both.
+ * Friendly launcher: quiet tooling, warm progress lines, clear public URL.
+ * Keep this window open while testing. Ctrl+C stops everything.
  */
 import { spawn, execFileSync } from "node:child_process";
 import { existsSync, writeFileSync, mkdirSync } from "node:fs";
@@ -23,18 +18,21 @@ import {
 const PREFERRED_PORT = 5173;
 const URL_FILE = join(ROOT, ".tools", "public-url.txt");
 
+const TIPS = [
+  "Polishing the hydrangeas…",
+  "Warming the wax seal…",
+  "Teaching Connie a few new jokes…",
+  "Counting sleeps until May 2027…",
+  "Folding tiny paper aeroplanes for the guest atlas…",
+  "Asking Kiko to stop eating the RSVP cards…",
+  "Ironing a vyshyvanka (metaphorically)…",
+  "Checking the last train times, just in case…",
+  "Plumping the guestbook cushions…",
+  "Whispering budmo to the servers…",
+];
+
 function log(msg = "") {
   console.log(msg);
-}
-
-function banner(lines) {
-  const width = Math.min(72, Math.max(40, ...lines.map((l) => l.length)) + 4);
-  const bar = "═".repeat(width);
-  log("");
-  log(bar);
-  for (const line of lines) log(`  ${line}`);
-  log(bar);
-  log("");
 }
 
 function sleep(ms) {
@@ -56,6 +54,30 @@ function withNodeOnPath(nodeInfo, env = process.env) {
   return next;
 }
 
+function friendlyLog(msg) {
+  if (/Using system Node/i.test(msg)) {
+    log("  ✓ Found everything we need to run the site");
+    return;
+  }
+  if (/No suitable system Node|Installing a portable|Downloading Node/i.test(msg)) {
+    log("  … Borrowing a little toolkit for this computer (one-time setup)");
+    return;
+  }
+  if (/Node ready|Using portable Node/i.test(msg)) {
+    log("  ✓ Toolkit ready");
+    return;
+  }
+  if (/Downloading Cloudflare|Downloading.*cloudflared/i.test(msg)) {
+    log("  … Fetching the magic tunnel (one-time setup)");
+    return;
+  }
+  if (/cloudflared ready|Using system cloudflared|Using portable cloudflared/i.test(msg)) {
+    log("  ✓ Tunnel tools ready");
+    return;
+  }
+  if (/^https?:\/\//i.test(String(msg).trim())) return;
+}
+
 async function waitForHttp(url, timeoutMs = 90000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
@@ -71,30 +93,40 @@ async function waitForHttp(url, timeoutMs = 90000) {
 }
 
 function runNpmInstall(nodeInfo) {
-  log("Installing project dependencies (npm install)…");
+  log("  … Gathering the party supplies");
   let npmCmd = nodeInfo.npm;
-  if (!npmCmd || !existsSync(npmCmd)) {
-    npmCmd = portableNodePaths().npm;
-  }
+  if (!npmCmd || !existsSync(npmCmd)) npmCmd = portableNodePaths().npm;
   if (!existsSync(npmCmd)) {
-    throw new Error("npm not found — cannot install dependencies");
+    throw new Error(
+      "We couldn’t find the package installer. Try installing Node.js from https://nodejs.org and run this again."
+    );
   }
 
   const env = withNodeOnPath(nodeInfo);
-  if (process.platform === "win32") {
-    execFileSync("cmd.exe", ["/c", npmCmd, "install"], {
-      cwd: ROOT,
-      stdio: "inherit",
-      env,
-    });
-  } else {
-    execFileSync(npmCmd, ["install"], {
-      cwd: ROOT,
-      stdio: "inherit",
-      env,
-    });
+  const npmArgs = ["install", "--no-fund", "--no-audit", "--loglevel=error"];
+  try {
+    if (process.platform === "win32") {
+      execFileSync("cmd.exe", ["/c", npmCmd, ...npmArgs], {
+        cwd: ROOT,
+        stdio: ["ignore", "ignore", "pipe"],
+        env,
+      });
+    } else {
+      execFileSync(npmCmd, npmArgs, {
+        cwd: ROOT,
+        stdio: ["ignore", "ignore", "pipe"],
+        env,
+      });
+    }
+  } catch (err) {
+    const detail = err.stderr ? String(err.stderr).trim() : "";
+    throw new Error(
+      detail
+        ? `Couldn’t finish setting up packages.\n${detail.slice(0, 400)}`
+        : "Couldn’t finish setting up packages. Check your internet connection and try again."
+    );
   }
-  log("Dependencies ready.");
+  log("  ✓ Party supplies gathered");
 }
 
 function startVite(nodeInfo) {
@@ -102,26 +134,27 @@ function startVite(nodeInfo) {
   const env = withNodeOnPath(nodeInfo);
 
   let child;
+  const viteArgs = ["--host", "0.0.0.0", "--port", String(PREFERRED_PORT)];
   if (existsSync(viteJs)) {
-    child = spawn(
-      nodeInfo.node,
-      [viteJs, "--host", "0.0.0.0", "--port", String(PREFERRED_PORT)],
-      { cwd: ROOT, env, stdio: ["ignore", "pipe", "pipe"] }
-    );
+    child = spawn(nodeInfo.node, [viteJs, ...viteArgs], {
+      cwd: ROOT,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
   } else {
     const npx = nodeInfo.npx || portableNodePaths().npx;
     if (process.platform === "win32") {
-      child = spawn(
-        "cmd.exe",
-        ["/c", npx, "vite", "--host", "0.0.0.0", "--port", String(PREFERRED_PORT)],
-        { cwd: ROOT, env, stdio: ["ignore", "pipe", "pipe"] }
-      );
+      child = spawn("cmd.exe", ["/c", npx, "vite", ...viteArgs], {
+        cwd: ROOT,
+        env,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
     } else {
-      child = spawn(
-        npx,
-        ["vite", "--host", "0.0.0.0", "--port", String(PREFERRED_PORT)],
-        { cwd: ROOT, env, stdio: ["ignore", "pipe", "pipe"] }
-      );
+      child = spawn(npx, ["vite", ...viteArgs], {
+        cwd: ROOT,
+        env,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
     }
   }
 
@@ -129,11 +162,7 @@ function startVite(nodeInfo) {
   let ready = false;
   const onData = (buf) => {
     const text = buf.toString();
-    process.stdout.write(text);
-    const m =
-      text.match(
-        /Local:\s+https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\]):(\d+)/i
-      ) || text.match(/http:\/\/0\.0\.0\.0:(\d+)/i);
+    const m = text.match(/Local:\s+https?:\/\/[^:\s]+:(\d+)/i);
     if (m) {
       port = Number(m[1]);
       ready = true;
@@ -142,11 +171,7 @@ function startVite(nodeInfo) {
   child.stdout.on("data", onData);
   child.stderr.on("data", onData);
 
-  return {
-    child,
-    getPort: () => port,
-    isReady: () => ready,
-  };
+  return { child, getPort: () => port, isReady: () => ready };
 }
 
 function startTunnel(cloudflaredBin, port) {
@@ -161,12 +186,6 @@ function startTunnel(cloudflaredBin, port) {
     const text = buf.toString();
     const m = text.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/i);
     if (m && !publicUrl) publicUrl = m[0].replace(/\/$/, "");
-    for (const line of text.split(/\r?\n/)) {
-      if (!line.trim()) continue;
-      if (/trycloudflare\.com|ERR |error|failed|Registered|Connected|INF /i.test(line)) {
-        console.log(`[tunnel] ${line.trim()}`);
-      }
-    }
   };
   child.stdout.on("data", tryParse);
   child.stderr.on("data", tryParse);
@@ -174,13 +193,22 @@ function startTunnel(cloudflaredBin, port) {
   return { child, getUrl: () => publicUrl };
 }
 
-async function waitFor(pred, timeoutMs, label) {
+async function waitWithTips(pred, timeoutMs, heading) {
+  log(`  … ${heading}`);
   const start = Date.now();
+  let tipIndex = 0;
+  let lastTipAt = 0;
   while (Date.now() - start < timeoutMs) {
     if (pred()) return true;
-    await sleep(300);
+    const now = Date.now();
+    if (now - lastTipAt > 2800) {
+      log(`     ${TIPS[tipIndex % TIPS.length]}`);
+      tipIndex += 1;
+      lastTipAt = now;
+    }
+    await sleep(350);
   }
-  throw new Error(`Timed out waiting for ${label}`);
+  throw new Error(`This step took too long (${heading}). Please try again.`);
 }
 
 function openBrowser(url) {
@@ -213,17 +241,42 @@ function pauseOnError() {
   }
 }
 
+function printReady(publicUrl, localUrl) {
+  const line = "═".repeat(64);
+  log("");
+  log(line);
+  log("");
+  log("  YOU'RE ALL SET — the wedding site is live for testing");
+  log("");
+  log("  Open this link on ANY device (phone, tablet, laptop, anywhere):");
+  log("");
+  log(`      ${publicUrl}`);
+  log("");
+  log("  Copy that address into Safari, Chrome, or any browser.");
+  log("  It works on other Wi‑Fi networks and on mobile data too.");
+  log("");
+  log(`  (On this computer only, you can also use: ${localUrl})`);
+  log("");
+  log("  Sign in with the invitation password from your invite.");
+  log("  (Passwords live in src/config/settings.js if you need a reminder.)");
+  log("");
+  log("  Keep THIS window open while you browse.");
+  log("  Closing it (or pressing Ctrl+C) turns the public link off.");
+  log("");
+  log(line);
+  log("");
+}
+
 async function main() {
   process.chdir(ROOT);
   mkdirSync(TOOLS, { recursive: true });
 
-  banner([
-    "Kazimir & Megan — local site + Cloudflare Tunnel",
-    "This window must stay open while you test.",
-    "Press Ctrl+C to stop.",
-  ]);
+  log("");
+  log("  ♡  Kazimir & Megan — wedding site launcher");
+  log("  A little setup, then a link you can open anywhere.");
+  log("");
 
-  const nodeInfo = await resolveNode(log);
+  const nodeInfo = await resolveNode(friendlyLog);
   if (!nodeInfo.npm) {
     const paths = portableNodePaths();
     nodeInfo.npm = paths.npm;
@@ -231,30 +284,40 @@ async function main() {
   }
 
   runNpmInstall(nodeInfo);
-  const cloudflaredBin = await ensureCloudflared(log);
+  const cloudflaredBin = await ensureCloudflared(friendlyLog);
 
-  log("Starting local website (Vite)…");
+  log("  … Lighting the candles (starting the website)");
   const vite = startVite(nodeInfo);
 
   try {
-    await waitFor(() => vite.isReady(), 45000, "Vite to print its local URL");
+    await waitWithTips(
+      () => vite.isReady(),
+      45000,
+      "Waiting for the site to wake up"
+    );
   } catch {
-    log("Vite did not print a Local URL yet — probing the default port…");
+    /* HTTP probe below */
   }
 
   const port = vite.getPort();
   const localUrl = `http://127.0.0.1:${port}`;
   if (!(await waitForHttp(localUrl, 60000))) {
-    vite.child.kill("SIGTERM");
+    try {
+      vite.child.kill("SIGTERM");
+    } catch {}
     throw new Error(
-      `Local site did not become ready at ${localUrl}. Check the messages above.`
+      "The website didn’t start in time. Close other copies of this launcher and try again."
     );
   }
-  log(`Local site is up: ${localUrl}`);
+  log("  ✓ Website is awake on this computer");
 
-  log("Opening Cloudflare Tunnel (public HTTPS URL)…");
+  log("  … Opening a door to the internet");
   const tunnel = startTunnel(cloudflaredBin, port);
-  await waitFor(() => !!tunnel.getUrl(), 90000, "Cloudflare public URL");
+  await waitWithTips(
+    () => !!tunnel.getUrl(),
+    90000,
+    "Creating your shareable link"
+  );
   const publicUrl = tunnel.getUrl();
 
   writeFileSync(
@@ -263,45 +326,35 @@ async function main() {
     "utf8"
   );
 
-  banner([
-    "READY — open either address:",
-    "",
-    `  Phone / any device:  ${publicUrl}`,
-    `  This computer:       ${localUrl}`,
-    "",
-    "Sign in with the invitation password (see src/config/settings.js).",
-    "The public link works only while this window stays open.",
-    "URL also saved to: .tools/public-url.txt",
-  ]);
-
+  printReady(publicUrl, localUrl);
   openBrowser(publicUrl);
 
-  const shutdown = (signal) => {
-    log(`\nStopping (${signal})…`);
+  const shutdown = () => {
+    log("");
+    log("  Closing the site and the public link. Goodbye for now.");
+    log("");
     try {
       tunnel.child.kill("SIGTERM");
     } catch {}
     try {
       vite.child.kill("SIGTERM");
     } catch {}
-    setTimeout(() => process.exit(0), 500);
+    setTimeout(() => process.exit(0), 400);
   };
-  process.on("SIGINT", () => shutdown("SIGINT"));
-  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 
-  vite.child.on("exit", (code) => {
-    log(`Vite exited (code ${code}).`);
+  vite.child.on("exit", () => {
     try {
       tunnel.child.kill("SIGTERM");
     } catch {}
-    process.exit(code || 1);
+    process.exit(1);
   });
-  tunnel.child.on("exit", (code) => {
-    log(`Cloudflare Tunnel exited (code ${code}).`);
+  tunnel.child.on("exit", () => {
     try {
       vite.child.kill("SIGTERM");
     } catch {}
-    process.exit(code || 1);
+    process.exit(1);
   });
 
   if (process.stdin.isTTY) {
@@ -311,11 +364,12 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("\nSomething went wrong:");
-  console.error(err && err.stack ? err.stack : err);
-  console.error(
-    "\nIf this keeps happening, install Node.js 18+ from https://nodejs.org and try again."
-  );
+  console.error("");
+  console.error("  Something didn’t work — sorry about that.");
+  console.error(`  ${err && err.message ? err.message : err}`);
+  console.error("");
+  console.error("  Tip: install Node.js 18+ from https://nodejs.org and try again.");
+  console.error("");
   pauseOnError();
   process.exit(1);
 });

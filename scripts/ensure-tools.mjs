@@ -139,7 +139,7 @@ export function findSystemCloudflared() {
 
 function extractTarGz(archive, destDir) {
   mkdirSync(destDir, { recursive: true });
-  execFileSync("tar", ["-xzf", archive, "-C", destDir], { stdio: "inherit" });
+  execFileSync("tar", ["-xzf", archive, "-C", destDir], { stdio: "ignore" });
 }
 
 function extractZip(archive, destDir) {
@@ -152,12 +152,11 @@ function extractZip(archive, destDir) {
         "-Command",
         `Expand-Archive -Path '${archive.replace(/'/g, "''")}' -DestinationPath '${destDir.replace(/'/g, "''")}' -Force`,
       ],
-      { stdio: "inherit" }
+      { stdio: "ignore" }
     );
     return;
   }
-  // unzip if available
-  execFileSync("unzip", ["-o", archive, "-d", destDir], { stdio: "inherit" });
+  execFileSync("unzip", ["-o", archive, "-d", destDir], { stdio: "ignore" });
 }
 
 export async function ensurePortableNode(log = console.log) {
@@ -174,7 +173,6 @@ export async function ensurePortableNode(log = console.log) {
     `km-node-${Date.now()}.${paths.platform === "win32" ? "zip" : "tar.gz"}`
   );
   log(`Downloading Node.js ${NODE_VERSION}…`);
-  log(url);
   await download(url, tmp);
 
   const extractRoot = join(TOOLS, "_extract_node");
@@ -220,7 +218,6 @@ export async function ensureCloudflared(log = console.log) {
   const { platform, arch } = detectPlatform();
   const spec = cloudflaredDownload({ platform, arch });
   log("Downloading Cloudflare Tunnel (cloudflared)…");
-  log(spec.url);
 
   if (spec.kind === "bin") {
     const tmp = dest + ".partial";
