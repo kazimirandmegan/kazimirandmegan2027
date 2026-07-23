@@ -57,6 +57,18 @@ export function boot() {
     window.scrollTo(0,0);
   }
   window.addEventListener("hashchange", ()=>{ if(TIER) show(location.hash.replace("#","")); });
+  /* iOS Safari often swallows hash-link taps inside a transformed / overflow
+     drawer — route explicitly so Keepsakes → In-Flight Entertainment etc. work. */
+  document.querySelectorAll("nav.links a[href^='#']").forEach(a=>{
+    a.addEventListener("click", e=>{
+      const route = (a.getAttribute("href")||"").replace(/^#/,"");
+      if(!route) return;
+      e.preventDefault();
+      navSet(false);
+      if(location.hash.replace(/^#/,"") === route) show(route);
+      else location.hash = route;
+    });
+  });
 
   /* ---------- mobile drawer + accordion nav ---------- */
   function navSet(open){
@@ -227,6 +239,8 @@ export function boot() {
 
   /* ---------- petals & emoji confetti ---------- */
   const canvas = document.getElementById("petals"), ctx = canvas.getContext("2d");
+  canvas.style.pointerEvents = "none";
+  canvas.style.visibility = "hidden";
   let petals = [];
   function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
   resize(); addEventListener("resize", resize);
@@ -273,11 +287,21 @@ export function boot() {
     ensureLoop();
   }
   let rafOn = false;
-  function ensureLoop(){ if(!rafOn){ rafOn = true; requestAnimationFrame(loop); } }
+  function ensureLoop(){
+    if(!rafOn){
+      rafOn = true;
+      canvas.style.visibility = "visible";
+      requestAnimationFrame(loop);
+    }
+  }
   function loop(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     petals = petals.filter(p=>p.y < canvas.height+40);
-    if(!petals.length){ rafOn = false; return; }   /* idle: stop burning CPU */
+    if(!petals.length){
+      rafOn = false;
+      canvas.style.visibility = "hidden";
+      return;
+    }   /* idle: hide canvas so it can never steal taps on phones */
     for(const p of petals){
       p.x += p.vx + Math.sin(p.y/40)*.5; p.y += p.vy; p.rot += p.vr;
       ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
@@ -406,7 +430,8 @@ export function boot() {
   }
 
   const fab = document.getElementById("chat-fab"), panel = document.getElementById("chat-panel"),
-        log = document.getElementById("chat-log"), input = document.getElementById("chat-input");
+        log = document.getElementById("chat-log"), input = document.getElementById("chat-input"),
+        veil = document.getElementById("chat-veil");
   function addMsg(text, who){
     const d = document.createElement("div");
     d.className = "msg "+who; d.textContent = text;
@@ -418,13 +443,20 @@ export function boot() {
     addMsg(q, "user"); input.value = "";
     setTimeout(()=>addMsg(answer(q), "bot"), 420);
   }
-  function openChat(){
-    panel.classList.add("open");
-    fab.setAttribute("aria-expanded","true");
-    document.getElementById("chat-nudge").classList.remove("show");
-    store.set("km-nudge","seen");
-    seedChat();
+  function setChatOpen(on){
+    panel.classList.toggle("open", on);
+    fab.setAttribute("aria-expanded", on ? "true" : "false");
+    if(veil) veil.classList.toggle("show", on);
+    document.body.classList.toggle("chat-open", on);
+    if(on){
+      document.getElementById("chat-nudge").classList.remove("show");
+      store.set("km-nudge","seen");
+      seedChat();
+      setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 50);
+    }
   }
+  function openChat(){ setChatOpen(true); }
+  function closeChat(){ setChatOpen(false); }
   function seedChat(){
     if(log.childElementCount) return;
     addMsg("Hello"+(NAME && NAME!=="Guest" ? ", "+NAME : "")+"! I'm Connie 🌸 — your Concierge for Nuptials, Networking, Itineraries & Events. I know this whole website inside out, so ask me anything: trains, hotels, timings, dress codes, the Ukrainian traditions, day trips, even what a 'Spoons' is.", "bot");
@@ -441,21 +473,21 @@ export function boot() {
       chips.appendChild(b);
     });
   }
-  fab.addEventListener("click", ()=>{
-    if(panel.classList.contains("open")){
-      panel.classList.remove("open");
-      fab.setAttribute("aria-expanded","false");
-    } else openChat();
+  fab.addEventListener("click", e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    setChatOpen(!panel.classList.contains("open"));
   });
-  document.querySelectorAll(".open-chat").forEach(b=>b.addEventListener("click", openChat));
+  document.querySelectorAll(".open-chat").forEach(b=>b.addEventListener("click", e=>{
+    e.preventDefault();
+    openChat();
+  }));
   document.getElementById("nudge-close").addEventListener("click", ()=>{
     document.getElementById("chat-nudge").classList.remove("show");
     store.set("km-nudge","seen");
   });
-  document.getElementById("chat-close").addEventListener("click", ()=>{
-    panel.classList.remove("open");
-    fab.setAttribute("aria-expanded","false");
-  });
+  document.getElementById("chat-close").addEventListener("click", closeChat);
+  if(veil) veil.addEventListener("click", closeChat);
   document.getElementById("chat-send").addEventListener("click", ()=>send());
   input.addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
 
@@ -1285,8 +1317,10 @@ export function boot() {
      PATRIOT MODE 🇺🇸 — the homesickness protocol (For Americans)
      ============================================================ */
   (function(){
-    const btn = document.getElementById("usa-btn"); if(!btn) return;
+    const btn = document.getElementById("usa-btn");
     const modal = document.getElementById("flag-modal");
+    const pledge = document.getElementById("pledge-btn");
+    if(!btn || !modal || !pledge) return;
     btn.addEventListener("click", ()=>{
       emojiBurst(["🇺🇸","🦅","🎆","⭐"], 42);
       document.body.classList.add("patriot");
@@ -1296,7 +1330,7 @@ export function boot() {
         modal.classList.add("open");
       }, 3200);
     });
-    document.getElementById("pledge-btn").addEventListener("click", ()=>{
+    pledge.addEventListener("click", ()=>{
       modal.classList.remove("open");
       emojiBurst(["🎆","🎇","🦅"], 30);
       toast("🦅 God bless. Now back to the phrasebook — it says trousers.");
@@ -1435,7 +1469,8 @@ export function boot() {
   }
   function xwInit(){
     const grid = document.getElementById("xw"); if(!grid || grid.childElementCount) return;
-    grid.style.gridTemplateColumns = "repeat("+XW_C+", 34px)";
+    const cellPx = matchMedia("(max-width:640px)").matches ? 40 : 34;
+    grid.style.gridTemplateColumns = "repeat("+XW_C+", "+cellPx+"px)";
     const used = {}, nums = {};
     XW_WORDS.forEach(w=>{ xwEach(w,(r,c)=>{ used[r+","+c]=true; }); nums[w.r+","+w.c] = w.n; });
     let saved = {}; try{ saved = JSON.parse(lstore.get("km-xw")||"{}"); }catch(e){}

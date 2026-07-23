@@ -1,6 +1,6 @@
 /* Gate, navigation, page shell, footer, header */
 /* ---------- password gate ---------- */
-#gate{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--ivory);padding:1.2rem;overflow:auto}
+#gate{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--ivory);padding:max(1.2rem,env(safe-area-inset-top,0px)) max(1.2rem,env(safe-area-inset-right,0px)) max(1.2rem,env(safe-area-inset-bottom,0px)) max(1.2rem,env(safe-area-inset-left,0px));overflow:auto}
 #gate .gate-card{background:var(--card);border:1px solid var(--rule);outline:1px solid var(--rule);outline-offset:6px;max-width:430px;width:100%;padding:2.6rem 2rem 2.2rem;text-align:center;box-shadow:var(--shadow);position:relative;margin:auto}
 #gate h1{font-size:2.05rem;color:var(--peri-deep);margin:.6rem 0 .2rem}
 #gate .amp{font-style:italic}
@@ -15,6 +15,9 @@
 
 /* ---------- nav ---------- */
 header{position:sticky;top:0;z-index:200;background:rgba(246,243,234,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+@media (max-width:1024px){
+  header{z-index:1160}
+}
 .nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.2rem;gap:1rem}
 .monogram{display:flex;align-items:center;gap:.7rem;text-decoration:none;cursor:pointer;background:none;border:none;flex:none}
 .seal{width:44px;height:44px;flex:none}
@@ -23,7 +26,7 @@ nav.links{display:flex;gap:1rem;flex-wrap:wrap;justify-content:flex-end;row-gap:
 nav.links a{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;color:var(--ink-soft);padding:.3rem 0;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap}
 nav.links a:hover{color:var(--peri-deep)}
 nav.links a.active{color:var(--peri-deep);border-bottom-color:var(--gold-soft)}
-#menu-btn{display:none;background:none;border:1px solid var(--rule);padding:.5rem .8rem;cursor:pointer;color:var(--ink);font-family:inherit;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;align-items:center;gap:.55rem;transition:border-color .2s}
+#menu-btn{display:none;background:none;border:1px solid var(--rule);padding:.55rem .85rem;min-height:44px;cursor:pointer;color:var(--ink);font-family:inherit;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;align-items:center;gap:.55rem;transition:border-color .2s}
 #menu-btn:hover{border-color:var(--gold-soft)}
 .mb-box{display:inline-flex;flex-direction:column;justify-content:center;gap:4px;width:18px}
 .mb-box span{display:block;height:1.5px;background:var(--ink);transition:transform .28s ease,opacity .2s ease}
@@ -31,9 +34,10 @@ nav.links a.active{color:var(--peri-deep);border-bottom-color:var(--gold-soft)}
 #menu-btn.is-open .mb-box span:nth-child(2){opacity:0}
 #menu-btn.is-open .mb-box span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
 .drawer-head{display:none}
-#nav-veil{position:fixed;inset:0;z-index:190;background:rgba(65,80,122,.32);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s ease}
+#nav-veil{position:fixed;inset:0;z-index:1150;background:rgba(65,80,122,.32);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s ease}
 #nav-veil.show{opacity:1;pointer-events:auto}
 body.nav-locked{overflow:hidden}
+body.chat-open{overflow:hidden;touch-action:none}
 @media (max-width:1024px){
   /* backdrop-filter on the header would trap the fixed drawer inside
      it, so on phones the header goes near-opaque instead */
@@ -41,10 +45,10 @@ body.nav-locked{overflow:hidden}
   #menu-btn{display:inline-flex}
   /* the drawer: slides in from the right, never wider than the screen,
      scrolls vertically, works in portrait AND landscape */
-  nav.links{position:fixed;top:0;right:0;bottom:0;z-index:400;width:min(340px,88vw);max-width:100%;background:var(--card);border-left:1px solid var(--rule);box-shadow:-24px 0 60px -30px rgba(65,80,122,.45);flex-direction:column;align-items:stretch;gap:0;padding:0 1.3rem calc(1.4rem + env(safe-area-inset-bottom));overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transform:translateX(105%);transition:transform .32s cubic-bezier(.22,.9,.3,1);visibility:hidden}
+  nav.links{position:fixed;top:0;right:0;bottom:0;z-index:1200;width:min(340px,88vw);max-width:100%;background:var(--card);border-left:1px solid var(--rule);box-shadow:-24px 0 60px -30px rgba(65,80,122,.45);flex-direction:column;align-items:stretch;gap:0;padding:0 1.3rem calc(1.4rem + env(safe-area-inset-bottom));overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transform:translateX(105%);transition:transform .32s cubic-bezier(.22,.9,.3,1);visibility:hidden}
   nav.links.open{transform:none;visibility:visible}
   .drawer-head{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);padding:1rem 0 .8rem;border-bottom:1px solid var(--rule);z-index:2}
-  #drawer-close{background:none;border:none;cursor:pointer;color:var(--ink-soft);font-size:1.7rem;line-height:1;padding:.1rem .3rem;font-family:inherit}
+  #drawer-close{background:none;border:none;cursor:pointer;color:var(--ink-soft);font-size:1.7rem;line-height:1;padding:.55rem;min-width:44px;min-height:44px;font-family:inherit;display:inline-flex;align-items:center;justify-content:center}
   nav.links a{padding:.85rem .2rem;border-bottom:1px solid var(--rule);font-size:.82rem;white-space:normal}
   /* flex column items default to min-width:auto, which lets a wide child
      push past the drawer in landscape — pin every direct child to the
@@ -56,6 +60,9 @@ body.nav-locked{overflow:hidden}
 
 /* ---------- page shell ---------- */
 main{position:relative;z-index:1}
+@media (max-width:1024px){
+  main{padding-bottom:calc(4.5rem + env(safe-area-inset-bottom,0px))}
+}
 .page{display:none;animation:fadeUp .5s ease both}
 .page.visible{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -96,15 +103,15 @@ p{margin:.6rem 0}
 .rsvp-guest-top{display:flex;gap:.7rem;align-items:flex-end;flex-wrap:wrap}
 .rsvp-guest-top .rsvp-l{flex:1 1 200px;margin:.2rem 0}
 .rsvp-guest h5{font-family:"Cormorant Garamond",serif;font-size:1.08rem;color:var(--gold-ink);margin:0 0 .3rem;font-weight:500}
-.rsvp-child{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--ink-soft);white-space:nowrap;padding-bottom:.55rem}
+.rsvp-child{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--ink-soft);padding-bottom:.55rem}
 .rsvp-diet{margin-top:.7rem}
 .rsvp-diet-lab{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:.4rem}
 .rsvp-diet-grid{display:flex;flex-wrap:wrap;gap:.35rem .7rem}
 .rsvp-check{display:flex;align-items:flex-start;gap:.5rem;font-size:.9rem;color:var(--ink);margin:.4rem 0;cursor:pointer;line-height:1.4}
-.rsvp-check input{margin-top:.2rem;flex:none;width:16px;height:16px;accent-color:var(--peri-deep)}
-.rsvp-diet-grid .rsvp-check{flex:0 1 auto;margin:.15rem 0;padding:.25rem .55rem;border:1px solid var(--rule);background:#fff}
+.rsvp-check input{margin-top:.15rem;flex:none;width:20px;height:20px;accent-color:var(--peri-deep)}
+.rsvp-diet-grid .rsvp-check{flex:0 1 auto;margin:.15rem 0;padding:.4rem .65rem;border:1px solid var(--rule);background:#fff;min-height:44px;align-items:center}
 .rsvp-diet-grid .rsvp-check input:checked~span{color:var(--peri-deep);font-weight:500}
-.rsvp-other-in{margin-top:.4rem;width:100%;padding:.5rem .7rem;font-family:inherit;font-size:.92rem;border:1px solid var(--rule);background:#fff;color:var(--ink)}
+.rsvp-other-in{margin-top:.4rem;width:100%;padding:.65rem .7rem;font-family:inherit;font-size:16px;border:1px solid var(--rule);background:#fff;color:var(--ink)}
 .rsvp-events .rsvp-check{padding:.55rem .3rem;border-bottom:1px dotted var(--rule)}
 .rsvp-events .rsvp-check:last-child{border-bottom:none}
 .rsvp-err{color:#A2543F;font-size:.9rem;min-height:1.2em;margin:.3rem 0 .6rem;font-style:italic}
@@ -117,6 +124,9 @@ p{margin:.6rem 0}
 @media (max-width:560px){
   .rsvp-fs{padding:1rem 1rem 1.1rem}
   .rsvp-guest-top .rsvp-l{flex:1 1 100%}
+  #gate .gate-card{padding:2rem 1.25rem 1.8rem}
+  .countdown{padding:.9rem .3rem}
+  .cd-lab{letter-spacing:.18em;font-size:.55rem}
 }
 .info-card h4{margin-top:0;display:flex;align-items:center;gap:.5rem}
 .btn{display:inline-block;text-decoration:none;cursor:pointer;border:none;font-family:"Cormorant Garamond",serif;font-size:.95rem;letter-spacing:.26em;text-transform:uppercase;padding:.85rem 1.9rem;transition:background .2s,color .2s,border-color .2s,transform .15s ease,box-shadow .2s ease;text-align:center;will-change:transform}
@@ -127,9 +137,11 @@ p{margin:.6rem 0}
 .btn.primary:hover{background:var(--ink);box-shadow:0 10px 24px -14px rgba(65,80,122,.55)}
 .btn.ghost{background:transparent;color:var(--peri-deep);border:1px solid var(--peri)}
 .btn.ghost:hover{background:var(--peri);color:#fff}
-/* gentle lift on the content cards */
+/* gentle lift on the content cards — fine pointer only (avoids sticky hover on phones) */
 .fun-card,.game-card{transition:transform .25s ease,box-shadow .25s ease}
-.fun-card:hover,.game-card:hover{transform:translateY(-2px);box-shadow:0 16px 36px -22px rgba(65,80,122,.35)}
+@media (hover:hover) and (pointer:fine){
+  .fun-card:hover,.game-card:hover{transform:translateY(-2px);box-shadow:0 16px 36px -22px rgba(65,80,122,.35)}
+}
 /* reveal-on-scroll (class added by JS; skipped entirely when the
    visitor prefers reduced motion) */
 .rev{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
@@ -145,7 +157,7 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .countdown{display:flex;align-items:stretch;gap:0;justify-content:center;margin:2rem auto .6rem;flex-wrap:wrap;max-width:640px;background:#fff;border:1px solid var(--gold-soft);box-shadow:var(--shadow);padding:1.1rem clamp(.4rem,2.5vw,1.2rem);position:relative;cursor:pointer}
 .countdown::after{content:"";position:absolute;inset:5px;border:1px solid var(--rule);pointer-events:none}
 .countdown::before{content:"❀";position:absolute;top:-0.72em;left:50%;transform:translateX(-50%);background:var(--ivory);color:var(--gold);padding:0 .55rem;font-size:.95rem;line-height:1}
-.cd-cell{text-align:center;min-width:clamp(64px,17vw,110px);padding:.35rem .2rem;position:relative}
+.cd-cell{text-align:center;min-width:clamp(56px,16vw,110px);padding:.35rem .2rem;position:relative;flex:1 1 auto}
 .cd-cell + .cd-cell::before{content:"";position:absolute;left:0;top:16%;bottom:16%;width:1px;background:linear-gradient(transparent,var(--gold-soft),transparent)}
 .cd-num{font-family:"Cormorant Garamond",serif;font-size:clamp(2.2rem,6vw,3rem);color:var(--peri-deep);line-height:1;font-variant-numeric:tabular-nums;font-weight:500}
 .cd-lab{font-size:.6rem;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-ink);margin-top:.45rem}
@@ -159,7 +171,6 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .hero-date .hd-ord{font-size:.55em;vertical-align:super;letter-spacing:.05em;color:var(--gold-ink)}
 .hero-names{font-size:clamp(2.5rem,8vw,4.6rem);text-align:center;letter-spacing:.08em;margin:.6rem 0 .2rem}
 .hero-names .amp{font-style:italic;color:var(--gold);letter-spacing:0}
-.hero-date{text-align:center;font-size:1.05rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);margin:.8rem 0 .1rem}
 .hero-loc{text-align:center;font-style:italic;color:var(--ink-soft)}
 
 /* wedding-day timeline */
@@ -181,11 +192,11 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .wcal td button{display:block;width:100%;height:100%;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--ink);padding:.35rem .2rem;text-align:center;transition:background .15s}
 .wcal td button:hover{background:rgba(147,168,216,.14)}
 .wcal .wc-day{font-family:"Cormorant Garamond",serif;font-size:1.25rem;color:var(--peri-deep);line-height:1.05;display:block}
-.wcal .wc-ev{display:block;font-size:.58rem;letter-spacing:.03em;color:var(--ink-soft);line-height:1.3;margin-top:.18rem;overflow:hidden}
+.wcal .wc-ev{display:block;font-size:.58rem;letter-spacing:.03em;color:var(--ink-soft);line-height:1.3;margin-top:.18rem;overflow:hidden;overflow-wrap:anywhere;word-break:break-word}
 .wcal td.big{background:rgba(179,148,92,.12);border-color:var(--gold-soft)}
 .wcal td.big .wc-day{color:var(--gold-ink);font-weight:600}
 .wcal td.big .wc-ev{color:var(--gold-ink)}
-@media(max-width:560px){.wcal td{height:58px}.wcal .wc-ev{font-size:.5rem}.wcal-title{font-size:1.1rem}}
+@media(max-width:560px){.wcal td{height:auto;min-height:58px}.wcal .wc-ev{font-size:.65rem}.wcal-title{font-size:1.1rem}.wcal th{font-size:.52rem;letter-spacing:.12em}}
 
 /* festivities week ribbon */
 .fest{position:relative;margin:1.6rem 0;padding-left:86px}
@@ -201,7 +212,7 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .fest-card .fc-sub{font-style:italic;color:var(--ink-soft);font-size:.93rem;margin:.15rem 0 .6rem}
 .fest-ev{display:flex;gap:.8rem;padding:.5rem 0;border-top:1px dotted var(--rule);font-size:.97rem;align-items:baseline}
 .fest-ev .fe-t{flex:none;width:5.4rem;font-family:"Cormorant Garamond",serif;color:var(--gold-ink);font-size:1.02rem;letter-spacing:.04em}
-.tag{display:inline-block;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;background:var(--blush);color:#8A6A55;padding:.12rem .5rem;margin-left:.35rem;vertical-align:middle;white-space:nowrap}
+.tag{display:inline-block;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;background:var(--blush);color:#8A6A55;padding:.12rem .5rem;margin-left:.35rem;vertical-align:middle}
 /* big-day variant: the medal shows a time instead of a date */
 .fest.bd .medal .dn{font-size:.92rem;letter-spacing:.02em;text-align:center;line-height:1.15;padding:0 .2rem}
 .fest.bd .fest-card .fc-sub{margin-bottom:.1rem}
@@ -212,10 +223,12 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
   .fest-day .medal{left:-64px;width:50px;height:50px}
   .fest-day .medal .dn{font-size:1.15rem}
   .fest-ev{flex-direction:column;gap:.1rem}
+  .fest-ev .fe-t{width:auto}
+  .tag{white-space:normal;margin:.2rem 0 0;display:inline}
 }
 
 /* departure board */
-.board{background:#20263B;color:#F4C64D;font-family:"Courier New",monospace;padding:1.2rem 1.3rem;margin:1.2rem 0;border:6px solid #171B2B;overflow-x:auto}
+.board{background:#20263B;color:#F4C64D;font-family:"Courier New",monospace;padding:1.2rem 1.3rem;margin:1.2rem 0;border:6px solid #171B2B;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .board .board-top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:.7rem}
 .board h4{color:#fff;font-family:"Courier New",monospace;letter-spacing:.2em;font-size:.85rem;margin:0}
 .board .clock{color:#7FD98B;font-size:1rem;letter-spacing:.14em}
@@ -243,7 +256,7 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .quiz-opts button.right{background:#E7EFDF;border-color:var(--sage-deep)}
 .quiz-opts button.wrong{background:#F4E3DC;border-color:#C08A72}
 .quiz-fb{min-height:1.4em;font-style:italic;font-size:.95rem;margin-top:.6rem;color:var(--ink-soft)}
-.phrase-table{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:.8rem}
+.phrase-table{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:0;min-width:480px}
 .phrase-table th{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink);text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--rule)}
 .phrase-table td{padding:.5rem .6rem;border-bottom:1px dotted var(--rule);vertical-align:top}
 .weather-meter{margin:1rem 0 .4rem}

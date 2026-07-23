@@ -20,6 +20,7 @@
 <button id="chat-fab" type="button" aria-expanded="false" aria-controls="chat-panel" aria-label="Ask Connie, the wedding concierge">
   <span class="fab-ico">🌸</span><span class="fab-label">Ask Connie</span>
 </button>
+<div id="chat-veil"></div>
 <div id="chat-panel" role="dialog" aria-label="Connie, the wedding concierge">
   <div id="chat-head"><span class="ch-t">Connie · Concierge</span><button id="chat-close" type="button" aria-label="Close">✕</button></div>
   <div id="chat-log"></div>
@@ -31,6 +32,23 @@
 </div>
 
 <div id="bus-run" aria-hidden="true">🚌</div>
+
+<div id="flag-modal" role="dialog" aria-modal="true" aria-label="American flag of comfort">
+  <div class="flag-card">
+    <svg viewBox="0 0 190 100" aria-hidden="true">
+      <rect width="190" height="100" fill="#B22234"/>
+      <rect y="7.7" width="190" height="7.7" fill="#fff"/>
+      <rect y="23.1" width="190" height="7.7" fill="#fff"/>
+      <rect y="38.5" width="190" height="7.7" fill="#fff"/>
+      <rect y="53.8" width="190" height="7.7" fill="#fff"/>
+      <rect y="69.2" width="190" height="7.7" fill="#fff"/>
+      <rect y="84.6" width="190" height="7.7" fill="#fff"/>
+      <rect width="76" height="53.8" fill="#3C3B6E"/>
+    </svg>
+    <p class="pledge">There. Breathe. The eagle has landed (temporarily).</p>
+    <button class="btn usa" id="pledge-btn" type="button">I'm okay now</button>
+  </div>
+</div>
 
 <div id="tp-overlay" role="dialog" aria-modal="true" aria-label="Bridal party stat card">
   <div class="tp-big">
