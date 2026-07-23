@@ -1,0 +1,39 @@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <g id="waxseal">
+    <circle cx="30" cy="30" r="27" fill="#B3945C"/>
+    <circle cx="30" cy="30" r="27" fill="url(#sealshine)"/>
+    <path d="M30 4c4 3 8 2 11 5-2 4 1 7-2 10 4 1 9 4 9 11s-5 10-9 11c3 3 0 6 2 10-3 3-7 2-11 5-4-3-8-2-11-5 2-4-1-7 2-10-4-1-9-4-9-11s5-10 9-11c-3-3 0-6-2-10 3-3 7-2 11-5z" fill="none" stroke="#9C7E48" stroke-width="1" opacity=".6"/>
+    <circle cx="30" cy="30" r="21" fill="none" stroke="#F0E4CA" stroke-width=".8" opacity=".8"/>
+    <text x="30" y="36.5" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="17" fill="#F7F0DE" letter-spacing="1">K·M</text>
+  </g>
+  <radialGradient id="sealshine" cx=".35" cy=".3" r=".9">
+    <stop offset="0" stop-color="#D9C08B" stop-opacity=".85"/><stop offset=".5" stop-color="#B3945C" stop-opacity="0"/>
+    <stop offset="1" stop-color="#8A6F3F" stop-opacity=".5"/>
+  </radialGradient>
+  <g id="hyd">
+    <g opacity=".9">
+      <circle cx="0" cy="-9" r="6.5" fill="#A9BCE4"/><circle cx="8.5" cy="-3" r="6.5" fill="#93A8D8"/>
+      <circle cx="5.5" cy="7" r="6.5" fill="#B9C8EA"/><circle cx="-5.5" cy="7" r="6.5" fill="#8FA3D2"/>
+      <circle cx="-8.5" cy="-3" r="6.5" fill="#A2B4DF"/><circle cx="0" cy="0" r="5.5" fill="#C3CFEC"/>
+      <circle cx="0" cy="-9" r="1.1" fill="#F6F3EA"/><circle cx="8.5" cy="-3" r="1.1" fill="#F6F3EA"/>
+      <circle cx="5.5" cy="7" r="1.1" fill="#F6F3EA"/><circle cx="-5.5" cy="7" r="1.1" fill="#F6F3EA"/>
+      <circle cx="-8.5" cy="-3" r="1.1" fill="#F6F3EA"/><circle cx="0" cy="0" r="1.1" fill="#F6F3EA"/>
+    </g>
+  </g>
+  <g id="cornerspray">
+    <path d="M8 8 C 40 20, 70 40, 96 92" stroke="#9AA98B" stroke-width="2" fill="none" opacity=".7"/>
+    <path d="M8 8 C 26 40, 44 66, 92 96" stroke="#7C8B6E" stroke-width="1.4" fill="none" opacity=".6"/>
+    <g opacity=".85">
+      <ellipse cx="52" cy="34" rx="12" ry="5" fill="#9AA98B" transform="rotate(30 52 34)"/>
+      <ellipse cx="34" cy="52" rx="12" ry="5" fill="#AEBB9F" transform="rotate(60 34 52)"/>
+      <ellipse cx="74" cy="58" rx="11" ry="4.5" fill="#8B9A7C" transform="rotate(35 74 58)"/>
+      <ellipse cx="58" cy="76" rx="11" ry="4.5" fill="#A3B194" transform="rotate(65 58 76)"/>
+    </g>
+    <use href="#hyd" transform="translate(24 22) scale(1.05)"/>
+    <use href="#hyd" transform="translate(58 14) scale(.8)"/>
+    <use href="#hyd" transform="translate(16 58) scale(.85)"/>
+    <use href="#hyd" transform="translate(88 84) scale(.7)"/>
+  </g>
+</defs>
+</svg>

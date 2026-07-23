@@ -1,10 +1,10 @@
 # Photo Checklist — every image the website looks for
 
 This is the master list of photo files the site expects. Drop the matching
-files into the **same folder as `index.html`** before you redeploy to Netlify,
-and the pictures appear automatically. Any file that isn't there simply stays
-hidden — nothing breaks, so you can add photos in batches over time.
-
+files into the **`public/`** folder (next to where `images_*.jpg` names are
+referenced) before you build and redeploy to Netlify, and the pictures appear
+automatically. Any file that isn't there simply stays hidden — nothing breaks,
+so you can add photos in batches over time.
 ## The two golden rules
 
 1. **Flat names, no folders.** Every filename starts with `images_` and has

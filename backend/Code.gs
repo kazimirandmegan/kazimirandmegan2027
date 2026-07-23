@@ -24,7 +24,7 @@
    It vanishes from the site on the next refresh.
    ============================================================ */
 
-/* Must match SETTINGS.cloudKey in index.html. This is light
+/* Must match SETTINGS.cloudKey in src/config/settings.js. This is light
    protection against random bots, not real security — the site is
    already behind its password gate. */
 const SECRET_KEY = "hydrangea";

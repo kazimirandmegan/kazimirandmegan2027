@@ -1,38 +1,42 @@
 # Developer Notes — Kazimir & Megan wedding website
 
 For any developer reviewing or extending this codebase. Written to be read in
-ten minutes.
+ten minutes. For a plain-language overview (including how to run locally),
+start with the root [README.md](../README.md).
 
 ## Architecture in one paragraph
 
-A single static file, `index.html` (~216KB), no build step, no framework, no
-server. Vanilla JS in one IIFE at the bottom; CSS custom-property design
-system in one `<style>` block; inline SVG artwork reused via `<defs>/<use>`.
-Optional sidecar files: `wall.json` (guestbook data) and an `images/` folder.
+Vite + vanilla JS SPA. Source lives under `src/`; `npm run build` emits static
+files to `dist/` for Netlify. Pages are HTML partials under `src/pages/`
+included into `src/index.html` at build/dev time. CSS is split under
+`src/css/`. Owner-editable config is `src/config/settings.js`. Interactive
+behaviour boots from `src/main.js` → `src/js/app.js`, with helpers in
+`src/js/*` and editable lists in `src/data/`. Optional sidecar files in
+`public/`: `wall.json` (guestbook fallback) and flat `images_*.jpg` photos.
 External runtime dependencies (all optional, all degrade gracefully): Google
-Fonts, Leaflet 1.9.4 + OpenStreetMap tiles (map), open-meteo.com (weather),
-Spotify embeds (playlists). Host anywhere static (Netlify drag-and-drop is
-the assumed target). Client state lives in `sessionStorage` (auth tier, per
-tab) and `localStorage` (name, journals, guestbook pins, game scores, hunt
-progress) via the guarded `store`/`lstore` wrappers — safe in private
-browsing.
+Fonts, Leaflet 1.9.4 + OpenStreetMap tiles, open-meteo.com (weather), Spotify
+embeds. Client state lives in `sessionStorage` (auth tier, per tab) and
+`localStorage` (name, guestbook pins, game scores, hunt progress) via the
+guarded `store`/`lstore` wrappers in `src/js/storage.js`.
 
-## The file's map
+## Project map
 
-1. `<head>` → **SETTINGS** object: every value the owner edits (passwords,
-   RSVP links, guests, playlists, travels, matchBoard, guestbookWall,
-   guestSheetCsv, photoAlbum, supportLink). Then all CSS.
-2. `<body>` → SVG defs, noscript fallback, password gate (`#gate`, a real
-   `<form>`), grouped dropdown nav, ~19 `<section class="page">` blocks
-   (hash-routed), footer, chat concierge, game overlays.
-3. `<script>` (one IIFE) → in order: storage wrappers · `ACCESS` tier map ·
-   router `show()` · tier filter `applyTier()` · gate · countdown/ICS ·
-   toasts/petals canvas · easter eggs · quiz · concierge (`KB` array) ·
-   weather · Leaflet map (`PLACES`) · dashboard + Google Sheets fetch ·
-   guestbook (wall.json, image compression) · playlists · Top Trumps
-   (`PARTY`) · bus · tabs · pin board (`SETTINGS.travels`) · Buddy Board ·
-   hunt (`HUNT`) · crossword (`XW_WORDS`) · Kiko Dash (`kdInit`).
-   Every block has a banner comment; owner-editable data is marked `✏️ EDIT`.
+1. **`src/config/settings.js`** — passwords, wedding date, contact links,
+   guests, playlists, matchBoard, guestbookWall, cloudUrl / cloudKey, CSV
+   fallbacks.
+2. **`src/pages/*.html`** — one file per hash route (`#home` → `home.html`,
+   etc.), each a `<section class="page" id="page-…">` (optional `data-tier`).
+3. **`src/partials/` + `src/index.html`** — gate, nav, footer, Connie, overlays;
+   Vite HTML-include plugin expands `<!-- include:… -->`.
+4. **`src/css/`** — tokens, base, layout, components, effects.
+5. **`src/js/app.js`** — gate, router, tier filter, RSVP, guestbook, maps,
+   Connie, games orchestration. Supporting modules: `storage.js`, `cloud.js`,
+   `tier.js`, plus smaller helpers and `games/`.
+6. **`src/data/`** — QUIZ, KB/SYN, PARTY, HUNT, XW_WORDS, map pins, RSVP
+   event/diet lists (marked for editing).
+7. **`backend/Code.gs`** — optional Google Apps Script (Sheets + Drive).
+8. **`public/`** — static assets copied into `dist/` (photos, optional
+   `wall.json`).
 
 ## Auth & tiering (important caveat)
 
@@ -40,7 +44,7 @@ Three shared passwords in `SETTINGS.passwords` map to tiers `full | vinko |
 afterparty`. At unlock, `applyTier()` **removes** every element whose
 `data-tier` attribute excludes the tier (including whole page sections), and
 the router refuses non-tier routes. The guest's **name** (free text at the
-gate) personalises greetings, dashboard, games and the concierge; it is
+gate) personalises greetings, games and the concierge; it is
 identity, not authentication. **This is front-door privacy only**: passwords
 and gated content are readable in the page source. If real separation is ever
 required: host-level protection (Netlify) or one deployment per tier.
@@ -83,10 +87,11 @@ into `SETTINGS.guestSheetCsv`. On load the site fetches and parses it
 for dashboard personalisation. Failure falls back silently to the inline
 list. Matching is by normalised name (case/space-insensitive `norm()`).
 
-**Guestbook at scale.** Permanent wall = `wall.json` beside index.html
+**Guestbook at scale.** Permanent wall = `wall.json` in `public/`
 (array of `{who, type: memory|advice|wish, text, img?}`); falls back to
 `SETTINGS.guestbookWall` if the fetch fails (including on `file://`).
-Photos are files in `images/`, never inlined. Rendering batches 24 with a
+Photos are files in `public/` with flat `images_*.jpg` names,
+never inlined. Rendering batches 24 with a
 "Show more" button; images are `loading="lazy"`. Guest-side pins are
 canvas-downscaled to ≤900px JPEG q0.78 before `localStorage` (cap: 20,
 oldest evicted; photo dropped with a toast if quota still hit). Submission
@@ -124,21 +129,22 @@ not the raw file.
 
 ## Testing & deployment
 
-Tested headless-Chromium at 1280px and 390px, all three tiers: routing, tier
-DOM-removal, gate (Enter key, case/space fuzz), dashboard persistence across
-reload, guestbook pin/quota path, crossword reveal/check, runner loop, full
-hunt completion, tabs, pin board, zero horizontal overflow, zero console
-errors. No automated suite ships in the repo; the Playwright script used is
-reproducible from these notes. Deploy: drag the folder (index.html,
-wall.json, images/) to Netlify; every edit is a re-drag. Filenames are
-case-sensitive once hosted.
+Tested historically headless-Chromium at 1280px and 390px, all three tiers:
+routing, tier DOM-removal, gate (Enter key, case/space fuzz), guestbook
+pin/quota path, crossword reveal/check, runner loop, full hunt completion,
+tabs, zero horizontal overflow. No automated suite ships in the repo.
+
+**Local:** `npm install` → `npm run dev`.  
+**Production:** `npm run build`, then deploy `dist/` to Netlify (see
+`netlify.toml`). Put photos and optional `wall.json` in `public/` so they
+are copied into `dist/`. Filenames are case-sensitive once hosted.
 
 ## Known debts (deliberate)
 
-Single-file constraint keeps content in HTML (owner-friendly, developer-
-noisy). The concierge KB duplicates page facts — update both. `mailto:`
-flows depend on a configured mail client. Crossword has no keyboard
-auto-advance. The pin-board world map is intentionally not a projection.
+The concierge KB duplicates page facts — update both. `mailto:` flows
+depend on a configured mail client. Crossword has no keyboard auto-advance.
+Interactive behaviour is still largely orchestrated in `src/js/app.js`
+(helpers are split out; further modularisation is welcome).
 
 ---
 
@@ -146,7 +152,7 @@ auto-advance. The pin-board world map is intentionally not a projection.
 
 ## The live cloud (replaces the CSV/Form pattern when configured)
 
-`Code.gs` is a Google Apps Script web app bound to a spreadsheet, deployed
+`backend/Code.gs` is a Google Apps Script web app bound to a spreadsheet, deployed
 "execute as me / anyone has access". Endpoints:
 
 - `GET  ?action=guestbook|scores|songs|ping&key=…` → `{ok, data}` JSON.

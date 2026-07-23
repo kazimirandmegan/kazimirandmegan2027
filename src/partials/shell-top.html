@@ -1,0 +1,103 @@
+<canvas id="petals" aria-hidden="true"></canvas>
+<div id="toast" role="status"></div>
+
+<!-- ================= PASSWORD GATE ================= -->
+<div id="gate">
+  <div class="gate-card">
+    <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <svg class="corner br" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <svg width="52" height="52" viewBox="0 0 60 60" style="margin:0 auto"><use href="#waxseal"/></svg>
+    <div class="small-caps" style="margin-top:1rem">You are warmly invited</div>
+    <h1>Kazimir <span class="amp">&amp;</span> Megan</h1>
+    <div class="small-caps blue">May 2027 · St Albans</div>
+    <p>Sign in with your name and the password from your invitation.</p>
+    <!-- A real <form> so phone keyboards' Go/Return key submits natively -->
+    <form id="gate-form" autocomplete="off" novalidate>
+      <input id="gname" type="text" placeholder="Your name" autocomplete="name"
+             autocapitalize="words" aria-label="Your name" style="margin-bottom:.5rem">
+      <input id="pw" type="password" placeholder="Password" autocomplete="off"
+             autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Website password">
+      <button id="pw-btn" type="submit">Enter</button>
+    </form>
+    <div class="gate-err" id="pw-err" role="alert"></div>
+    <div class="gate-hint">Capitals and spaces don't matter in the password. Lost it? Write to us — details are on your invitation.<br>
+    <span style="opacity:.85">If the button does nothing at all, you're likely in a file preview — open the site's web link in Safari or Chrome.</span></div>
+  </div>
+</div>
+
+<!-- ================= NAVIGATION =================
+     Each link has data-tier: which guest tiers can see it. -->
+<header id="site-header" style="display:none">
+  <div class="nav-inner">
+    <button class="monogram" id="seal-btn" title="A little surprise…">
+      <svg class="seal" viewBox="0 0 60 60"><use href="#waxseal"/></svg>
+      <span>K &amp; M</span>
+    </button>
+    <button id="menu-btn" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+      <span class="mb-box" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="mb-txt">Menu</span>
+    </button>
+    <nav class="links" id="nav-links">
+      <div class="drawer-head">
+        <span class="small-caps">K &amp; M · Menu</span>
+        <button type="button" id="drawer-close" aria-label="Close menu">×</button>
+      </div>
+      <a href="#home" data-tier="full vinko afterparty">Home</a>
+      <div class="ngroup">
+        <button class="ngroup-btn" type="button">Our Story <span class="car">▾</span></button>
+        <div class="nmenu">
+          <a href="#about" data-tier="full vinko afterparty">About Us</a>
+          <a href="#party" data-tier="full vinko afterparty">The Bridal Party</a>
+          <a href="#generations" data-tier="full vinko afterparty">Generations of Love</a>
+          <a href="#memory" data-tier="full vinko afterparty">In Loving Memory</a>
+          <a href="#bts" data-tier="full vinko afterparty">Behind the Scenes</a>
+          <a href="#thankyous" data-tier="full vinko afterparty">Thank Yous</a>
+        </div>
+      </div>
+      <div class="ngroup">
+        <button class="ngroup-btn" type="button">Celebrations <span class="car">▾</span></button>
+        <div class="nmenu">
+          <a href="#week" data-tier="full">The Wedding Week</a>
+          <a href="#vinko" data-tier="full vinko">Pre-Wedding Celebration</a>
+          <a href="#bigday" data-tier="full">The Big Day</a>
+          <a href="#ceremony" data-tier="full">The Ceremony</a>
+          <a href="#breakfast" data-tier="full">The Wedding Breakfast</a>
+          <a href="#reception" data-tier="full afterparty">The Evening Reception</a>
+          <a href="#afterparty" data-tier="full afterparty">The After Party</a>
+        </div>
+      </div>
+      <div class="ngroup">
+        <button class="ngroup-btn" type="button">Explore <span class="car">▾</span></button>
+        <div class="nmenu">
+          <a href="#expl-sta" data-tier="full vinko afterparty">St Albans</a>
+          <a href="#expl-ldn" data-tier="full vinko afterparty">London</a>
+          <a href="#expl-day" data-tier="full vinko afterparty">England Day Trips</a>
+          <a href="#expl-eur" data-tier="full vinko afterparty">Europe</a>
+        </div>
+      </div>
+      <div class="ngroup">
+        <button class="ngroup-btn" type="button">For Guests <span class="car">▾</span></button>
+        <div class="nmenu">
+          <a href="#rsvp" data-tier="full vinko afterparty">RSVP</a>
+          <a href="#stay" data-tier="full vinko afterparty">Where to Stay</a>
+          <a href="#registry" data-tier="full vinko afterparty">Registry</a>
+          <a href="#americans" data-tier="full vinko afterparty">For Americans</a>
+          <a href="#atlas" data-tier="full vinko afterparty">The Guest Atlas</a>
+          <a href="#workouts" data-tier="full vinko afterparty">Wedding Workouts</a>
+          <a href="#games" data-tier="full vinko afterparty">In-Flight Entertainment</a>
+        </div>
+      </div>
+      <div class="ngroup">
+        <button class="ngroup-btn" type="button">Keepsakes <span class="car">▾</span></button>
+        <div class="nmenu">
+          <a href="#guestbook" data-tier="full vinko afterparty">Guestbook &amp; Photos</a>
+          <a href="#playlists" data-tier="full vinko afterparty">Playlists</a>
+        </div>
+      </div>
+      <a href="#faqs" data-tier="full vinko afterparty">FAQs</a>
+      <a href="#contact" data-tier="full vinko afterparty">Contact</a>
+    </nav>
+  </div>
+</header>
+<div id="nav-veil" aria-hidden="true"></div>
+

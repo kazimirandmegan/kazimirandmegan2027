@@ -1,0 +1,15 @@
+/* Colour and type tokens */
+/* ============================================================
+   DESIGN CODE — nothing below needs editing for day-to-day
+   changes, but it won't bite if you're curious.
+   ============================================================ */
+:root{
+  --ivory:#F6F3EA; --card:#FBF9F2;
+  --peri:#93A8D8; --peri-deep:#6B82B8;
+  --ink:#41507A; --ink-soft:#5B6788;
+  --sage:#9AA98B; --sage-deep:#7C8B6E;
+  --gold:#B3945C; --gold-soft:#CBB78D;
+  --gold-ink:#8A6F3F;       /* darker gold for small text (WCAG contrast) */
+  --blush:#E9DDD3; --rule:#D8D2C2;
+  --shadow:0 18px 50px -18px rgba(65,80,122,.22);
+}
