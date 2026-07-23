@@ -41,7 +41,15 @@ The public link is also saved in [`.tools/public-url.txt`](.tools/public-url.txt
 
 - **Leave the window open** — closing it (or pressing `Ctrl+C`) stops the site and the public link.
 - The Cloudflare link **changes every time** you start the launcher.
-- You still need an invitation password to get past the gate — see [`src/config/settings.js`](src/config/settings.js) (look for `passwords`). We don’t print those passwords in this README.
+- You still need an invitation password to get past the gate (any name works; capitals and spaces in the password don’t matter):
+
+| Guest access | Password | Who it’s for |
+|--------------|----------|--------------|
+| **full** | `hydrangea2027` | Invited to everything |
+| **vinko** | `barvinok2027` | Pre-wedding celebration |
+| **afterparty** | `budmo2am` | Evening / after party |
+
+  These are also listed under **Guest access levels** below, and live in [`src/config/settings.js`](src/config/settings.js) if you need to change them.
 - You need an internet connection for the public Cloudflare link. The local address works offline once packages are installed.
 - This is for **testing**, not the final wedding website. For the real hosted site, see **Publishing the site** below.
 
@@ -152,17 +160,18 @@ Guests move between pages with the menu (and `#` links). Some pages only appear 
 
 ## Guest access levels
 
-There are **three passwords**, each unlocking a different version of the site:
+There are **three passwords**, each unlocking a different version of the site.
+Capitals and spaces don’t matter when typing them.
 
-| Level | Who it’s for | What they see |
-|-------|----------------|---------------|
-| **full** | Guests invited to the whole celebration | Everything |
-| **vinko** | Guests invited to the pre-wedding celebration | Shared pages + the Vinko page |
-| **afterparty** | Evening / late guests | Shared pages + reception + after party |
+| Level | Password | Who it’s for | What they see |
+|-------|----------|--------------|---------------|
+| **full** | `hydrangea2027` | Guests invited to the whole celebration | Everything |
+| **vinko** | `barvinok2027` | Guests invited to the pre-wedding celebration | Shared pages + the Vinko page |
+| **afterparty** | `budmo2am` | Evening / late guests | Shared pages + reception + after party |
 
 Shared pages include Home, About, Stay, RSVP, Explore, Games, Guestbook, and similar. Celebration pages (ceremony, breakfast, full week, and so on) are limited by invitation.
 
-Passwords are in [`src/config/settings.js`](src/config/settings.js). This is front-door privacy only — it is not hard security.
+To change a password later, edit [`src/config/settings.js`](src/config/settings.js). This is front-door privacy only — it is not hard security.
 
 ---
 
