@@ -1,0 +1,75 @@
+<!-- ============================================================
+     ===== PAGE: GUESTBOOK & PHOTO WALL (all tiers) =====
+     Permanent entries live in SETTINGS.guestbookWall — paste in
+     anything guests email you and redeploy.
+     ============================================================ -->
+<section class="page" id="page-guestbook">
+  <div class="sheet">
+    <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <div class="page-eyebrow small-caps">Leave your mark</div>
+    <h2 class="title">Guestbook &amp; Photo Wall</h2>
+    <p class="subtitle">Memories before, mayhem after — plus the official Advice Wall</p>
+
+    <div class="fg-tabs" role="tablist">
+      <button type="button" class="on" data-gbtab="before" role="tab">Before the day</button>
+      <button type="button" data-gbtab="after" role="tab">After the day</button>
+    </div>
+
+    <div class="fg-panel on" id="gbtab-before">
+      <p style="margin:0 0 .4rem">Wishes for the day, advice for married life, and photos of us at our most embarrassing — pin them below and watch this wall grow between now and May.</p>
+    </div>
+    <div class="fg-panel" id="gbtab-after">
+      <h4 style="margin:.2rem 0 .4rem">Photos from the celebrations</h4>
+      <p style="margin:0 0 .4rem">The morning-after wall. Add your snaps from the week and the big day — they join a living mosaic everyone can explore. Prefer full quality and bulk upload? The shared album is here too: <span id="album-slot"></span></p>
+    </div>
+
+    <div class="gb-form">
+      <h4 style="margin-top:0" id="gb-form-title">Pin something to the wall</h4>
+      <input type="text" id="gb-who" placeholder="Your name" aria-label="Your name">
+      <div id="gb-type-wrap">
+        <select id="gb-type" aria-label="Type of note">
+          <option value="memory">A memory of us</option>
+          <option value="advice">A piece of advice for married life</option>
+          <option value="wish">A wish for the big day</option>
+          <option value="photo">Just a photo</option>
+        </select>
+        <textarea id="gb-text" rows="3" placeholder="Write away — wisdom, embarrassment, affection, all welcome (optional if you're adding a photo)" aria-label="Your message"></textarea>
+      </div>
+      <label class="devnote" style="display:block;margin:.2rem 0 .6rem">Add a photo: <input type="file" id="gb-photo" accept="image/*" multiple></label>
+      <div class="btn-row" style="justify-content:flex-start;margin:.4rem 0 0">
+        <button class="btn primary" id="gb-pin" type="button">Pin to the wall</button>
+        <button class="btn ghost" id="gb-mail" type="button">Email it to us</button>
+      </div>
+      <p class="devnote" id="gb-form-help" style="margin-top:.7rem">How the wall works: pinning saves instantly on this device so you can see it in place. Tap "Email it to us" and we'll add it to the permanent wall for everyone.</p>
+    </div>
+
+    <!-- BEFORE wall -->
+    <div class="gb-wallwrap on" id="gbwall-before">
+      <h3>Notes &amp; wishes <button class="hunt-token" data-hunt="5" aria-label="A hidden petal">❀</button></h3>
+      <div class="gb-notes" id="gb-notes-before"></div>
+      <h3 class="gb-mosaic-h" id="gb-mos-h-before" style="display:none">The photo mosaic <span class="gb-count" id="gb-count-before"></span></h3>
+      <p class="note gb-mosaic-hint" id="gb-mos-hint-before" style="display:none">Hover or tap any photo to enlarge it — tap again to open it full-screen.</p>
+      <div class="gb-mosaic" id="gb-mosaic-before"></div>
+      <div class="btn-row"><button class="btn ghost gb-more" data-more="before" type="button" style="display:none">Show more photos</button></div>
+    </div>
+
+    <!-- AFTER wall -->
+    <div class="gb-wallwrap" id="gbwall-after">
+      <h3>Notes from the day</h3>
+      <div class="gb-notes" id="gb-notes-after"></div>
+      <h3 class="gb-mosaic-h" id="gb-mos-h-after" style="display:none">The photo mosaic <span class="gb-count" id="gb-count-after"></span></h3>
+      <p class="note gb-mosaic-hint" id="gb-mos-hint-after" style="display:none">Hover or tap any photo to enlarge it — tap again to open it full-screen.</p>
+      <div class="gb-mosaic" id="gb-mosaic-after"></div>
+      <div class="btn-row"><button class="btn ghost gb-more" data-more="after" type="button" style="display:none">Show more photos</button></div>
+      <p class="note" id="gb-after-empty" style="text-align:center">No photos yet — after the celebrations, this wall fills with everyone's snapshots. Be the first to add one.</p>
+    </div>
+
+    <!-- shared lightbox -->
+    <div class="gb-lightbox" id="gb-lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+      <button class="gb-lb-close" id="gb-lb-close" aria-label="Close">✕</button>
+      <button class="gb-lb-nav gb-lb-prev" id="gb-lb-prev" aria-label="Previous photo">‹</button>
+      <figure class="gb-lb-fig"><img id="gb-lb-img" alt="Guestbook photo"><figcaption id="gb-lb-cap"></figcaption></figure>
+      <button class="gb-lb-nav gb-lb-next" id="gb-lb-next" aria-label="Next photo">›</button>
+    </div>
+  </div>
+</section>

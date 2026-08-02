@@ -1,0 +1,27 @@
+<!-- ============================================================
+     ===== PAGE: PLAYLISTS (all tiers) =====
+     ============================================================ -->
+<section class="page" id="page-playlists">
+  <div class="sheet">
+    <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <div class="page-eyebrow small-caps">The soundtrack</div>
+    <h2 class="title">The Playlists</h2>
+    <p class="subtitle">Crowd-sourced, quality-controlled (loosely)</p>
+
+    <h3>The shared playlist — add your songs</h3>
+    <p>This one belongs to all of us. Add anything: the song that makes you think of us, the one that gets you on a dance floor, the guilty pleasure you'll deny later. We'll be listening while we address envelopes.</p>
+    <div id="pl-shared"></div>
+
+    <div class="fun-card">
+      <h4 style="margin-top:0">Or fire a request straight at the DJ booth</h4>
+      <input type="text" id="song-in" placeholder="Song — Artist" aria-label="Song request">
+      <div class="btn-row" style="justify-content:flex-start"><button class="btn primary" id="song-add" type="button">Add request</button><button class="btn ghost" id="song-mail" type="button">Send my requests to the couple</button></div>
+      <div class="songchips" id="song-list"></div>
+      <p class="devnote">Requests save on this device; the send button emails your list to us. The Macarena clause of the terms and conditions applies.</p>
+    </div>
+
+    <h3>The other playlists</h3>
+    <p>Mood-setters for the week — press play right here once the links are in.</p>
+    <div class="pl-grid" id="pl-grid"></div>
+  </div>
+</section>

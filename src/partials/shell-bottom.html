@@ -1,0 +1,63 @@
+
+
+<div id="garland" aria-hidden="true">
+  <svg viewBox="-14 -14 28 28"><use href="#hyd" transform="scale(.8)"/></svg>
+  <svg viewBox="-14 -14 28 28"><use href="#hyd"/></svg>
+  <svg viewBox="-14 -14 28 28"><use href="#hyd" transform="scale(.7)"/></svg>
+  <svg viewBox="-14 -14 28 28"><use href="#hyd" transform="scale(1.1)"/></svg>
+  <svg viewBox="-14 -14 28 28"><use href="#hyd" transform="scale(.7)"/></svg>
+  <svg viewBox="-14 -14 28 28"><use href="#hyd"/></svg>
+  <svg viewBox="-14 -14 28 28"><use href="#hyd" transform="scale(.8)"/></svg>
+</div>
+<footer id="site-footer" style="display:none">
+  <span class="small-caps">Kazimir &amp; Megan · May 2027 · St Albans</span>
+  Made with love (and one very patient laptop). Try clicking the wax seal.
+  <button id="paw-btn" type="button" title="Who goes there?">🐾</button>
+</footer>
+
+<!-- ================= WEDDING CONCIERGE (chatbot) ================= -->
+<div id="chat-nudge" role="status">Hi, I'm Connie — your concierge for trains, hotels, dress codes and anything else on this site. <button id="nudge-close" type="button" aria-label="Dismiss">✕</button></div>
+<button id="chat-fab" type="button" aria-expanded="false" aria-controls="chat-panel" aria-label="Ask Connie, the wedding concierge">
+  <span class="fab-ico">🌸</span><span class="fab-label">Ask Connie</span>
+</button>
+<div id="chat-veil"></div>
+<div id="chat-panel" role="dialog" aria-label="Connie, the wedding concierge">
+  <div id="chat-head"><span class="ch-t">Connie · Concierge</span><button id="chat-close" type="button" aria-label="Close">✕</button></div>
+  <div id="chat-log"></div>
+  <div id="chat-chips"></div>
+  <div id="chat-input-row">
+    <input id="chat-input" type="text" placeholder="Ask Connie about trains, food, timings…" aria-label="Your question">
+    <button id="chat-send" type="button" aria-label="Send">➤</button>
+  </div>
+</div>
+
+<div id="bus-run" aria-hidden="true">🚌</div>
+
+<div id="flag-modal" role="dialog" aria-modal="true" aria-label="American flag of comfort">
+  <div class="flag-card">
+    <svg viewBox="0 0 190 100" aria-hidden="true">
+      <rect width="190" height="100" fill="#B22234"/>
+      <rect y="7.7" width="190" height="7.7" fill="#fff"/>
+      <rect y="23.1" width="190" height="7.7" fill="#fff"/>
+      <rect y="38.5" width="190" height="7.7" fill="#fff"/>
+      <rect y="53.8" width="190" height="7.7" fill="#fff"/>
+      <rect y="69.2" width="190" height="7.7" fill="#fff"/>
+      <rect y="84.6" width="190" height="7.7" fill="#fff"/>
+      <rect width="76" height="53.8" fill="#3C3B6E"/>
+    </svg>
+    <p class="pledge">There. Breathe. The eagle has landed (temporarily).</p>
+    <button class="btn usa" id="pledge-btn" type="button">I'm okay now</button>
+  </div>
+</div>
+
+<div id="tp-overlay" role="dialog" aria-modal="true" aria-label="Bridal party stat card">
+  <div class="tp-big">
+    <button class="tp-close" id="tp-close" type="button" aria-label="Close">✕</button>
+    <div class="tp-band"><span id="tpb-role"></span><span>K&amp;M Trumps</span></div>
+    <div class="tp-face" id="tpb-face"></div>
+    <h4 style="text-align:center;margin:.7rem 0 0" id="tpb-name"></h4>
+    <div class="tp-stats" id="tpb-stats"></div>
+    <div class="tp-facts" id="tpb-facts"></div>
+  </div>
+</div>
+

@@ -1,0 +1,3 @@
+# Photos and optional static data for the wedding site.
+# Drop images_*.jpg here (see docs/PHOTO-CHECKLIST.md).
+# Optional: wall.json for a guestbook fallback when the cloud is offline.

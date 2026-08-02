@@ -1,0 +1,25 @@
+/* Editable data */
+export const PARTY = [
+    {role:"Maid of Honour", name:"[NAME]", img:"images_party-1.jpg",
+     stats:[["Dance-floor stamina",92],["Speech tear risk",78],["Logistics wizardry",95],["Karaoke courage",70]],
+     known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
+    {role:"Best Man", name:"[NAME]", img:"images_party-2.jpg",
+     stats:[["Dance-floor stamina",84],["Speech danger level",97],["Punctuality",41],["Pint speed",88]],
+     known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
+    {role:"Bridesmaid", name:"[NAME]", img:"images_party-3.jpg",
+     stats:[["Hype generation",93],["Craft skills",81],["Navigation",34],["Playlist taste",89]],
+     known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
+    {role:"Bridesmaid", name:"[NAME]", img:"images_party-4.jpg",
+     stats:[["Calm under pressure",90],["Group-chat response time",99],["Sunscreen discipline",72],["Cake opinion strength",95]],
+     known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
+    {role:"Groomsman", name:"[NAME]", img:"images_party-5.jpg",
+     stats:[["Tie-knot quality",77],["BBQ authority",91],["Directions confidence (unearned)",96],["Actual directions",38]],
+     known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
+    {role:"Groomsman", name:"[NAME]", img:"images_party-6.jpg",
+     stats:[["Dance-floor stamina",88],["Toast enthusiasm",94],["Early-morning charisma",22],["Loyalty",100]],
+     known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
+    {role:"Dog of Honour", name:"Kiko", img:"images_party-kiko.jpg",
+     stats:[["Tail-wag RPM",98],["Treat detection range",100],["Obedience",34],["Red-carpet charm",96]],
+     known:"Supervising every planning meeting from the sofa",
+     fact:"Has personally approved all floral arrangements by sniffing them"}
+  ];

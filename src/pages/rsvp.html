@@ -1,0 +1,100 @@
+<!-- ============================================================
+     ===== PAGE: RSVP (all tiers — each sees their card) =====
+     ============================================================ -->
+<section class="page" id="page-rsvp">
+  <div class="sheet">
+    <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <svg class="corner br" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <div class="page-eyebrow small-caps">Répondez s'il vous plaît</div>
+    <h2 class="title">RSVP</h2>
+    <p class="subtitle">Please reply by <span class="placeholder">[RSVP DEADLINE]</span> — it helps us enormously with numbers, seating, and pierogi mathematics</p>
+
+    <!-- returning-guest banner: shown when we find an existing RSVP -->
+    <div class="rsvp-saved" id="rsvp-saved" style="display:none">
+      <div class="rsvp-saved-head">
+        <span class="small-caps blue">Your RSVP is in ✓</span>
+        <button class="btn ghost" id="rsvp-edit" type="button">Edit my reply</button>
+      </div>
+      <div id="rsvp-saved-body"></div>
+    </div>
+
+    <!-- the form itself -->
+    <div class="rsvp-form" id="rsvp-form">
+      <div class="rsvp-fallback" id="rsvp-fallback" style="display:none">
+        <p>The live RSVP form needs the site's cloud to be switched on. Until then, the couple can be reached on the <a href="#contact">Contact</a> page.</p>
+      </div>
+
+      <div id="rsvp-fields">
+        <!-- 1 · who -->
+        <fieldset class="rsvp-fs">
+          <legend>Who's replying</legend>
+          <label class="rsvp-l">Lead guest — full name
+            <input type="text" id="r-name" autocomplete="name" placeholder="First and last name">
+            <span class="rsvp-hint">Please use your full first <em>and</em> last name, and the same one each time you sign in — it's how we find your reply again.</span>
+          </label>
+        </fieldset>
+
+        <!-- 2 · attending -->
+        <fieldset class="rsvp-fs">
+          <legend>Will you join us?</legend>
+          <div class="rsvp-choice" id="r-attending">
+            <button type="button" class="rsvp-opt" data-attend="yes">Joyfully accept 💛</button>
+            <button type="button" class="rsvp-opt" data-attend="no">Regretfully decline</button>
+          </div>
+        </fieldset>
+
+        <!-- everything below hides when they decline -->
+        <div id="rsvp-ifyes">
+          <!-- 3 · contact -->
+          <fieldset class="rsvp-fs">
+            <legend>Contact details</legend>
+            <label class="rsvp-l">Email
+              <input type="email" id="r-email" autocomplete="email" placeholder="you@example.com"></label>
+            <label class="rsvp-l">Mobile
+              <input type="tel" id="r-mobile" autocomplete="tel" placeholder="+44…"></label>
+            <label class="rsvp-l">Home address
+              <input type="text" id="r-address" autocomplete="street-address" placeholder="Street, town, country">
+              <span class="rsvp-hint">We use your town and country to place a pin on the Guest Atlas (only your city is ever shown publicly, never your street).</span>
+            </label>
+          </fieldset>
+
+          <!-- 4 · the party -->
+          <fieldset class="rsvp-fs">
+            <legend>Your party</legend>
+            <p class="rsvp-hint" style="margin-top:0">Please only add the people named on your invitation. We're unable to accommodate additional guests or plus-ones — with love, and a strict seating plan.</p>
+            <label class="rsvp-l" style="max-width:220px">How many in your party?
+              <select id="r-size">
+                <option value="1">1</option><option value="2">2</option>
+                <option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option>
+              </select>
+            </label>
+            <div id="r-guests"></div>
+          </fieldset>
+
+          <!-- 5 · which events (tier-aware, built by JS) -->
+          <fieldset class="rsvp-fs" id="r-events-fs">
+            <legend>Which celebrations?</legend>
+            <p class="rsvp-hint" style="margin-top:0">Tick everything you'll be joining.</p>
+            <div id="r-events"></div>
+          </fieldset>
+
+          <!-- 6 · around the wedding -->
+          <fieldset class="rsvp-fs">
+            <legend>Around the wedding</legend>
+            <p class="rsvp-hint" style="margin-top:0">Just a heads-up for us — the details get coordinated later on the WhatsApp group.</p>
+            <label class="rsvp-check"><input type="checkbox" id="r-activities"> <span>Interested in pre-wedding St Albans / London activities</span></label>
+            <label class="rsvp-check"><input type="checkbox" id="r-travelafter"> <span>Planning to travel around the UK / Europe afterwards</span></label>
+          </fieldset>
+        </div>
+
+        <div class="rsvp-err" id="r-err"></div>
+        <div class="btn-row" style="justify-content:flex-start">
+          <button class="btn primary" id="r-submit" type="button">Send our RSVP</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="note" style="text-align:center">Having trouble? Email us — details on the <a href="#contact">Contact</a> page — and a human will sort it.</p>
+  </div>
+</section>

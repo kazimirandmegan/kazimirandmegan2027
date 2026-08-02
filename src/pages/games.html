@@ -1,0 +1,53 @@
+<!-- ============================================================
+     ===== PAGE: IN-FLIGHT ENTERTAINMENT (all tiers) =====
+     Games are fully offline once the page has loaded — perfect
+     for the plane over. Crossword answers & clues live in the
+     XW_WORDS list in the code; runner tuning in the KD section.
+     ============================================================ -->
+<section class="page" id="page-games">
+  <div class="sheet">
+    <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <div class="page-eyebrow small-caps">Seatback mode</div>
+    <h2 class="title">In-Flight Entertainment</h2>
+    <p class="subtitle">Everything here works with zero signal — tested at 38,000 feet (spiritually)</p>
+
+    <div class="game-card">
+      <h3 style="margin-top:0">Kiko Dash 🐕</h3>
+      <p>Kiko has escaped with both wedding rings swinging from her necklace. Jump the wedding admin — wax seals, RSVP envelopes, rogue hydrangeas — through four scenes, a new one every 250&nbsp;metres. <strong>Tap / click / space</strong> to jump; a quick tap hops, holding jumps higher.</p>
+      <div id="dash-canvas-wrap"><canvas id="kiko-canvas" width="800" height="220" aria-label="Kiko Dash game — tap or press space to jump"></canvas></div>
+      <div class="kd-hud">
+        <span class="kd-score" id="kd-score">000 m</span>
+        <span class="kd-level" id="kd-level">LVL 1 · ST ALBANS</span>
+        <span class="kd-score">BEST <span id="kd-best">000</span> m</span>
+        <button class="btn ghost" id="kd-mail" type="button">Email my best score</button>
+      </div>
+      <h4>Leaderboard (this device)</h4>
+      <div class="table-scroll"><table class="lb" id="kd-lb"><tr><th>#</th><th>Guest</th><th>Metres</th></tr></table></div>
+      <p class="devnote">Scores save on each device; email yours in and we'll keep the official wedding-wide tally. <strong>Prizes at stake:</strong> highest score emailed before 29 May wins the first slice of cake, a victory lap announced by the DJ, and a pint on Kazimir. Runner-up chooses one song — no vetoes.</p>
+    </div>
+
+    <div class="game-card">
+      <h3 style="margin-top:0">The Wedding Crossword ✏️</h3>
+      <p>Nine clues, all answerable from this very website. No prizes, only honour.</p>
+      <div class="xw-wrap"><div class="xw" id="xw"></div></div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button class="btn primary" id="xw-check" type="button">Check</button>
+        <button class="btn ghost" id="xw-reveal" type="button">Reveal</button>
+        <button class="btn ghost" id="xw-clear" type="button">Clear</button>
+      </div>
+      <div class="xw-clues"><div><h4>Across</h4><ul class="tidy" id="xw-across"></ul></div><div><h4>Down</h4><ul class="tidy" id="xw-down"></ul></div></div>
+    </div>
+
+    <div class="game-card">
+      <h3 style="margin-top:0">How well do you know us? 🧠</h3>
+      <div class="fun-card" id="quiz" style="border:none;padding:0;margin:.4rem 0 0"></div>
+    </div>
+
+    <div class="game-card">
+      <h3 style="margin-top:0">The Hunt 🌸</h3>
+      <p>We may or may not have hidden six little petals across this website. We admit nothing. But if a certain kind of guest were to find all six, a certain codeword might appear — worth whispering at the bar on the night for <span class="placeholder">[PLACEHOLDER: prize — e.g. a golden drink token]</span>.</p>
+      <div class="hunt-petals" id="hunt-petals"></div>
+      <div class="hunt-riddle" id="hunt-riddle"></div>
+    </div>
+  </div>
+</section>

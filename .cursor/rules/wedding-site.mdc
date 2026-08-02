@@ -1,0 +1,37 @@
+---
+description: Wedding site architecture and editing conventions
+globs:
+  - "src/**"
+  - "backend/**"
+  - "docs/**"
+---
+
+# Kazimir & Megan wedding website
+
+## Where to edit
+
+- Everyday config (passwords, dates, emails, playlists, `cloudUrl`): `src/config/settings.js`
+- Page copy: `src/pages/<route>.html` (keep `id="page-..."`, `class="page"`, and any `data-tier`)
+- Photos: `public/images_*.jpg` — see `docs/PHOTO-CHECKLIST.md`
+- Behaviour: `src/js/` (boot orchestrator is `src/js/app.js`)
+- Editable lists (party, quiz, Connie KB, map pins): `src/data/`
+
+## Architecture
+
+- Vite + vanilla JS. Dev: `npm run dev`. Build: `npm run build` → `dist/`.
+- Hash SPA: `#home`, `#rsvp`, etc. Router and tier pruning live in `src/js/app.js` / `src/js/tier.js`.
+- Three guest tiers: `full`, `vinko`, `afterparty`. Elements with `data-tier` are removed if the unlocked tier is not listed.
+- Optional backend: `backend/Code.gs` (Google Apps Script). `SETTINGS.cloudKey` must match `SECRET_KEY`.
+
+## Local demo with a public URL
+
+Double-click `Start Wedding Site.bat` / `.command` / `.sh` (or run `npm start`).
+That script installs deps if needed, starts Vite, and opens a Cloudflare
+quick tunnel (`*.trycloudflare.com`). Keep the process running while testing
+from phones or other devices. See root README.
+
+## Do not
+
+- Do not treat gate passwords as real security; do not add secrets beyond the existing gate/cloud-key model without an explicit request.
+- Do not rewrite to React/Next unless asked.
+- Prefer updating placeholders (`PLACEHOLDER`) and content over drive-by refactors.
