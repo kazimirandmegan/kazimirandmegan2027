@@ -2,7 +2,7 @@
 
 This is the website for **Kazimir & Megan’s wedding** on **29 May 2027** in **St Albans**.
 
-This README is for people helping build or edit the site (you don’t need to be a developer to follow most of it). Wedding guests use the live site link and the password from their invitation — not this document.
+This README is for people helping build or edit the site (you don’t need to be a developer to follow most of it). Wedding guests use the live site link and the password from their invitation — not this document. 
 
 ---
 
