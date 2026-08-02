@@ -47,6 +47,7 @@ body.disco{animation:disco 1.2s linear 3}
 .msg{max-width:85%;padding:.6rem .85rem;font-size:.93rem;line-height:1.5}
 .msg.bot{background:#fff;border:1px solid var(--rule);align-self:flex-start}
 .msg.user{background:var(--peri-deep);color:#fff;align-self:flex-end}
+.msg.thinking{color:var(--ink-soft);font-style:italic;opacity:.85}
 #chat-chips{display:flex;gap:.4rem;flex-wrap:wrap;padding:0 1rem .6rem}
 #chat-chips button{font-family:inherit;font-size:.85rem;padding:.55rem .85rem;min-height:40px;border:1px solid var(--peri);background:#fff;color:var(--peri-deep);cursor:pointer;border-radius:999px}
 #chat-chips button:hover{background:var(--peri);color:#fff}
@@ -54,6 +55,7 @@ body.disco{animation:disco 1.2s linear 3}
 #chat-input{flex:1;border:none;padding:.85rem .9rem;font-family:inherit;font-size:16px;background:#fff;color:var(--ink);outline:none;min-width:0}
 #chat-send{border:none;background:var(--peri-deep);color:#fff;padding:0 1.1rem;cursor:pointer;font-size:1.05rem;min-width:48px}
 #chat-send:hover{background:var(--ink)}
+#chat-send:disabled,#chat-input:disabled{opacity:.55;cursor:wait}
 
 footer{text-align:center;padding:2rem 1rem calc(3rem + env(safe-area-inset-bottom,0px));color:var(--ink-soft);font-size:.85rem;position:relative;z-index:1}
 footer .small-caps{display:block;margin-bottom:.4rem}

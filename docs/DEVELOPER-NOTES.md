@@ -490,6 +490,14 @@ future editor isn't surprised.
   and a menu-navigator).
 - Engine upgraded: a `SYN` synonym map widens matching, phrase keywords
   score higher, and the fallback names concrete topics instead of dead-ending.
+- **OpenAI wiring:** the chat UI posts to `/api/connie`. Locally, Vite
+  serves that route from `server/connie-ai.mjs` (reads `OPENAI_API_KEY`
+  from `.env`). On Netlify, the same handler runs as
+  `netlify/functions/connie.mjs` (set `OPENAI_API_KEY` in Site settings →
+  Environment variables; optional `OPENAI_MODEL`, default `gpt-4o-mini`).
+  The system prompt is grounded in `src/data/concierge-kb.js` (tier-filtered).
+  If the key is missing or the call fails, Connie falls back to the offline
+  keyword matcher — guests still get answers without a network AI.
 
 ## Code.gs
 - Guestbook: new `phase` column (before/after) in headers, write row and

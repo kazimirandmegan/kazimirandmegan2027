@@ -80,7 +80,8 @@ Then open `http://localhost:5173`.
 | Wording on a specific page | The matching file under [`src/pages/`](src/pages/) |
 | Photos | Drop files into [`public/`](public/) using the names in [`docs/PHOTO-CHECKLIST.md`](docs/PHOTO-CHECKLIST.md) |
 | Bridal party Top Trumps stats | [`src/data/party.js`](src/data/party.js) |
-| Connie’s answers (the chat helper) | [`src/data/concierge-kb.js`](src/data/concierge-kb.js) |
+| Connie’s facts (grounds the AI + offline fallback) | [`src/data/concierge-kb.js`](src/data/concierge-kb.js) |
+| Connie AI (OpenAI key — never put in the frontend) | Copy [`.env.example`](.env.example) → `.env` locally; on Netlify set `OPENAI_API_KEY` |
 | Quiz / crossword / hunt riddles | [`src/data/quiz.js`](src/data/quiz.js), [`src/data/crossword.js`](src/data/crossword.js), [`src/data/hunt.js`](src/data/hunt.js) |
 | Explore map pins | [`src/data/maps/`](src/data/maps/) |
 
@@ -97,6 +98,8 @@ Search the project for `PLACEHOLDER` to find details that still need filling in.
 - **`src/css/`** — look and feel (colours, layout, components)
 - **`src/js/`** — how the site behaves (gate, navigation, RSVP, games, …)
 - **`src/data/`** — lists and content used by games, maps, and Connie
+- **`server/`** — server-only helpers (Connie → OpenAI); key never ships to the browser
+- **`netlify/functions/`** — production API for Connie (`/api/connie`)
 - **`public/`** — photos and other files copied as-is when you publish
 - **`backend/`** — optional Google Apps Script for live guestbook, RSVPs, and scores
 - **`docs/`** — longer technical notes and the photo checklist
@@ -147,7 +150,7 @@ Guests move between pages with the menu (and `#` links). Some pages only appear 
 |-------|----------------|
 | **Password gate** | Asks for name + password before the site opens |
 | **Navigation** | Desktop menus and the mobile drawer |
-| **Connie** | Chat helper for trains, dress codes, timings, and more |
+| **Connie** | AI wedding concierge (OpenAI); falls back to keyword answers offline |
 | **Maps** | Interactive Leaflet maps on story / explore / atlas pages |
 | **Weather** | Live St Albans forecast (Open-Meteo) |
 | **Countdown** | Days-until-the-wedding on the home page |

@@ -386,19 +386,18 @@ export function boot() {
   renderQuiz();
 
   /* ============================================================
-     THE WEDDING CONCIERGE ✏️ EDIT — add entries to the knowledge
-     base below. Each entry: keywords it listens for, the answer,
-     and which tiers may hear it (omit tiers = everyone).
-     It matches keywords offline — no accounts, no costs, works
-     even with no signal. It only knows what's written here.
+     THE WEDDING CONCIERGE (Connie)
+     Prefers OpenAI via POST /api/connie (key stays server-side).
+     Falls back to the offline keyword KB in concierge-kb.js if the
+     API is offline, unconfigured, or errors. Edit that file for facts.
      ============================================================ */
   
   const FALLBACK = "I'm Connie, and I only know what's written on this website — but I know all of it. Try me on trains, taxis, airports, hotels, parking, timings, what to wear, the food, the Ukrainian celebration, day trips to London or Europe, the guestbook, or the games. For anything I can't answer, the humans check their email (Contact page) more often than they'd like to admit.";
 
-  /* light synonym map so guests' phrasing matches the keywords. Each line:
-     if the question contains the term on the left, we also test the ones
-     on the right. Keeps the KB readable while widening what Connie hears. */
-  
+  /* Offline keyword engine — used when AI is unavailable. */
+  const chatHistory = [];
+  let chatBusy = false;
+
   function expandQuery(q){
     let extra = [];
     const low = " "+q.toLowerCase()+" ";
@@ -416,32 +415,71 @@ export function boot() {
     }
     return s;
   }
-  function answer(q){
+  function answerOffline(q){
     const rxEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
     const words = " " + expandQuery(q).toLowerCase() + " ";
-    /* rank ALL entries so we can offer runners-up if the top score is weak */
     const ranked = KB.map(e=>({e, s:scoreEntry(e, words, rxEsc)}))
                      .filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
     if(!ranked.length) return FALLBACK;
-    /* confident hit */
-    if(ranked[0].s >= 5 || ranked.length===1) return ranked[0].e.a;
-    /* weak/ambiguous: lead with the best guess, then nudge toward alternatives */
     return ranked[0].e.a;
+  }
+
+  async function answerAi(q){
+    const res = await fetch("/api/connie", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: q,
+        history: chatHistory.slice(-12),
+        tier: TIER || null,
+        name: NAME || null,
+      }),
+    });
+    let data = null;
+    try { data = await res.json(); } catch (_) { /* ignore */ }
+    if(!res.ok){
+      const err = new Error(data?.error || "Connie AI unavailable");
+      err.code = data?.code || "HTTP_"+res.status;
+      throw err;
+    }
+    if(!data?.reply) throw new Error("Empty Connie reply");
+    return data.reply;
   }
 
   const fab = document.getElementById("chat-fab"), panel = document.getElementById("chat-panel"),
         log = document.getElementById("chat-log"), input = document.getElementById("chat-input"),
-        veil = document.getElementById("chat-veil");
+        veil = document.getElementById("chat-veil"),
+        sendBtn = document.getElementById("chat-send");
   function addMsg(text, who){
     const d = document.createElement("div");
     d.className = "msg "+who; d.textContent = text;
     log.appendChild(d); log.scrollTop = log.scrollHeight;
+    return d;
   }
-  function send(qText){
+  function setChatBusy(on){
+    chatBusy = on;
+    if(input) input.disabled = on;
+    if(sendBtn) sendBtn.disabled = on;
+  }
+  async function send(qText){
     const q = (qText !== undefined ? qText : input.value).trim();
-    if(!q) return;
+    if(!q || chatBusy) return;
     addMsg(q, "user"); input.value = "";
-    setTimeout(()=>addMsg(answer(q), "bot"), 420);
+    setChatBusy(true);
+    const thinking = addMsg("Connie is thinking…", "bot thinking");
+    try {
+      const reply = await answerAi(q);
+      thinking.classList.remove("thinking");
+      thinking.textContent = reply;
+      chatHistory.push({ role: "user", content: q }, { role: "assistant", content: reply });
+    } catch (_) {
+      /* AI missing or failed — keyword KB still works offline */
+      thinking.classList.remove("thinking");
+      thinking.textContent = answerOffline(q);
+    } finally {
+      setChatBusy(false);
+      try { input.focus(); } catch (_) {}
+    }
   }
   function setChatOpen(on){
     panel.classList.toggle("open", on);

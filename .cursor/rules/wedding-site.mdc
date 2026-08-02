@@ -15,6 +15,7 @@ globs:
 - Photos: `public/images_*.jpg` — see `docs/PHOTO-CHECKLIST.md`
 - Behaviour: `src/js/` (boot orchestrator is `src/js/app.js`)
 - Editable lists (party, quiz, Connie KB, map pins): `src/data/`
+- Connie AI (server): `server/connie-ai.mjs` + `netlify/functions/connie.mjs`. Set `OPENAI_API_KEY` in `.env` (local) or Netlify env (prod). Never put the key in `settings.js` or client code.
 
 ## Architecture
 
@@ -32,6 +33,6 @@ from phones or other devices. See root README.
 
 ## Do not
 
-- Do not treat gate passwords as real security; do not add secrets beyond the existing gate/cloud-key model without an explicit request.
+- Do not treat gate passwords as real security; do not add secrets beyond the existing gate/cloud-key model without an explicit request. Exception: `OPENAI_API_KEY` for Connie belongs only in `.env` / Netlify env, never in client bundles.
 - Do not rewrite to React/Next unless asked.
 - Prefer updating placeholders (`PLACEHOLDER`) and content over drive-by refactors.
