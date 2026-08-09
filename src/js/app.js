@@ -464,7 +464,7 @@ export function boot() {
     const starters = TIER==="afterparty"
       ? ["Last trains home?","Where's the after party?","What should I wear?"]
       : TIER==="vinko"
-      ? ["What is the pre-wedding celebration?","What should I wear?","Which airport?"]
+      ? ["What is the Vinkoplytenna?","What should I wear?","Which airport?"]
       : ["Which airport?","Last trains home?","What should I wear?"];
     chips.innerHTML = "";
     starters.forEach(s=>{
