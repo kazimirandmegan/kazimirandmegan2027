@@ -526,12 +526,26 @@ export function boot() {
       .then(r=>r.json()).then(d=>{
         const c = d.current, day = d.daily;
         const [ico,txt] = WXC[c.weather_code] || ["🌡","Weather"];
-        if(mini) mini.textContent = ico+" "+Math.round(c.temperature_2m)+"°C · "+txt;
+        const isAmericans = !!document.getElementById("page-americans") && document.getElementById("page-americans").classList.contains("visible");
+        const tC = Math.round(c.temperature_2m);
+        const tF = Math.round(c.temperature_2m * 9/5 + 32);
+        const feelC = Math.round(c.apparent_temperature);
+        const feelF = Math.round(c.apparent_temperature * 9/5 + 32);
+        const minC = Math.round(day.temperature_2m_min[0]);
+        const maxC = Math.round(day.temperature_2m_max[0]);
+        const minF = Math.round(day.temperature_2m_min[0] * 9/5 + 32);
+        const maxF = Math.round(day.temperature_2m_max[0] * 9/5 + 32);
+        const unit = isAmericans ? "°F" : "°C";
+        const tempStr = isAmericans ? tF+unit : tC+unit;
+        const feelStr = isAmericans ? feelF+unit : feelC+unit;
+        const minStr = isAmericans ? minF : minC;
+        const maxStr = isAmericans ? maxF : maxC;
+        if(mini) mini.textContent = ico+" "+tempStr+" · "+txt;
         if(card) card.innerHTML =
           '<div class="wx-big">'+ico+'</div>'+
-          '<div><div class="wx-temp">'+Math.round(c.temperature_2m)+'°C</div>'+
-          '<div class="wx-meta">'+txt+' · feels like '+Math.round(c.apparent_temperature)+'° · wind '+Math.round(c.wind_speed_10m)+' km/h</div>'+
-          '<div class="wx-meta">Today: '+Math.round(day.temperature_2m_min[0])+'–'+Math.round(day.temperature_2m_max[0])+'°C · rain chance '+day.precipitation_probability_max[0]+'%</div></div>'+
+          '<div><div class="wx-temp">'+tempStr+'</div>'+
+          '<div class="wx-meta">'+txt+' · feels like '+feelStr+' · wind '+Math.round(c.wind_speed_10m)+' km/h</div>'+
+          '<div class="wx-meta">Today: '+minStr+'–'+maxStr+unit+' · rain chance '+day.precipitation_probability_max[0]+'%</div></div>'+
           '<div class="wx-src">live · refreshes every 15 min · open-meteo.com</div>';
       }).catch(()=>{
         if(mini) mini.textContent = "🌦 the skies are being coy — live weather appears once the site is online";
@@ -598,8 +612,8 @@ export function boot() {
   /* ---- Guest Atlas: live from RSVP addresses (cloud) ---- */
   const ST_ALBANS = {lat:51.7527, lng:-0.3394};
   let atlasMap = null, atlasDrop = null, atlasMarkers = [];
-  function haversineMiles(a, b){
-    const R = 3958.8, toR = x=>x*Math.PI/180;
+  function haversineKm(a, b){
+    const R = 6371, toR = x=>x*Math.PI/180;
     const dLat = toR(b.lat-a.lat), dLng = toR(b.lng-a.lng);
     const s = Math.sin(dLat/2)**2 + Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLng/2)**2;
     return Math.round(2*R*Math.asin(Math.sqrt(s)));
@@ -610,10 +624,10 @@ export function boot() {
       .filter(r=>isFinite(r.lat) && isFinite(r.lng) && r.attending!=="no")
       .map(r=>{
         const place = [r.city, r.country].filter(Boolean).join(", ") || "Somewhere lovely";
-        const miles = haversineMiles(ST_ALBANS, {lat:r.lat, lng:r.lng});
-        return {name:r.name||"Guests", place, lat:r.lat, lng:r.lng, miles};
+        const km = haversineKm(ST_ALBANS, {lat:r.lat, lng:r.lng});
+        return {name:r.name||"Guests", place, lat:r.lat, lng:r.lng, km};
       })
-      .sort((a,b)=>b.miles-a.miles);
+      .sort((a,b)=>b.km-a.km);
 
     const boardWrap = document.getElementById("atlas-board-wrap");
     const empty = document.getElementById("atlas-empty");
@@ -634,7 +648,7 @@ export function boot() {
           fillColor: i===0 ? "#B3945C" : "#6B82B8", fillOpacity:.95})
           .addTo(atlasMap)
           .bindPopup("<strong>"+esc(p.name)+"</strong>"+leader+"<br>"+esc(p.place)+
-                     "<br>"+p.miles.toLocaleString()+" miles to St Albans");
+                     "<br>"+p.km.toLocaleString()+" km to St Albans");
         atlasMarkers.push(m);
       });
     }
@@ -646,7 +660,7 @@ export function boot() {
       tbl.querySelectorAll("tr:not(:first-child)").forEach(r=>r.remove());
       people.slice(0,15).forEach((p,i)=>{
         const tr = document.createElement("tr");
-        [i+1, p.name, p.place, p.miles.toLocaleString()].forEach(v=>{
+        [i+1, p.name, p.place, p.km.toLocaleString()+" km"].forEach(v=>{
           const td=document.createElement("td"); td.textContent=v; tr.appendChild(td);
         });
         if(i===0) tr.style.fontWeight = "600";
@@ -1368,11 +1382,11 @@ export function boot() {
     btn.addEventListener("click", ()=>{
       emojiBurst(["🇺🇸","🦅","🎆","⭐"], 42);
       document.body.classList.add("patriot");
-      toast("Deploying freedom…");
+      toast("I pledge allegiance to the flag…");
       setTimeout(()=>{
         document.body.classList.remove("patriot");
         modal.classList.add("open");
-      }, 3200);
+      }, 1500);
     });
     pledge.addEventListener("click", ()=>{
       modal.classList.remove("open");
@@ -1904,11 +1918,11 @@ export function boot() {
           spawnIn -= dt;
           if(spawnIn <= 0 || (obs.length===0 && frame>30)){
             spawn();
-            spawnIn = Math.max(46, 100 - Math.floor(score/8)) * (0.8 + Math.random()*0.45);
+            spawnIn = Math.max(38, 100 - Math.floor(score/5)) * (0.8 + Math.random()*0.45);
           }
         }
         if(banner){ banner.t -= dt; if(banner.t <= 0) banner = null; }
-        speed = 4.4 + score/90;
+        speed = 4.4 + score/50;
         kvy += 0.58*dt; ky = Math.min(GY, ky + kvy*dt);
         if(jumpBuf > 0){ jumpBuf -= dt; if(ky >= GY-0.5) doJump(); }
         obs.forEach(o=>o.x -= speed*dt);

@@ -1,4 +1,4 @@
 export const DIET_OPTS = [
-    "Drinks alcohol","Nut allergy","Shellfish allergy","Gluten-free",
-    "Dairy-free","Vegetarian","Vegan","Pescatarian","Halal","Kosher"
+    "Does not drink","Thirsty 🍺🍷🍹","Nut allergy","Shellfish allergy","Gluten-free king 👑",
+    "Dairy-free queenz 👑","Vegetarian","Vegan","Pescatarian","Halal","Kosher"
   ];

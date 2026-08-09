@@ -320,6 +320,11 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .wo-dots{position:absolute;top:1rem;right:1rem;letter-spacing:.15em;color:var(--peri-deep);font-size:.78rem}
 .wo-tag{display:inline-block;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;background:#E7EFDF;border:1px solid var(--sage-deep);color:#4F5F41;padding:.1rem .55rem;margin-top:.5rem}
 
+/* ---------- Ukraine page ---------- */
+.ukraine-salute{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:2rem;text-align:center}
+.ukraine-flag{font-size:8rem;line-height:1}
+.ukraine-text{font-family:"Cormorant Garamond",serif;font-size:clamp(2.8rem,8vw,6rem);font-weight:600;color:#005BBB;letter-spacing:.04em}
+
 /* ---------- phone polish ---------- */
 @media (max-width:480px){
   #chat-fab .fab-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}

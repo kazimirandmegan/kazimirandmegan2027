@@ -12,6 +12,7 @@ export const SHARED = [
   "expl-day",
   "expl-eur",
   "americans",
+  "ukraine",
   "stay",
   "workouts",
   "atlas",

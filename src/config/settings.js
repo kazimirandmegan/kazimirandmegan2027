@@ -139,5 +139,7 @@ export const SETTINGS = {
   scoreCsv:        "",  /* live Kiko Dash leaderboard — name,score      */
   scoreFormUrl:    "",  /* pre-filled link containing {name} & {score}  */
   songFormUrl:     "",  /* pre-filled link containing {song} & {name}   */
-  guestMapCsv:     ""   /* Guest Atlas pins — name,place,lat,lng        */
+  guestMapCsv:     "",  /* Guest Atlas pins — name,place,lat,lng        */
+
+  googleCalendarUrl: ""  /* Google Calendar subscribe link — set to enable the button in Wedding Week */
 };
