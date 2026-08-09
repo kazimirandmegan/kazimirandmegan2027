@@ -65,7 +65,7 @@ ul.tidy li{padding:.18rem 0}
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;margin:.8rem 0}
 .table-scroll > table{margin:0}
 table.plain{width:100%;border-collapse:collapse;font-size:.97rem;margin:.8rem 0}
-table.plain th{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink);text-align:left;padding:.5rem .55rem;border-bottom:1px solid var(--rule)}
+table.plain th{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink);text-align:left;padding:.5rem .55rem;border-bottom:1px solid var(--rule)}
 table.plain td{padding:.55rem .55rem;border-bottom:1px dotted var(--rule);vertical-align:top}
 @media (max-width:560px){
   table.plain{min-width:520px}
@@ -77,7 +77,7 @@ table.plain td{padding:.55rem .55rem;border-bottom:1px dotted var(--rule);vertic
 /* ---------- dropdown navigation ---------- */
 nav.links{align-items:center}
 .ngroup{position:relative}
-.ngroup-btn{background:none;border:none;cursor:pointer;font-family:inherit;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);padding:.3rem 0;display:flex;align-items:center;gap:.35rem;transition:color .2s}
+.ngroup-btn{background:none;border:none;cursor:pointer;font-family:inherit;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);padding:.3rem 0;display:flex;align-items:center;gap:.35rem;transition:color .2s}
 .ngroup-btn:hover,.ngroup:focus-within>.ngroup-btn{color:var(--peri-deep)}
 .ngroup-btn .car{font-size:.55rem;color:var(--gold-ink);transition:transform .25s ease}
 /* desktop dropdown: gentle fade-and-drop; opens on hover or keyboard
@@ -93,7 +93,7 @@ nav.links{align-items:center}
   /* the drawer: each group is a tap-to-open accordion; one open at a
      time, chevron rotates, options slide down smoothly */
   .ngroup{width:100%}
-  .ngroup-btn{width:100%;padding:.85rem .2rem;color:var(--ink);letter-spacing:.24em;font-size:.66rem;border-bottom:1px solid var(--rule);justify-content:space-between}
+  .ngroup-btn{width:100%;padding:.85rem .2rem;color:var(--ink);letter-spacing:.24em;font-size:.78rem;border-bottom:1px solid var(--rule);justify-content:space-between}
   .ngroup.m-open>.ngroup-btn{color:var(--peri-deep)}
   .ngroup-btn .car{display:inline;font-size:.62rem;transition:transform .3s ease}
   .ngroup.m-open>.ngroup-btn .car{transform:rotate(180deg)}
@@ -106,7 +106,7 @@ nav.links{align-items:center}
 .wx-big{font-size:2.7rem;line-height:1}
 .wx-temp{font-family:"Cormorant Garamond",serif;font-size:2.5rem;color:var(--peri-deep);line-height:1}
 .wx-meta{font-size:.92rem;color:var(--ink-soft)}
-.wx-src{font-size:.72rem;color:var(--ink-soft);margin-left:auto;align-self:flex-end}
+.wx-src{font-size:.78rem;color:var(--ink-soft);margin-left:auto;align-self:flex-end}
 
 /* ---------- st albans map ---------- */
 #stamap{height:430px;border:1px solid var(--rule);z-index:1}
@@ -145,10 +145,10 @@ nav.links{align-items:center}
 .gb-note.wish{border-top-color:var(--sage)}
 .gb-note .pin{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:1.05rem}
 .gb-note .who{font-family:"Cormorant Garamond",serif;color:var(--peri-deep);font-size:1.05rem;margin-top:.5rem}
-.gb-note .kind{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink)}
+.gb-note .kind{font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink)}
 .gb-note img{margin:.5rem 0;border:1px solid var(--rule);max-width:100%}
 .gb-note.gb-local{outline:2px dashed var(--gold-soft);outline-offset:3px}
-.gb-count{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);vertical-align:middle}
+.gb-count{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);vertical-align:middle}
 /* ---------- living photo mosaic ---------- */
 .gb-mosaic{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin:.8rem 0 1rem}
 @media (max-width:540px){.gb-mosaic{grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:4px}}
@@ -159,7 +159,7 @@ nav.links{align-items:center}
   .gb-tile:hover img,.gb-tile:focus-visible img{transform:scale(1.02)}
 }
 .gb-tile:focus-visible{outline:2px solid var(--peri-deep);outline-offset:2px;z-index:5}
-.gb-tile.gb-local::after{content:"on this device";position:absolute;left:0;right:0;bottom:0;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;text-align:center;background:rgba(179,148,92,.85);color:#fff;padding:1px 0}
+.gb-tile.gb-local::after{content:"on this device";position:absolute;left:0;right:0;bottom:0;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;text-align:center;background:rgba(179,148,92,.85);color:#fff;padding:1px 0}
 /* ---------- lightbox ---------- */
 .gb-lightbox{position:fixed;inset:0;z-index:1200;background:rgba(32,38,59,.86);display:flex;align-items:center;justify-content:center;padding:1.5rem}
 .gb-lightbox[hidden]{display:none}
@@ -184,7 +184,7 @@ nav.links{align-items:center}
 
 /* ---------- train board v2 ---------- */
 .board{padding-top:0}
-.board-strip{background:#F4C64D;color:#20263B;font-weight:bold;padding:.4rem .8rem;letter-spacing:.22em;font-size:.72rem;margin:0 -1.3rem .8rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem}
+.board-strip{background:#F4C64D;color:#20263B;font-weight:bold;padding:.4rem .8rem;letter-spacing:.22em;font-size:.78rem;margin:0 -1.3rem .8rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem}
 .board td{text-shadow:0 0 8px rgba(244,198,77,.45)}
 .board tr:nth-child(even) td{background:rgba(255,255,255,.035)}
 .board .dest{color:#fff;text-shadow:0 0 8px rgba(255,255,255,.35)}
@@ -201,7 +201,7 @@ nav.links{align-items:center}
 .tp-face{aspect-ratio:1/1;background:linear-gradient(135deg,#DCE4F4,#EAE6D8);display:flex;align-items:center;justify-content:center;font-family:"Cormorant Garamond",serif;font-size:3rem;color:var(--peri-deep);position:relative;overflow:hidden;border-bottom:3px solid var(--gold-soft)}
 .tp-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .tp-card h4{margin:.6rem 0 0}
-.tp-role{font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink)}
+.tp-role{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink)}
 #tp-overlay{position:fixed;inset:0;background:rgba(32,38,59,.55);z-index:1100;display:none;align-items:center;justify-content:center;padding:1rem}
 #tp-overlay.open{display:flex}
 .tp-big{background:var(--card);border:2px solid var(--gold-soft);max-width:360px;width:100%;box-shadow:var(--shadow);position:relative;max-height:92vh;overflow:auto}
@@ -244,7 +244,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .euro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1rem 0}
 .euro-card{border:1px solid var(--rule);border-top:3px solid var(--peri);padding:1rem 1.1rem;background:#FFFDF6}
 .euro-card h4{margin:0}
-.euro-card .et{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink);margin:.15rem 0 .4rem}
+.euro-card .et{font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink);margin:.15rem 0 .4rem}
 .euro-card .et .ec{color:var(--peri-deep);letter-spacing:.06em}
 
 /* ---------- games ---------- */
@@ -256,7 +256,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .xw .xc.blk{background:transparent;border:none}
 .xw .xc input{width:100%;height:100%;border:none;text-align:center;font-family:"Cormorant Garamond",serif;font-size:1.15rem;text-transform:uppercase;color:var(--ink);background:transparent;padding:0}
 .xw .xc input:focus{outline:2px solid var(--peri);outline-offset:-2px}
-.xw .xc .xn{position:absolute;top:0;left:2px;font-size:.5rem;color:var(--gold-ink)}
+.xw .xc .xn{position:absolute;top:0;left:2px;font-size:.62rem;color:var(--gold-ink)}
 .xw .xc.ok input{background:#E7EFDF}
 .xw .xc.bad input{background:#F4E3DC}
 .xw-clues{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1rem;font-size:.95rem}
@@ -266,7 +266,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .kd-hud{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
 .kd-score{font-family:"Courier New",monospace;color:var(--peri-deep);font-size:1.05rem;letter-spacing:.1em}
 .lb{width:100%;border-collapse:collapse;font-size:.92rem;margin:.6rem 0}
-.lb th{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink);text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--rule)}
+.lb th{font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink);text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--rule)}
 .lb td{padding:.4rem .5rem;border-bottom:1px dotted var(--rule)}
 .lb tr:first-child td{color:var(--gold-ink);font-weight:bold}
 @media (max-width:560px){
@@ -289,7 +289,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 @media (min-width:1025px){
   .nav-inner{flex-direction:column;align-items:center;gap:.15rem;padding:.7rem 1.2rem .55rem}
   nav.links{justify-content:center;gap:1.6rem}
-  nav.links a,.ngroup-btn{font-size:.8rem;letter-spacing:.24em}
+  nav.links a,.ngroup-btn{font-size:.875rem;letter-spacing:.24em}
   .monogram span{font-size:1.25rem}
   /* --- desktop dropdown: absolute, hover/focus, soft fade.
      Guarded here so it NEVER applies on a phone (where tap = :hover). --- */
@@ -298,6 +298,14 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
   .ngroup:hover>.nmenu,.ngroup:focus-within>.nmenu{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0);transition:opacity .18s ease,transform .18s ease}
   .nmenu a{padding:.5rem 1.15rem !important;white-space:nowrap;transition:background .15s,padding-left .15s}
   .nmenu a:hover{background:var(--ivory);padding-left:1.35rem !important}
+  /* last 2 ngroups (For Guests, Keepsakes) pin their dropdown to the right
+     so it never slides off the right edge of the viewport */
+  .ngroup:last-of-type .nmenu,
+  .ngroup:nth-last-of-type(2) .nmenu{left:auto;right:0;transform:translate(0,8px)}
+  .ngroup:last-of-type:hover>.nmenu,
+  .ngroup:last-of-type:focus-within>.nmenu,
+  .ngroup:nth-last-of-type(2):hover>.nmenu,
+  .ngroup:nth-last-of-type(2):focus-within>.nmenu{transform:translate(0,0)}
 }
 
 /* ---------- wedding workouts ---------- */
@@ -306,8 +314,8 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .wo-card .wo-time{font-family:"Courier New",monospace;font-size:.8rem;letter-spacing:.14em;color:var(--gold-ink)}
 .wo-card h4{margin:.2rem 0 .1rem;font-size:1.3rem}
 .wo-card .wo-coach{font-style:italic;color:var(--ink-soft);font-size:.92rem;margin-bottom:.5rem}
-.wo-dots{position:absolute;top:1rem;right:1rem;letter-spacing:.15em;color:var(--peri-deep);font-size:.7rem}
-.wo-tag{display:inline-block;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;background:#E7EFDF;border:1px solid var(--sage-deep);color:#4F5F41;padding:.1rem .55rem;margin-top:.5rem}
+.wo-dots{position:absolute;top:1rem;right:1rem;letter-spacing:.15em;color:var(--peri-deep);font-size:.78rem}
+.wo-tag{display:inline-block;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;background:#E7EFDF;border:1px solid var(--sage-deep);color:#4F5F41;padding:.1rem .55rem;margin-top:.5rem}
 
 /* ---------- phone polish ---------- */
 @media (max-width:480px){
