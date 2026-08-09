@@ -79,3 +79,23 @@
 .gal-lb-prev:hover,.gal-lb-next:hover{background:rgba(255,255,255,.22)}
 .gal-lb-counter{position:fixed;top:max(.9rem,env(safe-area-inset-top,.9rem));left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;pointer-events:none}
 @media (max-width:640px){.gal-lb-prev,.gal-lb-next{width:42px;height:42px;font-size:1.5rem}}
+
+/* ---------- BTS static masonry ---------- */
+.bts-masonry{column-count:3;column-gap:10px;margin:0}
+@media (max-width:640px){.bts-masonry{column-count:2;column-gap:6px}}
+@media (max-width:380px){.bts-masonry{column-count:1}}
+.bts-tile{break-inside:avoid;display:block;margin-bottom:10px;cursor:pointer;position:relative;overflow:hidden;background:var(--ivory)}
+.bts-tile img{display:block;width:100%;height:auto;transition:transform .4s ease}
+@media (hover:hover) and (pointer:fine){.bts-tile:hover img{transform:scale(1.05)}}
+.bts-tile-cap{padding:.45rem .55rem .5rem;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:.95rem;color:var(--ink);line-height:1.3}
+
+/* ---------- After-tab photo upload ---------- */
+.gb-upload-section{background:var(--ivory);border:1px solid var(--rule);padding:1rem 1.1rem;margin:0 0 1.4rem;border-radius:2px}
+.gb-upload-title{margin:0 0 .6rem;font-size:1rem;font-weight:600}
+.gb-upload-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.gb-upload-sel{font-family:inherit;font-size:.88rem;padding:.38rem .6rem;border:1px solid var(--rule);background:#fff;color:var(--ink);min-height:36px;flex:none}
+.gb-upload-filebtn{position:relative;flex:none;font-size:.82rem;cursor:pointer}
+.gb-upload-status{margin:.5rem 0 0;font-size:.85rem;color:var(--ink-soft);font-style:italic;min-height:1.2em}
+
+/* before-phase masonry within the wall */
+.gal-masonry--before{margin-top:.8rem}

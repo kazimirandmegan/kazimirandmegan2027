@@ -18,7 +18,7 @@ import {
   buildStoryLines,
   buildMaps,
 } from "../data/maps/map-config.js";
-import { initGallery, refreshGallery } from "./gallery.js";
+import { initGallery, refreshGallery, openGalleryLightbox } from "./gallery.js";
 
 export function boot() {
   /* ---------- tier access (from ./tier.js) ---------- */
@@ -1078,19 +1078,48 @@ export function boot() {
       }
     });
 
-    /* update the masonry photo gallery */
-    const allPhotos = [
+    /* render before-phase photos into the simple before masonry */
+    (function(){
+      const grid = document.getElementById('gal-masonry-before');
+      if (!grid) return;
+      grid.innerHTML = '';
+      const beforePhotos = gbPhotos.before.filter(it => IMG_OK.test(it.e.img));
+      beforePhotos.forEach((it, idx) => {
+        const div = document.createElement('div');
+        div.className = 'gal-item';
+        div.setAttribute('role', 'button');
+        div.setAttribute('tabindex', '0');
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = it.e.who || '';
+        img.src = it.e.img;
+        img.onerror = () => div.remove();
+        const over = document.createElement('div');
+        over.className = 'gal-item-over';
+        if (it.e.who) {
+          const who = document.createElement('span');
+          who.className = 'gal-item-who';
+          who.textContent = it.e.who;
+          over.appendChild(who);
+        }
+        div.appendChild(img);
+        div.appendChild(over);
+        const photos = beforePhotos.map(p => ({ src: p.e.img, who: p.e.who || null, caption: p.e.text || null, cat: null }));
+        div.addEventListener('click', () => openGalleryLightbox(photos, idx));
+        div.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openGalleryLightbox(photos, idx); } });
+        grid.appendChild(div);
+      });
+    })();
+
+    /* update the after-phase masonry gallery */
+    const afterPhotos = [
       ...(SETTINGS.galleryPhotos || []),
-      ...gbPhotos.before.filter(it=>IMG_OK.test(it.e.img)).map(it=>({
-        src: it.e.img, who: it.e.who||null, caption: it.e.text||null,
-        cat: it.e.cat||null, local: it.local
-      })),
-      ...gbPhotos.after.filter(it=>IMG_OK.test(it.e.img)).map(it=>({
-        src: it.e.img, who: it.e.who||null, caption: it.e.text||null,
-        cat: it.e.cat||'Guests', local: it.local
+      ...gbPhotos.after.filter(it => IMG_OK.test(it.e.img)).map(it => ({
+        src: it.e.img, who: it.e.who || null, caption: it.e.text || null,
+        cat: it.e.cat || 'Guests', local: it.local
       }))
     ];
-    refreshGallery(allPhotos);
+    refreshGallery(afterPhotos);
   }
   gbRender();
   document.querySelectorAll(".gb-more").forEach(btn=>{
@@ -1395,6 +1424,47 @@ export function boot() {
     setPhase("before");
   })();
 
+  /* ---- After-tab photo upload → cloud ---- */
+  (function(){
+    const fileInput = document.getElementById('gb-upload-file');
+    const catSel    = document.getElementById('gb-upload-cat');
+    const btn       = document.getElementById('gb-upload-btn');
+    const status    = document.getElementById('gb-upload-status');
+    if (!btn || !fileInput) return;
+
+    let uploadQueue = [];
+    fileInput.addEventListener('change', function(){
+      const files = [...(this.files || [])];
+      status.textContent = files.length ? files.length + ' photo' + (files.length > 1 ? 's' : '') + ' selected' : '';
+      uploadQueue = files;
+    });
+
+    btn.addEventListener('click', () => {
+      if (!uploadQueue.length) { status.textContent = 'Choose at least one photo first.'; return; }
+      if (!CLOUD) { status.textContent = 'Live uploads aren\'t set up yet — email your photos to us instead!'; return; }
+      const cat = catSel ? catSel.value : 'Guests';
+      const who = (document.getElementById('gb-who') || {}).value || '';
+      btn.disabled = true;
+      const was = btn.textContent; btn.textContent = 'Uploading…';
+      status.textContent = '';
+      Promise.all(uploadQueue.slice(0, 20).map(f =>
+        shrinkImage(f, 1400, 0.82).then(dataUrl =>
+          cloudPost({ action: 'guestbook', who, type: 'photo', text: '', photo: dataUrl, phase: 'after', cat })
+        ).catch(() => null)
+      )).then(results => {
+        const ok = results.filter(Boolean).length;
+        status.textContent = ok + ' photo' + (ok !== 1 ? 's' : '') + ' uploaded — they\'ll appear in the gallery shortly!';
+        uploadQueue = [];
+        fileInput.value = '';
+        gbCloudRefresh().catch(() => {});
+      }).catch(() => {
+        status.textContent = 'Upload failed — check your connection and try again.';
+      }).finally(() => {
+        btn.disabled = false; btn.textContent = was;
+      });
+    });
+  })();
+
   /* shared photo album slot (Guestbook → After the day) */
   (function(){
     const slot = document.getElementById("album-slot"); if(!slot) return;
@@ -1402,6 +1472,77 @@ export function boot() {
       slot.innerHTML = '<a class="btn primary" style="margin-top:.3rem" target="_blank" rel="noopener" href="'+SETTINGS.photoAlbum+'">Open the shared album</a>';
     else
       slot.innerHTML = '<span class="placeholder">[the shared album link appears here after the wedding — SETTINGS.photoAlbum]</span>';
+  })();
+
+  /* ---- BTS gallery lightbox ---- */
+  (function(){
+    const lb      = document.getElementById('bts-lb');
+    if (!lb) return;
+    const lbImg   = document.getElementById('bts-lb-img');
+    const lbCap   = document.getElementById('bts-lb-cap');
+    const lbCtr   = document.getElementById('bts-lb-counter');
+    const closeBtn = document.getElementById('bts-lb-close');
+    const prevBtn  = document.getElementById('bts-lb-prev');
+    const nextBtn  = document.getElementById('bts-lb-next');
+    let btsPhotos = [], btsIdx = 0;
+
+    function btsLbShow(idx) {
+      btsIdx = (idx + btsPhotos.length) % btsPhotos.length;
+      const p = btsPhotos[btsIdx];
+      lbImg.style.opacity = '0';
+      lbImg.onload = () => { lbImg.style.opacity = '1'; };
+      lbImg.src = p.src;
+      if (lbCap) lbCap.textContent = p.caption || '';
+      if (lbCtr) lbCtr.textContent = (btsIdx + 1) + ' / ' + btsPhotos.length;
+    }
+    function btsOpen(photos, idx) {
+      btsPhotos = photos; btsIdx = idx;
+      btsLbShow(idx);
+      const scrollY = window.scrollY;
+      document.body.dataset.lbScroll = scrollY;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + scrollY + 'px';
+      document.body.style.width = '100%';
+      lb.classList.add('open');
+    }
+    function btsClose() {
+      lb.classList.remove('open');
+      const scrollY = parseFloat(document.body.dataset.lbScroll || '0');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    }
+
+    closeBtn && closeBtn.addEventListener('click', btsClose);
+    prevBtn  && prevBtn.addEventListener('click',  () => btsLbShow(btsIdx - 1));
+    nextBtn  && nextBtn.addEventListener('click',  () => btsLbShow(btsIdx + 1));
+    lb.addEventListener('click', e => { if (e.target === lb) btsClose(); });
+    document.addEventListener('keydown', e => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') btsClose();
+      else if (e.key === 'ArrowLeft') btsLbShow(btsIdx - 1);
+      else if (e.key === 'ArrowRight') btsLbShow(btsIdx + 1);
+    });
+
+    /* Wire tiles in both grids */
+    function wireGrid(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const tiles = [...grid.querySelectorAll('.bts-tile')];
+      const photos = tiles.map(t => ({
+        src: (t.querySelector('img') || {}).src || '',
+        caption: t.dataset.caption || ''
+      }));
+      tiles.forEach((tile, i) => {
+        tile.style.cursor = 'pointer';
+        tile.addEventListener('click', () => btsOpen(photos, i));
+      });
+    }
+    wireGrid('bts-eng-grid');
+    wireGrid('bts-plan-grid');
   })();
 
   /* ============================================================

@@ -1,30 +1,61 @@
 <!-- ============================================================
-     ===== PAGE: BEHIND THE SCENES (all tiers) =====
-     Add photos as images_bts-1.jpg ... images_bts-6.jpg
-     Duplicate a <figure class="bts-frame"> block for more.
+     PAGE: BEHIND THE SCENES
+     Engagement photos: images_engagement-1.jpg, images_engagement-2.jpg, …
+     Planning photos:   images_bts-1.jpg, images_bts-2.jpg, …
+     Add photos by copying a tile block and incrementing the number.
      ============================================================ -->
 <section class="page" id="page-bts">
   <div class="sheet">
     <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
     <div class="page-eyebrow small-caps">The making of</div>
     <h2 class="title">Behind the Scenes</h2>
-    <p class="subtitle">Planning a three-nation wedding, documented for posterity — updated as we go</p>
+    <p class="subtitle">The engagement, and the making of a three-nation wedding</p>
 
-    <p style="max-width:640px;margin:0 auto 1rem;text-align:center">
-      Cake tastings conducted with scientific rigour. Seating charts redrafted more times than the
-      Treaty of Versailles. One dog supervising everything. We'll keep adding photos here as the
-      plans come together — check back.
-    </p>
-
-    <div class="bts-grid">
-      <figure class="bts-frame"><div class="bts-ph"><span class="ph-hint">images_bts-1.jpg</span><img src="images_bts-1.jpg" alt="" onerror="this.remove()"></div><figcaption>[PLACEHOLDER: caption]</figcaption></figure>
-      <figure class="bts-frame"><div class="bts-ph"><span class="ph-hint">images_bts-2.jpg</span><img src="images_bts-2.jpg" alt="" onerror="this.remove()"></div><figcaption>[PLACEHOLDER: caption]</figcaption></figure>
-      <figure class="bts-frame"><div class="bts-ph"><span class="ph-hint">images_bts-3.jpg</span><img src="images_bts-3.jpg" alt="" onerror="this.remove()"></div><figcaption>[PLACEHOLDER: caption]</figcaption></figure>
-      <figure class="bts-frame"><div class="bts-ph"><span class="ph-hint">images_bts-4.jpg</span><img src="images_bts-4.jpg" alt="" onerror="this.remove()"></div><figcaption>[PLACEHOLDER: caption]</figcaption></figure>
-      <figure class="bts-frame"><div class="bts-ph"><span class="ph-hint">images_bts-5.jpg</span><img src="images_bts-5.jpg" alt="" onerror="this.remove()"></div><figcaption>[PLACEHOLDER: caption]</figcaption></figure>
-      <figure class="bts-frame"><div class="bts-ph"><span class="ph-hint">images_bts-6.jpg</span><img src="images_bts-6.jpg" alt="" onerror="this.remove()"></div><figcaption>[PLACEHOLDER: caption]</figcaption></figure>
+    <div class="fg-tabs" role="tablist">
+      <button type="button" class="on" data-fgtab="bts-eng" role="tab">The Engagement</button>
+      <button type="button" data-fgtab="bts-plan" role="tab">Planning the Wedding</button>
     </div>
 
-    <p class="note" style="text-align:center">To add more: put photos in the site folder as images_bts-7.jpg, images_bts-8.jpg… and copy one of the frame blocks in the file (each is one line — search for bts-frame).</p>
+    <!-- ENGAGEMENT gallery -->
+    <div class="fg-panel on" id="fgtab-bts-eng">
+      <p style="max-width:640px;margin:0 auto 1.2rem;text-align:center">From the proposal to the countdown — the beginning of it all.</p>
+      <div class="bts-masonry" id="bts-eng-grid">
+        <!-- Add engagement photos: copy a block and change the number -->
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_engagement-1.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_engagement-2.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_engagement-3.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_engagement-4.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_engagement-5.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_engagement-6.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+      </div>
+    </div>
+
+    <!-- PLANNING gallery -->
+    <div class="fg-panel" id="fgtab-bts-plan">
+      <p style="max-width:640px;margin:0 auto 1.2rem;text-align:center">Cake tastings conducted with scientific rigour. Seating charts redrafted more times than the Treaty of Versailles. One dog supervising everything.</p>
+      <div class="bts-masonry" id="bts-plan-grid">
+        <!-- Add planning photos: copy a block and change the number -->
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_bts-1.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_bts-2.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_bts-3.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_bts-4.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_bts-5.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+        <div class="bts-tile" data-caption="[Caption]"><img src="images_bts-6.jpg" alt="" loading="lazy" onerror="this.closest('.bts-tile').remove()"><div class="bts-tile-cap">[Caption]</div></div>
+      </div>
+    </div>
+
+    <!-- BTS lightbox (shared between both galleries) -->
+    <div class="gal-lightbox" id="bts-lb" role="dialog" aria-modal="true" aria-label="Photo viewer">
+      <button class="gal-lb-close" id="bts-lb-close" aria-label="Close photo">✕</button>
+      <button class="gal-lb-prev" id="bts-lb-prev" aria-label="Previous photo">‹</button>
+      <div class="gal-lb-img-wrap">
+        <img id="bts-lb-img" alt="">
+      </div>
+      <button class="gal-lb-next" id="bts-lb-next" aria-label="Next photo">›</button>
+      <p class="gal-lb-meta" id="bts-lb-cap"></p>
+      <span class="gal-lb-counter" id="bts-lb-counter"></span>
+    </div>
+
+    <p class="note" style="text-align:center;margin-top:1.5rem">To add more photos: save them as images_engagement-7.jpg (or images_bts-7.jpg) and copy one of the tile blocks above.</p>
   </div>
 </section>

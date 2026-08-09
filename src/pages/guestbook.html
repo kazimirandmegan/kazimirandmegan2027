@@ -1,8 +1,4 @@
-<!-- ============================================================
-     ===== PAGE: GUESTBOOK & PHOTO WALL (all tiers) =====
-     Permanent entries live in SETTINGS.guestbookWall — paste in
-     anything guests email you and redeploy.
-     ============================================================ -->
+<!-- PAGE: GUESTBOOK & PHOTO WALL -->
 <section class="page" id="page-guestbook">
   <div class="sheet">
     <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
@@ -15,14 +11,63 @@
       <button type="button" data-gbtab="after" role="tab">After the day</button>
     </div>
 
+    <!-- BEFORE panel: just intro -->
     <div class="fg-panel on" id="gbtab-before">
-      <p style="margin:0 0 .4rem">Wishes for the day, advice for married life, and photos of us at our most embarrassing — pin them below and watch this wall grow between now and May.</p>
-    </div>
-    <div class="fg-panel" id="gbtab-after">
-      <h4 style="margin:.2rem 0 .4rem">Photos from the celebrations</h4>
-      <p style="margin:0 0 .4rem">The morning-after wall. Add your snaps from the week and the big day — they join a living gallery everyone can explore. Prefer full quality and bulk upload? The shared album is here too: <span id="album-slot"></span></p>
+      <p style="margin:0 0 .4rem">Wishes for the day, advice for married life, and photos of us at our most embarrassing — pin them below.</p>
     </div>
 
+    <!-- AFTER panel: photo upload + filters + masonry gallery + notes -->
+    <div class="fg-panel" id="gbtab-after">
+      <p style="margin:0 0 1rem">The morning-after wall. Add your snaps from the day — they join a living gallery everyone can explore. Prefer full quality and bulk upload? The shared album is here too: <span id="album-slot"></span></p>
+
+      <!-- Photo upload section -->
+      <div class="gb-upload-section">
+        <h4 class="gb-upload-title">Share your photos from the day</h4>
+        <div class="gb-upload-row">
+          <select id="gb-upload-cat" aria-label="Photo category" class="gb-upload-sel">
+            <option value="Ceremony">Ceremony</option>
+            <option value="Reception">Reception</option>
+            <option value="Guests">Guests</option>
+            <option value="Photo Booth">Photo Booth</option>
+          </select>
+          <label class="btn ghost gb-upload-filebtn">
+            Choose photos
+            <input type="file" id="gb-upload-file" accept="image/*" multiple style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden">
+          </label>
+          <button class="btn primary" id="gb-upload-btn" type="button">Upload</button>
+        </div>
+        <p class="gb-upload-status" id="gb-upload-status" aria-live="polite"></p>
+      </div>
+
+      <!-- Category filters -->
+      <div class="gal-filters" role="group" aria-label="Filter by category">
+        <span class="gal-filter-label">Show:</span>
+        <button class="gal-filter active" data-cat="all" type="button">All</button>
+        <button class="gal-filter" data-cat="Ceremony" type="button">Ceremony</button>
+        <button class="gal-filter" data-cat="Reception" type="button">Reception</button>
+        <button class="gal-filter" data-cat="Guests" type="button">Guests</button>
+        <button class="gal-filter" data-cat="Photo Booth" type="button">Photo Booth</button>
+      </div>
+
+      <!-- Today's Memories featured strip -->
+      <div class="gal-featured" id="gal-featured-section">
+        <div class="gal-feat-eyebrow">Today's Memories</div>
+        <div class="gal-feat-grid" id="gal-featured-strip"></div>
+      </div>
+
+      <p class="gal-meta" id="gal-meta"></p>
+
+      <!-- Masonry grid (after-phase photos only) -->
+      <div class="gal-masonry" id="gal-masonry" role="list" aria-label="Wedding photo gallery"></div>
+      <div class="gal-sentinel" id="gal-sentinel" aria-hidden="true"><div class="gal-spinner"></div></div>
+      <div class="gal-empty" id="gal-empty" style="display:none">
+        <div class="gal-empty-icon">📷</div>
+        <p>No photos yet.</p>
+        <p>Upload some above — they appear here immediately and everyone can see them.</p>
+      </div>
+    </div>
+
+    <!-- Shared pin form -->
     <div class="gb-form">
       <h4 style="margin-top:0" id="gb-form-title">Pin something to the wall</h4>
       <input type="text" id="gb-who" placeholder="Your name" aria-label="Your name">
@@ -43,57 +88,18 @@
       <p class="devnote" id="gb-form-help" style="margin-top:.7rem">How the wall works: pinning saves instantly on this device so you can see it in place. Tap "Email it to us" and we'll add it to the permanent wall for everyone.</p>
     </div>
 
-    <!-- BEFORE wall — notes only (photos go to the gallery below) -->
+    <!-- BEFORE wall: notes + photos combined -->
     <div class="gb-wallwrap on" id="gbwall-before">
       <h3>Notes &amp; wishes <button class="hunt-token" data-hunt="5" aria-label="A hidden petal">❀</button></h3>
       <div class="gb-notes" id="gb-notes-before"></div>
+      <div class="gal-masonry gal-masonry--before" id="gal-masonry-before" aria-label="Before-day photos"></div>
     </div>
 
-    <!-- AFTER wall — notes only -->
+    <!-- AFTER wall: notes from the day -->
     <div class="gb-wallwrap" id="gbwall-after">
       <h3>Notes from the day</h3>
       <div class="gb-notes" id="gb-notes-after"></div>
       <p class="note" id="gb-after-empty" style="text-align:center">No notes yet — after the celebrations, this wall fills with everyone's messages. Be the first.</p>
-    </div>
-
-    <!-- ============================================================
-         PHOTO GALLERY
-         ============================================================ -->
-    <hr class="gal-divider">
-    <h3 id="gal-heading">The Photo Gallery</h3>
-
-    <!-- Today's Memories -->
-    <div class="gal-featured" id="gal-featured-section">
-      <div class="gal-feat-eyebrow">Today's Memories</div>
-      <div class="gal-feat-grid" id="gal-featured-strip"></div>
-    </div>
-
-    <!-- Meta / count -->
-    <p class="gal-meta" id="gal-meta"></p>
-
-    <!-- Category filters -->
-    <div class="gal-filters" role="group" aria-label="Filter by category">
-      <span class="gal-filter-label">Show:</span>
-      <button class="gal-filter active" data-cat="all" type="button">All</button>
-      <button class="gal-filter" data-cat="Ceremony" type="button">Ceremony</button>
-      <button class="gal-filter" data-cat="Reception" type="button">Reception</button>
-      <button class="gal-filter" data-cat="Guests" type="button">Guests</button>
-      <button class="gal-filter" data-cat="Photo Booth" type="button">Photo Booth</button>
-    </div>
-
-    <!-- Masonry grid -->
-    <div class="gal-masonry" id="gal-masonry" role="list" aria-label="Photo gallery"></div>
-
-    <!-- Infinite scroll sentinel -->
-    <div class="gal-sentinel" id="gal-sentinel" aria-hidden="true">
-      <div class="gal-spinner"></div>
-    </div>
-
-    <!-- Empty state -->
-    <div class="gal-empty" id="gal-empty" style="display:none">
-      <div class="gal-empty-icon">📷</div>
-      <p>No photos yet.</p>
-      <p>Pin one above — it appears here the moment you add it. After the wedding, this gallery fills with everyone's snaps from the week.</p>
     </div>
 
     <!-- Lightbox -->
@@ -108,7 +114,7 @@
       <span class="gal-lb-counter" id="gal-lb-counter"></span>
     </div>
 
-    <!-- legacy hidden mosaics (keep IDs so app.js gbRender doesn't error) -->
+    <!-- legacy hidden stubs -->
     <div id="gb-mosaic-before" style="display:none"></div>
     <div id="gb-mosaic-after" style="display:none"></div>
     <div id="gb-mos-h-before" style="display:none"></div>
@@ -117,8 +123,6 @@
     <div id="gb-mos-hint-after" style="display:none"></div>
     <div id="gb-count-before" style="display:none"></div>
     <div id="gb-count-after" style="display:none"></div>
-
-    <!-- keep old lightbox IDs so existing lb wiring doesn't break -->
     <div id="gb-lightbox" hidden aria-hidden="true">
       <img id="gb-lb-img" alt=""><figcaption id="gb-lb-cap"></figcaption>
       <button id="gb-lb-close" style="display:none"></button>
