@@ -1090,9 +1090,9 @@ export function boot() {
         div.setAttribute('role', 'button');
         div.setAttribute('tabindex', '0');
         const img = document.createElement('img');
-        img.loading = 'lazy';
         img.alt = it.e.who || '';
         img.src = it.e.img;
+        img.onload = () => img.classList.add('gal-loaded');
         img.onerror = () => div.remove();
         const over = document.createElement('div');
         over.className = 'gal-item-over';
