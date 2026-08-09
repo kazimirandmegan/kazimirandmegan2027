@@ -8,20 +8,20 @@
     <div class="page-eyebrow small-caps">The two of us</div>
     <h2 class="title">About Us</h2>
 
-    <!-- PHOTO SLOT: add  images_about.jpg -->
-    <figure class="photo-slot">
-      <svg class="art" viewBox="0 0 720 280" role="img" aria-label="Watercolour hydrangeas and hearts">
-        <rect width="720" height="280" fill="#FBF9F2"/>
-        <use href="#cornerspray" transform="translate(30 36) scale(1.6)"/>
-        <use href="#cornerspray" transform="translate(690 244) scale(1.6) rotate(180)"/>
-        <path d="M360 190 c-34-38-92-16-92 24 0 40 60 62 92 96 32-34 92-56 92-96 0-40-58-62-92-24z" transform="translate(0 -105) scale(.9)" fill="#93A8D8" opacity=".55"/>
-        <use href="#hyd" transform="translate(300 150) scale(1.6)"/>
-        <use href="#hyd" transform="translate(420 150) scale(1.6)"/>
-        <text x="360" y="40" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="20" fill="#6B82B8">Add a photo of the two of you — images_about.jpg</text>
-      </svg>
-      <img class="real" src="images_about.jpg" alt="Kazimir and Megan" onerror="this.remove()">
-      <figcaption>[PLACEHOLDER: caption]</figcaption>
-    </figure>
+    <div class="bio-photos about-hero-photos">
+      <figure class="bio-photo">
+        <img src="images_about.jpg" alt="Kazimir and Megan" loading="lazy" onerror="this.closest('figure').remove()">
+        <figcaption>At a summer event together</figcaption>
+      </figure>
+      <figure class="bio-photo">
+        <img src="images_about-2.jpg" alt="Kazimir and Megan" loading="lazy" onerror="this.closest('figure').remove()">
+        <figcaption>On our travels</figcaption>
+      </figure>
+      <figure class="bio-photo">
+        <img src="images_about-3.jpg" alt="Kazimir and Megan" loading="lazy" onerror="this.closest('figure').remove()">
+        <figcaption>The Dolomites, Italy</figcaption>
+      </figure>
+    </div>
 
     <h3>Our story</h3>
     <p>Dear reader,</p>

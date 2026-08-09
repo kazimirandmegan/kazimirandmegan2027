@@ -6,3 +6,10 @@ dist/
 .env.*
 !.env.example
 .tools/
+
+# Source photos — keep in Wedding Photos/ folder locally, not in git
+Wedding Photos/
+
+# Large archives
+*.zip
+*.ZIP

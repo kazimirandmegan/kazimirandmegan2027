@@ -221,6 +221,9 @@ nav.links{align-items:center}
 .bio-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--rule)}
 .bio-photo figcaption{text-align:center;font-style:italic;font-size:.82rem;color:var(--ink-soft);padding-top:.45rem}
 .bio-photos:not(:has(figure)){display:none}
+.about-hero-photos{margin:1.4rem 0}
+.about-hero-photos .bio-photo{flex:1 1 240px;max-width:none}
+.about-hero-photos .bio-photo img{aspect-ratio:4/3}
 
 /* ---------- runaway bus ---------- */
 #bus-run{position:fixed;bottom:16vh;left:-15vw;font-size:3.2rem;z-index:1150;pointer-events:none;opacity:0}
