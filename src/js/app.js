@@ -18,6 +18,7 @@ import {
   buildStoryLines,
   buildMaps,
 } from "../data/maps/map-config.js";
+import { initGallery, refreshGallery } from "./gallery.js";
 
 export function boot() {
   /* ---------- tier access (from ./tier.js) ---------- */
@@ -1076,6 +1077,20 @@ export function boot() {
         if(empty) empty.style.display = (hasPhotos || notesHost.children.length) ? "none" : "";
       }
     });
+
+    /* update the masonry photo gallery */
+    const allPhotos = [
+      ...(SETTINGS.galleryPhotos || []),
+      ...gbPhotos.before.filter(it=>IMG_OK.test(it.e.img)).map(it=>({
+        src: it.e.img, who: it.e.who||null, caption: it.e.text||null,
+        cat: it.e.cat||null, local: it.local
+      })),
+      ...gbPhotos.after.filter(it=>IMG_OK.test(it.e.img)).map(it=>({
+        src: it.e.img, who: it.e.who||null, caption: it.e.text||null,
+        cat: it.e.cat||'Guests', local: it.local
+      }))
+    ];
+    refreshGallery(allPhotos);
   }
   gbRender();
   document.querySelectorAll(".gb-more").forEach(btn=>{
