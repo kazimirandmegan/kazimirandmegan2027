@@ -387,6 +387,21 @@ export function refreshGallery(photos) {
   initGallery(incoming);
 }
 
+export function galleryResumed() {
+  // IntersectionObserver won't fire inside display:none containers, so
+  // when the After tab becomes visible we reconnect it and re-observe
+  // any images that still have a data-src waiting to be loaded.
+  initLazyObserver();
+  [
+    document.getElementById('gal-masonry'),
+    document.getElementById('gal-featured-strip'),
+  ].forEach(container => {
+    if (!container) return;
+    container.querySelectorAll('img[data-src]').forEach(img => _lazyObs.observe(img));
+  });
+  initScrollObserver();
+}
+
 export function openGalleryLightbox(photos, index) {
   _lbPhotos = photos;
   buildLightbox();

@@ -18,7 +18,7 @@ import {
   buildStoryLines,
   buildMaps,
 } from "../data/maps/map-config.js";
-import { initGallery, refreshGallery, openGalleryLightbox } from "./gallery.js";
+import { initGallery, refreshGallery, openGalleryLightbox, galleryResumed } from "./gallery.js";
 
 export function boot() {
   /* ---------- tier access (from ./tier.js) ---------- */
@@ -1413,6 +1413,7 @@ export function boot() {
         if(title) title.textContent = "Add to the after-the-day wall";
         /* after the day, photos are the point — keep the note options but default to photo */
         const sel = document.getElementById("gb-type"); if(sel) sel.value = "photo";
+        galleryResumed();
       } else {
         if(title) title.textContent = "Pin something to the wall";
         const sel = document.getElementById("gb-type"); if(sel && sel.value==="photo") sel.value = "memory";
@@ -2005,4 +2006,19 @@ export function boot() {
       }).catch(()=>{});
     }
   }
+
+  /* ---- Background-preload BTS photos while user browses other pages ---- */
+  (function(){
+    function preloadBts(){
+      const srcs = [];
+      for(let i=1;i<=40;i++) srcs.push('images_engagement-'+i+'.jpg');
+      for(let i=1;i<=30;i++) srcs.push('images_bts-'+i+'.jpg');
+      srcs.forEach(src=>{ const img=new Image(); img.src=src; });
+    }
+    if(typeof requestIdleCallback!=='undefined'){
+      requestIdleCallback(preloadBts,{timeout:12000});
+    } else {
+      setTimeout(preloadBts,6000);
+    }
+  })();
 }
