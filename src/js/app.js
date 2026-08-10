@@ -1108,6 +1108,7 @@ export function boot() {
         div.setAttribute('tabindex', '0');
         const img = document.createElement('img');
         img.alt = it.e.who || '';
+        img.loading = 'lazy';
         img.src = it.e.img;
         img.onload = () => img.classList.add('gal-loaded');
         img.onerror = () => div.remove();
@@ -1504,6 +1505,11 @@ export function boot() {
   (function(){
     const lb      = document.getElementById('bts-lb');
     if (!lb) return;
+
+    /* Move lightbox to body so position:fixed isn't scoped to a .page
+       ancestor that carries a CSS transform during the fadeUp animation. */
+    if (lb.parentElement !== document.body) document.body.appendChild(lb);
+
     const lbImg   = document.getElementById('bts-lb-img');
     const lbCap   = document.getElementById('bts-lb-cap');
     const lbCtr   = document.getElementById('bts-lb-counter');
@@ -1553,17 +1559,29 @@ export function boot() {
       else if (e.key === 'ArrowRight') btsLbShow(btsIdx + 1);
     });
 
-    /* Wire tiles in both grids */
+    /* Wire tiles — IntersectionObserver lazy loads data-src images with a
+       300px pre-load buffer and fade-in, matching the main gallery approach. */
     function wireGrid(gridId) {
       const grid = document.getElementById(gridId);
       if (!grid) return;
       const tiles = [...grid.querySelectorAll('.bts-tile')];
-      const photos = tiles.map(t => ({
-        src: (t.querySelector('img') || {}).src || '',
-        caption: t.dataset.caption || ''
-      }));
+
+      /* Capture src paths upfront for the lightbox */
+      const photos = tiles.map(t => {
+        const img = t.querySelector('img');
+        return { src: (img && img.getAttribute('src')) || '', caption: t.dataset.caption || '' };
+      });
+
+      /* Wire fade-in: images start opacity:0 (CSS); add .bts-loaded when loaded */
       tiles.forEach((tile, i) => {
-        tile.style.cursor = 'pointer';
+        const img = tile.querySelector('img');
+        if (img) {
+          if (img.complete && img.naturalWidth) {
+            img.classList.add('bts-loaded');
+          } else {
+            img.addEventListener('load', () => img.classList.add('bts-loaded'), { once: true });
+          }
+        }
         tile.addEventListener('click', () => btsOpen(photos, i));
       });
     }

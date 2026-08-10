@@ -195,7 +195,14 @@ function wireFilters() {
 }
 
 function buildLightbox() {
-  if (document.getElementById('gal-lightbox')) return;
+  const existing = document.getElementById('gal-lightbox');
+  if (existing) {
+    /* Ensure the lightbox is a direct body child so position:fixed works
+       correctly — .page ancestors run a CSS transform during fadeUp which
+       would otherwise scope fixed positioning to the page element. */
+    if (existing.parentElement !== document.body) document.body.appendChild(existing);
+    return;
+  }
   const lb = document.createElement('div');
   lb.id = 'gal-lightbox';
   lb.className = 'gal-lightbox';
