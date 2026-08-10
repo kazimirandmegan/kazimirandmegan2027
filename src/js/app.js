@@ -2055,7 +2055,7 @@ export function boot() {
     function preloadBts(){
       const srcs = [];
       for(let i=1;i<=40;i++) srcs.push('images_engagement-'+i+'.jpg');
-      for(let i=1;i<=30;i++) srcs.push('images_bts-'+i+'.jpg');
+      for(let i=1;i<=43;i++) srcs.push('images_bts-'+i+'.jpg');
       srcs.forEach(src=>{ const img=new Image(); img.src=src; });
     }
     if(typeof requestIdleCallback!=='undefined'){
