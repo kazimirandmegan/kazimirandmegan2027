@@ -1,9 +1,9 @@
 /* Editable data */
 export const PARTY = [
-  {role:"Co-Maid of Honour", name:"Grace Rigabar", img:"images_party-grace.jpg",
+  {role:"Maid of Honour", name:"Grace Rigabar", img:"images_party-grace.jpg",
    stats:[["Hype generation",98],["Speech tear risk",91],["Logistical genius",97],["Dance-floor stamina",89]],
    known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
-  {role:"Co-Maid of Honour", name:"Zoryana Uzwyshyn-Jones", img:"images_party-zoryana.jpg",
+  {role:"Maid of Honour", name:"Zoryana Uzwyshyn-Jones", img:"images_party-zoryana.jpg",
    stats:[["Artistic talent",99],["Wreath-weaving speed",96],["Ukrainian song knowledge",100],["Calm under pressure",88]],
    known:"[PLACEHOLDER: known for]", fact:"[PLACEHOLDER: fun fact]"},
   {role:"Co-Best Man", name:"Ryan Rigabar", img:"images_party-ryan.jpg",

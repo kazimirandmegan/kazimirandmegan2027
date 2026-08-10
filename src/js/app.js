@@ -536,7 +536,7 @@ export function boot() {
         const minF = Math.round(day.temperature_2m_min[0] * 9/5 + 32);
         const maxF = Math.round(day.temperature_2m_max[0] * 9/5 + 32);
         const unit = isAmericans ? "°F" : "°C";
-        const tempStr = isAmericans ? tF+unit : tC+unit;
+        const tempStr = isAmericans ? tF+"°F" : tC+"°C ("+tF+"°F)";
         const feelStr = isAmericans ? feelF+unit : feelC+unit;
         const minStr = isAmericans ? minF : minC;
         const maxStr = isAmericans ? maxF : maxC;
@@ -825,6 +825,7 @@ export function boot() {
           b.setAttribute("aria-pressed", on);          /* screen readers hear the choice */
         });
         document.getElementById("rsvp-ifyes").style.display = attending==="yes" ? "" : "none";
+        const _ifd = document.getElementById("rsvp-ifdecline"); if(_ifd) _ifd.style.display = attending==="no" ? "" : "none";
         if(attending==="yes" && !document.querySelector("#r-guests .rsvp-guest")) buildGuestRows();
       });
     });
@@ -841,6 +842,7 @@ export function boot() {
         b.classList.toggle("on", on); b.setAttribute("aria-pressed", on);
       });
       document.getElementById("rsvp-ifyes").style.display = attending==="yes" ? "" : "none";
+      const _ifd2 = document.getElementById("rsvp-ifdecline"); if(_ifd2) _ifd2.style.display = attending==="no" ? "" : "none";
       document.getElementById("r-email").value = d.email || "";
       document.getElementById("r-mobile").value = d.mobile || "";
       document.getElementById("r-address").value = d.address || "";
@@ -871,7 +873,8 @@ export function boot() {
       if(!name){ err.textContent = "Please add the lead guest's full name."; return; }
       if(!attending){ err.textContent = "Please let us know if you can make it."; return; }
 
-      const payload = { action:"rsvp", name:name, attending:attending };
+      const declineMsg = document.getElementById("r-decline-msg");
+      const payload = { action:"rsvp", name:name, attending:attending, decline_message: attending==="no" && declineMsg ? declineMsg.value.trim() : "" };
       if(attending === "yes"){
         payload.email = document.getElementById("r-email").value.trim();
         payload.mobile = document.getElementById("r-mobile").value.trim();
@@ -1188,8 +1191,16 @@ export function boot() {
     let type = document.getElementById("gb-type").value;
     const phase = gbCurrentPhase();
     const photos = gbPhotoQueue.slice();
+    const isPrivate = !!(document.getElementById("gb-private") && document.getElementById("gb-private").checked);
     if(!text && !photos.length){ toast("Add a few words or a photo first."); return; }
     if(!text && photos.length) type = "photo";        /* photo-only entries */
+    if(isPrivate){
+      toast("Saved privately — only we'll see it. You can also email it to us below.");
+      document.getElementById("gb-text").value="";
+      gbPhotoQueue=[]; document.getElementById("gb-photo").value="";
+      document.getElementById("gb-private").checked=false;
+      return;
+    }
 
     /* build one entry per photo (so each becomes a mosaic tile); if there's
        text but no photo, a single note; text+photos → text rides the first. */
