@@ -561,7 +561,7 @@ export function boot() {
      ============================================================ */
   const MAP_COLS = {venue:"#B3945C", sight:"#6B82B8", pub:"#7C8B6E", stay:"#C08A72", rail:"#41507A", guest:"#93A8D8", journey:"#B3945C",
                     from:"#B3945C", home:"#A2543F", travel:"#6B82B8", hm:"#7C8B6E",
-                    culture:"#7C8B6E", kids:"#C08A72", food:"#B3945C", date:"#A2543F"};
+                    culture:"#7C8B6E", kids:"#C08A72", food:"#B3945C", foodie:"#B3945C", date:"#A2543F"};
   
   
   
