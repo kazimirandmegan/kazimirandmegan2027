@@ -3,8 +3,8 @@
      ============================================================ -->
 <section class="page" id="page-rsvp">
   <div class="sheet">
-    <svg class="corner tl" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
-    <svg class="corner br" viewBox="0 0 150 150"><use href="#cornerspray" transform="scale(1.4)"/></svg>
+    <img class="corner tl" src="images_hydrangea-single.png" alt="" aria-hidden="true">
+    <img class="corner br" src="images_hydrangea-single.png" alt="" aria-hidden="true">
     <div class="page-eyebrow small-caps">Répondez s'il vous plaît</div>
     <h2 class="title">RSVP</h2>
     <p class="subtitle">Please reply by <span class="placeholder">[RSVP DEADLINE]</span></p>
@@ -28,6 +28,7 @@
         <!-- 1 · who -->
         <fieldset class="rsvp-fs">
           <legend>Who's replying</legend>
+          <p class="rsvp-hint" style="margin-top:0"><strong>One reply per household, please.</strong> Fill in on behalf of your whole family — you'll add each person's name and dietary needs in the party section below.</p>
           <label class="rsvp-l">Lead guest — full name
             <input type="text" id="r-name" autocomplete="name" placeholder="First and last name">
             <span class="rsvp-hint">Please use your full first <em>and</em> last name, and the same one each time you sign in — it's how we find your reply again.</span>
@@ -61,7 +62,9 @@
             <label class="rsvp-l">Email
               <input type="email" id="r-email" autocomplete="email" placeholder="you@example.com"></label>
             <label class="rsvp-l">Mobile
-              <input type="tel" id="r-mobile" autocomplete="tel" placeholder="+44…"></label>
+              <input type="tel" id="r-mobile" autocomplete="tel" placeholder="+44…">
+              <span class="rsvp-hint">Include your country dialling code — e.g. +44 for UK, +1 for US/Canada, +353 for Ireland.</span>
+            </label>
             <label class="rsvp-l">Street address
               <input type="text" id="r-street" autocomplete="address-line1" placeholder="Street address">
             </label>
@@ -92,7 +95,7 @@
 
           <!-- 5 · which events (tier-aware, built by JS) -->
           <fieldset class="rsvp-fs" id="r-events-fs">
-            <legend>Which celebrations?</legend>
+            <legend>Which events?</legend>
             <p class="rsvp-hint" style="margin-top:0">Tick everything you'll be joining.</p>
             <div id="r-events"></div>
           </fieldset>
@@ -101,17 +104,24 @@
           <fieldset class="rsvp-fs">
             <legend>Around the wedding</legend>
             <p class="rsvp-hint" style="margin-top:0">Just a heads-up for us — the details get coordinated later on the WhatsApp group.</p>
+            <label class="rsvp-check"><input type="checkbox" id="r-afterparty"> <span>After party — into the small hours in St Albans (Sat 29)</span></label>
             <label class="rsvp-check"><input type="checkbox" id="r-activities"> <span>Interested in pre-wedding activities during the week</span></label>
             <div id="r-activities-sub" style="display:none;padding-left:1.8rem;margin-top:.3rem">
               <p class="rsvp-hint" style="margin:.1rem 0 .45rem">Tick any that appeal — no commitment yet:</p>
-              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="evensong"> <span>Evensong at the Cathedral (Tue 25)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="evensong"> <span>Evensong at the Cathedral (Tue 25, 5:00 PM)</span></label>
               <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="pubcrawl"> <span>St Albans pub crawl (Tue 25 evening)</span></label>
-              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="market"> <span>St Albans market &amp; Cathedral tour (Wed 26)</span></label>
-              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="hightea"> <span>High tea at ours (Wed 26 afternoon)</span></label>
-              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="workouts"> <span>Morning workout sessions (various days)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="market"> <span>St Albans market &amp; Cathedral tour (Wed 26 AM)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="hightea"> <span>High tea at ours (Wed 26 PM)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="workouts"> <span>Morning workout sessions (Tue–Fri, 8:00 AM)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="sundaybrunch"> <span>Sunday brunch &amp; picnic (Sun 30)</span></label>
               <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="london"> <span>London hang-out day (Mon 31)</span></label>
             </div>
-            <label class="rsvp-check"><input type="checkbox" id="r-travelafter"> <span>Planning to travel around the UK / Europe afterwards</span></label>
+            <label class="rsvp-check"><input type="checkbox" id="r-travelafter"> <span>Planning to travel after the wedding</span></label>
+            <div id="r-travelafter-sub" style="display:none;padding-left:1.8rem;margin-top:.3rem">
+              <p class="rsvp-hint" style="margin:.1rem 0 .45rem">Which appeals? Helps us point you to the right tips:</p>
+              <label class="rsvp-check"><input type="checkbox" name="r-travel-sub" value="england"> <span>England day trips</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-travel-sub" value="europe"> <span>Europe</span></label>
+            </div>
           </fieldset>
         </div>
 

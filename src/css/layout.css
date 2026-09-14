@@ -73,7 +73,7 @@ main{position:relative;z-index:1}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .sheet{max-width:980px;margin:2.2rem auto 3.5rem;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);position:relative;padding:3.2rem clamp(1.1rem,5vw,4rem) 3.4rem}
 .sheet::after{content:"";position:absolute;inset:10px;border:1px solid var(--rule);pointer-events:none}
-.corner{position:absolute;width:150px;height:150px;pointer-events:none;opacity:.9;z-index:2}
+.corner{position:absolute;width:150px;height:150px;pointer-events:none;opacity:.9;z-index:2;object-fit:contain}
 .corner.tl{top:-8px;left:-8px}
 .corner.br{bottom:-8px;right:-8px;transform:rotate(180deg)}
 @media(max-width:640px){.corner{width:96px;height:96px}}
@@ -83,6 +83,7 @@ main{position:relative;z-index:1}
 .flourish{display:flex;align-items:center;gap:.9rem;justify-content:center;margin:1.6rem 0}
 .flourish::before,.flourish::after{content:"";height:1px;width:70px;background:var(--gold-soft)}
 .flourish svg{width:26px;height:26px}
+.flourish-hyd{width:72px;height:72px;object-fit:contain;display:block}
 h3{font-size:1.5rem;margin:2rem 0 .6rem}
 h4{font-size:1.15rem;margin:1.3rem 0 .35rem;color:var(--ink)}
 p{margin:.6rem 0}
@@ -135,10 +136,11 @@ p{margin:.6rem 0}
 .rsvp-opt.on[data-attend="yes"]{background:#E7EFDF;border-color:var(--sage-deep);color:var(--sage-deep)}
 .rsvp-opt.on[data-attend="no"]{background:#F4E3DC;border-color:#C08A72;color:#9C5E45}
 .rsvp-guest{border:1px solid var(--rule);background:var(--ivory);padding:.9rem 1rem;margin:.7rem 0}
-.rsvp-guest-top{display:flex;gap:.7rem;align-items:flex-end;flex-wrap:wrap}
+.rsvp-guest-top{display:flex;gap:.8rem;align-items:flex-end;flex-wrap:wrap}
 .rsvp-guest-top .rsvp-l{flex:1 1 200px;margin:.2rem 0}
 .rsvp-guest h5{font-family:"Cormorant Garamond",serif;font-size:1.08rem;color:var(--gold-ink);margin:0 0 .3rem;font-weight:500}
-.rsvp-child{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--ink-soft);padding-bottom:.55rem}
+.rsvp-child{display:flex;align-items:center;gap:.55rem;font-size:1rem;font-weight:600;color:var(--gold-ink);padding:.55rem .8rem;border:2px solid var(--gold);background:#fffbf0;border-radius:4px;align-self:flex-end;margin-bottom:.2rem;white-space:nowrap;cursor:pointer}
+.rsvp-child input{width:22px;height:22px;accent-color:var(--gold-ink);flex:none;cursor:pointer}
 .rsvp-diet{margin-top:.7rem}
 .rsvp-diet-lab{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:.4rem}
 .rsvp-diet-grid{display:flex;flex-wrap:wrap;gap:.35rem .7rem}
@@ -232,6 +234,11 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .wcal td.big .wc-day{color:var(--gold-ink);font-weight:600}
 .wcal td.big .wc-ev{color:var(--gold-ink)}
 @media(max-width:560px){.wcal td{height:auto;min-height:58px}.wcal .wc-ev{font-size:.72rem}.wcal-title{font-size:1.1rem}.wcal th{font-size:.72rem;letter-spacing:.08em}}
+/* home-page full-month calendar variant */
+.wcal-home td{height:44px}
+.wcal-home td.wday{opacity:.28;pointer-events:none}
+.wcal-home td.wday span{display:block;text-align:center;padding:.55rem 0;font-family:"Cormorant Garamond",serif;font-size:1.1rem;color:var(--ink-soft)}
+@media(max-width:560px){.wcal-home td{height:auto;min-height:36px}}
 
 /* festivities week ribbon */
 .fest{position:relative;margin:1.6rem 0;padding-left:86px}

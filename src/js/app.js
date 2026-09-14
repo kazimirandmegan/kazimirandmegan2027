@@ -566,9 +566,10 @@ export function boot() {
      every map; each initialises lazily on first visit to its page.
      cat: venue | sight | pub | stay | rail  (colours in MAP_COLS)
      ============================================================ */
-  const MAP_COLS = {venue:"#B3945C", sight:"#6B82B8", pub:"#7C8B6E", stay:"#C08A72", rail:"#41507A", guest:"#93A8D8", journey:"#B3945C",
-                    from:"#B3945C", home:"#A2543F", travel:"#6B82B8", hm:"#7C8B6E",
-                    culture:"#7C8B6E", kids:"#C08A72", food:"#B3945C", foodie:"#B3945C", date:"#A2543F"};
+  const MAP_COLS = {venue:"#B3945C", sight:"#3D6FD4", pub:"#3A8C54", stay:"#C46A4A", rail:"#2E4080", guest:"#93A8D8", journey:"#B3945C",
+                    from:"#B3945C", home:"#A2543F", travel:"#3D6FD4", hm:"#5A8C6A",
+                    culture:"#3A8C54", kids:"#C46A4A", food:"#C87D2A", foodie:"#C87D2A", date:"#A2543F",
+                    important:"#1C1C1C", shop:"#7D4E9B"};
   
   
   
@@ -590,24 +591,108 @@ export function boot() {
     if(typeof L === "undefined"){
       el.outerHTML = '<p class="note">This map loads when you\'re online — the leaderboard below still works.</p>';
       mapRefs[route] = null;
-      /* the leaderboard doesn't need the map — build it anyway */
       if(cfg.atlas) atlasCloudRefresh();
       return;
     }
     const map = L.map(cfg.el,{scrollWheelZoom:false, worldCopyJump:true}).setView(cfg.center, cfg.zoom);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);
     (cfg.lines||[]).forEach(pts=>L.polyline(pts,{color:"#B3945C",weight:2,dashArray:"2 8",opacity:.85}).addTo(map));
+
+    /* track markers for category filter + search */
+    const allMarkers = [], catMarkers = {};
     function drop(p){
-      /* optional photo in the popup — only from local flat image names,
-         and it quietly removes itself if the file isn't uploaded yet */
       const photo = (p.img && /^images[_\/][\w.\-]+$/.test(p.img))
         ? "<img src='"+esc(p.img)+"' alt='"+esc(p.n)+"' loading='lazy' onerror='this.remove()' style='width:100%;max-width:220px;margin:.45rem 0 .2rem;border:1px solid #D8D2C2;display:block'>"
         : "";
-      L.circleMarker([p.lat,p.lng],{radius:9,color:"#fff",weight:2,fillColor:MAP_COLS[p.cat]||"#6B82B8",fillOpacity:.95})
+      const m = L.circleMarker([p.lat,p.lng],{radius:9,color:"#fff",weight:2,fillColor:MAP_COLS[p.cat]||"#6B82B8",fillOpacity:.95})
         .addTo(map)
         .bindPopup("<strong>"+esc(p.n)+"</strong>"+photo+"<br>"+esc(p.d||"")+"<br><a target=_blank rel=noopener href='https://maps.google.com/?q="+encodeURIComponent(p.n)+"'>Google Maps →</a>");
+      allMarkers.push({m,p});
+      if(!catMarkers[p.cat]) catMarkers[p.cat]=[];
+      catMarkers[p.cat].push({m,p});
     }
     cfg.pins.forEach(drop);
+
+    /* explore maps: inject search+GPS toolbar, wire legend filter */
+    if(/^expl-/.test(route)){
+      const mapWrap = el.parentElement;
+      const toolbar = document.createElement('div');
+      toolbar.className = 'map-toolbar';
+      toolbar.innerHTML =
+        '<input class="map-search" type="search" placeholder="Search pins…" aria-label="Search map pins">'+
+        '<button class="map-gps-btn" type="button" title="Show my location">📍 My location</button>';
+      mapWrap.parentElement.insertBefore(toolbar, mapWrap);
+
+      const searchInput = toolbar.querySelector('.map-search');
+      const gpsBtn     = toolbar.querySelector('.map-gps-btn');
+
+      function showAll(){ allMarkers.forEach(({m})=>m.setStyle({fillOpacity:.95,opacity:1})); }
+
+      /* legend category filter */
+      let activeFilter = null;
+      const legendEl = mapWrap.nextElementSibling;
+      if(legendEl && legendEl.classList.contains('map-legend')){
+        legendEl.querySelectorAll('[data-cat]').forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            const cat = btn.dataset.cat;
+            searchInput.value = '';
+            if(activeFilter===cat){
+              activeFilter=null;
+              legendEl.querySelectorAll('[data-cat]').forEach(b=>b.classList.remove('lg-active','lg-dim'));
+              showAll();
+            } else {
+              activeFilter=cat;
+              legendEl.querySelectorAll('[data-cat]').forEach(b=>{
+                b.classList.toggle('lg-active', b.dataset.cat===cat);
+                b.classList.toggle('lg-dim',    b.dataset.cat!==cat);
+              });
+              allMarkers.forEach(({m,p})=>
+                m.setStyle(p.cat===cat ? {fillOpacity:.95,opacity:1} : {fillOpacity:.08,opacity:.18})
+              );
+              catMarkers[cat]&&catMarkers[cat].forEach(({m})=>m.bringToFront());
+            }
+          });
+        });
+      }
+
+      /* search */
+      searchInput.addEventListener('input', ()=>{
+        const q = searchInput.value.trim().toLowerCase();
+        if(activeFilter){ activeFilter=null; if(legendEl) legendEl.querySelectorAll('[data-cat]').forEach(b=>b.classList.remove('lg-active','lg-dim')); }
+        if(!q){ showAll(); return; }
+        const hits = allMarkers.filter(({p})=>p.n.toLowerCase().includes(q)||(p.d&&p.d.toLowerCase().includes(q)));
+        allMarkers.forEach(({m})=>m.setStyle({fillOpacity:.08,opacity:.18}));
+        hits.forEach(({m})=>{ m.setStyle({fillOpacity:.95,opacity:1}); m.bringToFront(); });
+        if(hits.length===1){ map.setView([hits[0].p.lat,hits[0].p.lng],Math.max(map.getZoom(),14)); hits[0].m.openPopup(); }
+        else if(hits.length>1){ try{ map.fitBounds(L.featureGroup(hits.map(({m})=>m)).getBounds().pad(.3)); }catch(e){} }
+      });
+
+      /* GPS live location */
+      let locMarker=null, locCircle=null, locWatch=null;
+      gpsBtn.addEventListener('click', ()=>{
+        if(!navigator.geolocation){ gpsBtn.title='Location unavailable in this browser'; return; }
+        if(locWatch!==null){
+          navigator.geolocation.clearWatch(locWatch); locWatch=null;
+          if(locMarker){ map.removeLayer(locMarker); locMarker=null; }
+          if(locCircle){ map.removeLayer(locCircle); locCircle=null; }
+          gpsBtn.classList.remove('gps-active');
+          gpsBtn.textContent='📍 My location';
+          return;
+        }
+        gpsBtn.textContent='📍 Locating…';
+        locWatch = navigator.geolocation.watchPosition(pos=>{
+          const {latitude:lat,longitude:lng,accuracy:acc}=pos.coords;
+          gpsBtn.textContent='📍 Live'; gpsBtn.classList.add('gps-active');
+          if(!locCircle) locCircle=L.circle([lat,lng],{radius:acc,color:'#4285F4',fillColor:'#4285F4',fillOpacity:.12,weight:1,interactive:false}).addTo(map);
+          else locCircle.setLatLng([lat,lng]).setRadius(acc);
+          if(!locMarker){
+            locMarker=L.circleMarker([lat,lng],{radius:8,color:'#fff',weight:2,fillColor:'#4285F4',fillOpacity:1}).addTo(map).bindPopup('You are here');
+            map.setView([lat,lng],Math.max(map.getZoom(),15));
+          } else { locMarker.setLatLng([lat,lng]); }
+        }, ()=>{ gpsBtn.textContent='📍 My location'; locWatch=null; },{enableHighAccuracy:true,maximumAge:5000});
+      });
+    }
+
     if(cfg.atlas){
       atlasMap = map;
       atlasDrop = drop;
@@ -792,8 +877,8 @@ export function boot() {
         row.innerHTML =
           '<h5>Guest '+(i+1)+(i===0?' (lead)':'')+'</h5>'+
           '<div class="rsvp-guest-top">'+
-            '<label class="rsvp-l">Full name<input type="text" data-gname value="'+esc(g.name||(i===0?document.getElementById("r-name").value:""))+'" placeholder="Name"></label>'+
             '<label class="rsvp-child"><input type="checkbox" data-gchild'+(g.child?" checked":"")+'> Child</label>'+
+            '<label class="rsvp-l">Full name<input type="text" data-gname value="'+esc(g.name||(i===0?document.getElementById("r-name").value:""))+'" placeholder="Name"></label>'+
           '</div>'+ diet;
         host.appendChild(row);
       }
@@ -862,8 +947,13 @@ export function boot() {
         const box = evWrap.querySelector('[data-ev="'+ev.k+'"]');
         if(box) box.checked = !!d[ev.k];
       });
+      const apAftEl = document.getElementById("r-afterparty"); if(apAftEl) apAftEl.checked = !!d.afterparty;
       document.getElementById("r-activities").checked = !!d.activities;
-      document.getElementById("r-travelafter").checked = !!d.travelling_after;
+      if(actSub) actSub.style.display = !!d.activities ? "" : "none";
+      if(d.activity_interests){ d.activity_interests.split(",").forEach(v=>{ const c=document.querySelector('[name="r-act-sub"][value="'+v+'"]'); if(c) c.checked=true; }); }
+      const travelChkEl = document.getElementById("r-travelafter"); if(travelChkEl) travelChkEl.checked = !!d.travelling_after;
+      if(travelSub) travelSub.style.display = !!d.travelling_after ? "" : "none";
+      if(d.travel_interests){ d.travel_interests.split(",").forEach(v=>{ const c=document.querySelector('[name="r-travel-sub"][value="'+v+'"]'); if(c) c.checked=true; }); }
       showSaved(d);
     }
 
@@ -874,6 +964,12 @@ export function boot() {
     const actSub = document.getElementById("r-activities-sub");
     if(actChk && actSub){
       actChk.addEventListener("change", ()=>{ actSub.style.display = actChk.checked ? "" : "none"; });
+    }
+    /* travel sub-checkboxes show/hide */
+    const travelChk = document.getElementById("r-travelafter");
+    const travelSub = document.getElementById("r-travelafter-sub");
+    if(travelChk && travelSub){
+      travelChk.addEventListener("change", ()=>{ travelSub.style.display = travelChk.checked ? "" : "none"; });
     }
 
     /* fetch this household's existing RSVP by their gate name */
@@ -920,10 +1016,13 @@ export function boot() {
           const box = evWrap.querySelector('[data-ev="'+ev.k+'"]');
           payload[ev.k] = !!(box && box.checked);
         });
+        payload.afterparty = document.getElementById("r-afterparty").checked;
         payload.activities = document.getElementById("r-activities").checked;
         const actSubs = document.querySelectorAll('[name="r-act-sub"]:checked');
         payload.activity_interests = Array.from(actSubs).map(c=>c.value).join(",");
         payload.travelling_after = document.getElementById("r-travelafter").checked;
+        const travelSubs = document.querySelectorAll('[name="r-travel-sub"]:checked');
+        payload.travel_interests = Array.from(travelSubs).map(c=>c.value).join(",");
       }
 
       const btn = document.getElementById("r-submit"); const was = btn.textContent;
@@ -962,7 +1061,7 @@ export function boot() {
   function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
   function rsvpObjFromPayload(p){
     const o = Object.assign({}, p);
-    ["pre_wedding","ceremony","breakfast","evening","afterparty","activities","travelling_after"].forEach(k=>{ o[k]=!!p[k]; });
+    ["pre_wedding","ceremony","breakfast","evening","activities","travelling_after","afterparty"].forEach(k=>{ o[k]=!!p[k]; });
     return o;
   }
   function rsvpSummaryHtml(d, events){
