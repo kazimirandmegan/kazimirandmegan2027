@@ -218,6 +218,13 @@ export function boot() {
   const em = document.getElementById("contact-email");
   em.textContent = SETTINGS.contactEmail; em.href = "mailto:"+SETTINGS.contactEmail;
   document.getElementById("whatsapp-link").href = SETTINGS.whatsappLink;
+  /* faqs page contact cards */
+  const faqEmail = document.getElementById("contact-email-link");
+  const faqEmailVal = document.getElementById("contact-email-val");
+  const faqWa = document.getElementById("contact-wa-link");
+  if(faqEmail){ faqEmail.href = "mailto:"+SETTINGS.contactEmail; }
+  if(faqEmailVal){ faqEmailVal.textContent = SETTINGS.contactEmail; }
+  if(faqWa){ faqWa.href = SETTINGS.whatsappLink; }
   const vy = document.getElementById("vyshyvanka-code");
   if(vy) vy.textContent = SETTINGS.vyshyvankaCode;
   if(SETTINGS.spotifyLink){
@@ -845,7 +852,10 @@ export function boot() {
       const _ifd2 = document.getElementById("rsvp-ifdecline"); if(_ifd2) _ifd2.style.display = attending==="no" ? "" : "none";
       document.getElementById("r-email").value = d.email || "";
       document.getElementById("r-mobile").value = d.mobile || "";
-      document.getElementById("r-address").value = d.address || "";
+      const rStreet = document.getElementById("r-street"); if(rStreet) rStreet.value = d.street || "";
+      const rCity = document.getElementById("r-city"); if(rCity) rCity.value = d.city || "";
+      const rCountry = document.getElementById("r-country"); if(rCountry) rCountry.value = d.country || "";
+      const rPostcode = document.getElementById("r-postcode"); if(rPostcode) rPostcode.value = d.postcode || "";
       if(d.party_size){ sizeSel.value = Math.min(6, Math.max(1, +d.party_size)); }
       buildGuestRows(d.guests || []);                 /* prefill saved guests */
       events.forEach(ev=>{
@@ -858,6 +868,13 @@ export function boot() {
     }
 
     buildGuestRows();
+
+    /* activities sub-checkboxes show/hide */
+    const actChk = document.getElementById("r-activities");
+    const actSub = document.getElementById("r-activities-sub");
+    if(actChk && actSub){
+      actChk.addEventListener("change", ()=>{ actSub.style.display = actChk.checked ? "" : "none"; });
+    }
 
     /* fetch this household's existing RSVP by their gate name */
     function loadForName(){
@@ -878,7 +895,14 @@ export function boot() {
       if(attending === "yes"){
         payload.email = document.getElementById("r-email").value.trim();
         payload.mobile = document.getElementById("r-mobile").value.trim();
-        payload.address = document.getElementById("r-address").value.trim();
+        const rStreetEl = document.getElementById("r-street");
+        const rCityEl = document.getElementById("r-city");
+        const rCountryEl = document.getElementById("r-country");
+        const rPostcodeEl = document.getElementById("r-postcode");
+        payload.street = rStreetEl ? rStreetEl.value.trim() : "";
+        payload.city = rCityEl ? rCityEl.value.trim() : "";
+        payload.country = rCountryEl ? rCountryEl.value.trim() : "";
+        payload.postcode = rPostcodeEl ? rPostcodeEl.value.trim() : "";
         payload.party_size = +sizeSel.value || 1;
         payload.guests = readGuestRows();
         /* gentle validation: every party member needs a name (the sheet
@@ -897,6 +921,8 @@ export function boot() {
           payload[ev.k] = !!(box && box.checked);
         });
         payload.activities = document.getElementById("r-activities").checked;
+        const actSubs = document.querySelectorAll('[name="r-act-sub"]:checked');
+        payload.activity_interests = Array.from(actSubs).map(c=>c.value).join(",");
         payload.travelling_after = document.getElementById("r-travelafter").checked;
       }
 

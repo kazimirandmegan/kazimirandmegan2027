@@ -1,7 +1,7 @@
 /* Motion, easter-egg effects, reduced-motion */
 /* ---------- patriot mode 🇺🇸 ---------- */
 @keyframes patriot{0%,100%{filter:none}25%{filter:hue-rotate(-20deg) saturate(1.5)}50%{filter:hue-rotate(200deg) saturate(1.6)}75%{filter:saturate(2)}}
-body.patriot{animation:patriot 1s linear 4}
+body.patriot{animation:patriot .4s linear 8}
 #flag-modal{position:fixed;inset:0;background:rgba(20,26,48,.72);z-index:1200;display:none;align-items:center;justify-content:center;padding:1rem}
 #flag-modal.open{display:flex}
 .flag-card{background:var(--card);border:2px solid #B22234;max-width:420px;width:100%;padding:1.6rem;text-align:center;box-shadow:var(--shadow)}

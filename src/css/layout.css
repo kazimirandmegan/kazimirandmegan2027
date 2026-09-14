@@ -90,6 +90,36 @@ p{margin:.6rem 0}
 .note{font-size:1rem;color:var(--ink-soft);font-style:italic}
 .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.2rem 0}
 .info-card{border:1px solid var(--rule);background:#fff;padding:1.1rem 1.2rem}
+/* ---------- FAQ rows (replaces info-grid on event detail pages) ---------- */
+.faq-rows{margin:1.2rem 0;border:1px solid var(--rule);background:#fff}
+.faq-row{display:flex;gap:1rem;padding:.9rem 1.1rem;border-bottom:1px solid var(--rule)}
+.faq-row:last-child{border-bottom:none}
+.faq-row-q{flex:none;width:10.5rem;font-family:"Cormorant Garamond",serif;font-size:1.02rem;color:var(--peri-deep);font-weight:600;line-height:1.4;padding-top:.05rem}
+.faq-row-a{flex:1;font-size:.97rem;line-height:1.6}
+.faq-row-a p{margin:.2rem 0}
+.faq-row-a p:first-child{margin-top:0}
+@media (max-width:600px){.faq-row{flex-direction:column;gap:.25rem}.faq-row-q{width:auto}}
+/* ---------- Wedding week event colour key ---------- */
+.week-key{display:flex;gap:.8rem 1.4rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;font-size:.85rem;align-items:center;padding:.6rem .8rem;background:var(--ivory);border:1px solid var(--rule)}
+.week-key span{display:inline-flex;align-items:center;gap:.4rem}
+.week-key span::before{content:"";width:10px;height:10px;border-radius:2px;flex:none}
+.wk-ess::before{background:var(--gold)}.wk-opt::before{background:var(--peri)}.wk-org::before{background:var(--sage)}
+.ev-tag{display:inline-block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.08rem .48rem;border-radius:2px;margin-right:.3rem;vertical-align:middle;font-family:"Cormorant Garamond",serif;font-weight:700}
+.ev-ess{background:#F4EDDC;color:var(--gold-ink);border:1px solid var(--gold-soft)}
+.ev-opt{background:#EFF3FB;color:var(--peri-deep);border:1px solid var(--peri)}
+.ev-org{background:#EDF2E9;color:var(--sage-deep);border:1px solid #B8C8A2}
+/* ---------- Specialist guide cards (FAQs page) ---------- */
+.guides-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;margin:1rem 0 1.5rem}
+.guide-card{border:1px solid var(--rule);background:#fff;padding:.9rem 1rem;text-decoration:none;color:var(--ink);display:block;transition:border-color .18s,box-shadow .18s}
+.guide-card:hover{border-color:var(--peri);box-shadow:0 3px 14px -8px rgba(65,80,122,.2)}
+.guide-card h4{margin:0 0 .2rem;color:var(--peri-deep);font-size:1rem}
+.guide-card p{margin:0;font-size:.85rem;color:var(--ink-soft);line-height:1.4}
+/* ---------- contact cards ---------- */
+.contact-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1rem 0}
+.contact-card{border:1px solid var(--rule);background:#fff;padding:1rem 1.1rem;text-decoration:none;color:var(--ink);display:block;transition:border-color .18s}
+.contact-card:hover{border-color:var(--peri)}
+.contact-card .cc-label{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:.3rem}
+.contact-card .cc-val{font-family:"Cormorant Garamond",serif;font-size:1.15rem;color:var(--peri-deep)}
 
 /* ---------- RSVP form ---------- */
 .rsvp-form{margin:1.4rem 0}

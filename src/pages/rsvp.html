@@ -62,16 +62,24 @@
               <input type="email" id="r-email" autocomplete="email" placeholder="you@example.com"></label>
             <label class="rsvp-l">Mobile
               <input type="tel" id="r-mobile" autocomplete="tel" placeholder="+44…"></label>
-            <label class="rsvp-l">Home address
-              <input type="text" id="r-address" autocomplete="street-address" placeholder="Street, town, country">
-              <span class="rsvp-hint">We use your town and country to place a pin on the Guest Atlas (only your city is ever shown publicly, never your street).</span>
+            <label class="rsvp-l">Street address
+              <input type="text" id="r-street" autocomplete="address-line1" placeholder="Street address">
+            </label>
+            <label class="rsvp-l">City / Town
+              <input type="text" id="r-city" autocomplete="address-level2" placeholder="City or town">
+            </label>
+            <label class="rsvp-l">Country
+              <input type="text" id="r-country" autocomplete="country-name" placeholder="Country">
+            </label>
+            <label class="rsvp-l">Postcode / ZIP
+              <input type="text" id="r-postcode" autocomplete="postal-code" placeholder="Postcode or ZIP code">
             </label>
           </fieldset>
 
           <!-- 4 · the party -->
           <fieldset class="rsvp-fs">
             <legend>Your party</legend>
-            <p class="rsvp-hint" style="margin-top:0">Please only add the people named on your invitation. We're unable to accommodate additional guests or plus-ones — with love, and a strict seating plan.</p>
+            <p class="rsvp-hint" style="margin-top:0"><strong>Please only add the people named on your invitation. We're unable to accommodate additional guests or plus-ones — with love, and a strict seating plan.</strong></p>
             <label class="rsvp-l" style="max-width:220px">How many in your party?
               <select id="r-size">
                 <option value="1">1</option><option value="2">2</option>
@@ -93,7 +101,16 @@
           <fieldset class="rsvp-fs">
             <legend>Around the wedding</legend>
             <p class="rsvp-hint" style="margin-top:0">Just a heads-up for us — the details get coordinated later on the WhatsApp group.</p>
-            <label class="rsvp-check"><input type="checkbox" id="r-activities"> <span>Interested in pre-wedding St Albans / London activities</span></label>
+            <label class="rsvp-check"><input type="checkbox" id="r-activities"> <span>Interested in pre-wedding activities during the week</span></label>
+            <div id="r-activities-sub" style="display:none;padding-left:1.8rem;margin-top:.3rem">
+              <p class="rsvp-hint" style="margin:.1rem 0 .45rem">Tick any that appeal — no commitment yet:</p>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="evensong"> <span>Evensong at the Cathedral (Tue 25)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="pubcrawl"> <span>St Albans pub crawl (Tue 25 evening)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="market"> <span>St Albans market &amp; Cathedral tour (Wed 26)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="hightea"> <span>High tea at ours (Wed 26 afternoon)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="workouts"> <span>Morning workout sessions (various days)</span></label>
+              <label class="rsvp-check"><input type="checkbox" name="r-act-sub" value="london"> <span>London hang-out day (Mon 31)</span></label>
+            </div>
             <label class="rsvp-check"><input type="checkbox" id="r-travelafter"> <span>Planning to travel around the UK / Europe afterwards</span></label>
           </fieldset>
         </div>
