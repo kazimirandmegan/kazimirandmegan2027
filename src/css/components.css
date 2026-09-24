@@ -87,8 +87,14 @@ nav.links{align-items:center}
    dropdown styling lives inside @media (min-width:1025px) below, so a
    tap-triggered :hover on a phone can never fling the submenu sideways. */
 .nmenu{display:block;max-height:0;overflow:hidden;background:transparent;transition:max-height .35s ease}
-.ngroup.m-open>.nmenu{max-height:34rem}
+.ngroup.m-open>.nmenu{max-height:44rem}
 .nmenu a{display:block;white-space:normal}
+/* ---- Explore sub-section inside nmenu ---- */
+.nmenu-sub{padding:0;margin:0}
+.nmenu-sub>summary{display:flex;align-items:center;justify-content:space-between;list-style:none;cursor:pointer;user-select:none}
+.nmenu-sub>summary::-webkit-details-marker{display:none}
+.nmenu-sub>summary .car{font-size:.55rem;color:var(--gold-ink);transition:transform .25s ease;flex-shrink:0}
+.nmenu-sub[open]>summary .car{transform:rotate(180deg)}
 @media (max-width:1024px){
   /* the drawer: each group is a tap-to-open accordion; one open at a
      time, chevron rotates, options slide down smoothly */
@@ -99,6 +105,8 @@ nav.links{align-items:center}
   .ngroup.m-open>.ngroup-btn .car{transform:rotate(180deg)}
   /* submenu drops straight down, indented, inside the drawer */
   .nmenu a{padding:.7rem .2rem .7rem 1.1rem !important;border-bottom:1px dotted var(--rule) !important;font-size:.78rem}
+  .nmenu-sub>summary{padding:.7rem .2rem;border-bottom:1px dotted var(--rule);font-size:.78rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);width:100%;box-sizing:border-box}
+  .nmenu-sub-body a{padding-left:1.8rem !important}
 }
 
 /* ---------- live weather ---------- */
@@ -111,7 +119,7 @@ nav.links{align-items:center}
 /* ---------- st albans map ---------- */
 #stamap{height:430px;border:1px solid var(--rule);z-index:1}
 .map-wrap{position:relative;margin:1rem 0;box-shadow:var(--shadow)}
-.map-legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.8rem;color:var(--ink-soft);margin:.6rem 0}
+.map-legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.93rem;color:var(--ink-soft);margin:.6rem 0}
 .map-legend span::before{content:"●";margin-right:.35rem}
 .lg-venue::before{color:#B3945C}.lg-sight::before{color:#3D6FD4}.lg-pub::before{color:#3A8C54}.lg-stay::before{color:#C46A4A}.lg-rail::before{color:#2E4080}
 .lg-from::before{color:#B3945C}.lg-home::before{color:#A2543F}.lg-travel::before{color:#3D6FD4}.lg-hm::before{color:#5A8C6A}
@@ -213,7 +221,7 @@ nav.links{align-items:center}
   .tp-card:hover{transform:translateY(-4px) rotate(-.6deg)}
 }
 .tp-face{aspect-ratio:1/1;background:linear-gradient(135deg,#DCE4F4,#EAE6D8);display:flex;align-items:center;justify-content:center;font-family:"Cormorant Garamond",serif;font-size:3rem;color:var(--peri-deep);position:relative;overflow:hidden;border-bottom:3px solid var(--gold-soft)}
-.tp-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tp-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%}
 .tp-card h4{margin:.6rem 0 0}
 .tp-role{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink)}
 #tp-overlay{position:fixed;inset:0;background:rgba(32,38,59,.55);z-index:1100;display:none;align-items:center;justify-content:center;padding:1rem}
@@ -233,7 +241,7 @@ nav.links{align-items:center}
 .bio-photos{display:flex;gap:1rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
 .bio-photo{flex:1 1 200px;max-width:280px;background:#fff;border:1px solid var(--rule);padding:8px;box-shadow:var(--shadow)}
 .bio-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--rule)}
-.bio-photo figcaption{text-align:center;font-style:italic;font-size:.82rem;color:var(--ink-soft);padding-top:.45rem}
+.bio-photo figcaption{text-align:center;font-style:italic;font-size:.95rem;color:var(--ink-soft);padding-top:.45rem}
 .bio-photos:not(:has(figure)){display:none}
 .about-hero-photos{margin:1.4rem 0}
 .about-hero-photos .bio-photo{flex:1 1 240px;max-width:none}
@@ -250,7 +258,7 @@ nav.links{align-items:center}
 .sheet h3::before{content:"❀ ";color:var(--peri);opacity:.55;font-size:.72em;vertical-align:.18em}
 ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 #garland{display:flex;justify-content:center;padding:1.2rem 0 0;opacity:.9}
-#garland .garland-img{height:80px;width:auto;max-width:100%;object-fit:contain}
+#garland .garland-img{width:min(400px,100%);height:auto;object-fit:contain}
 
 /* ---------- field guide tabs ---------- */
 .fg-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 0}
@@ -315,6 +323,9 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
   .ngroup:hover>.nmenu,.ngroup:focus-within>.nmenu{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0);transition:opacity .18s ease,transform .18s ease}
   .nmenu a{padding:.5rem 1.15rem !important;white-space:nowrap;transition:background .15s,padding-left .15s}
   .nmenu a:hover{background:var(--ivory);padding-left:1.35rem !important}
+  .nmenu-sub>summary{padding:.5rem 1.15rem;font-size:.78rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap;transition:background .15s,padding-left .15s}
+  .nmenu-sub>summary:hover{background:var(--ivory);padding-left:1.35rem}
+  .nmenu .nmenu-sub-body a{padding-left:1.55rem !important}
   /* last 2 ngroups (For Guests, Keepsakes) pin their dropdown to the right
      so it never slides off the right edge of the viewport */
   .ngroup:last-of-type .nmenu,

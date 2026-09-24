@@ -19,8 +19,6 @@
       <button id="pw-btn" type="submit">Enter</button>
     </form>
     <div class="gate-err" id="pw-err" role="alert"></div>
-    <div class="gate-hint">Capitals and spaces don't matter in the password. Lost it? Write to us — details are on your invitation.<br>
-    <span style="opacity:.85">If the button does nothing at all, you're likely in a file preview — open the site's web link in Safari or Chrome.</span></div>
   </div>
 </div>
 
@@ -28,10 +26,6 @@
      Each link has data-tier: which guest tiers can see it. -->
 <header id="site-header" style="display:none">
   <div class="nav-inner">
-    <button class="monogram" id="seal-btn" title="A little surprise…">
-      <svg class="seal" viewBox="0 0 60 60"><use href="#waxseal"/></svg>
-      <span>K &amp; M</span>
-    </button>
     <button id="menu-btn" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
       <span class="mb-box" aria-hidden="true"><span></span><span></span><span></span></span>
       <span class="mb-txt">Menu</span>
@@ -69,13 +63,18 @@
         <button class="ngroup-btn" type="button">For Guests <span class="car">▾</span></button>
         <div class="nmenu">
           <a href="#registry" data-tier="full vinko afterparty">Registry</a>
-          <a href="#games" data-tier="full vinko afterparty">In-Flight Entertainment</a>
           <a href="#guestbook" data-tier="full vinko afterparty">Guestbook &amp; Photos</a>
+          <details class="nmenu-sub">
+            <summary>Explore <span class="car">▾</span></summary>
+            <div class="nmenu-sub-body">
+              <a href="#expl-sta" data-tier="full vinko afterparty">St Albans</a>
+              <a href="#expl-ldn" data-tier="full vinko afterparty">London</a>
+              <a href="#expl-day" data-tier="full vinko afterparty">England</a>
+              <a href="#expl-eur" data-tier="full vinko afterparty">Europe</a>
+            </div>
+          </details>
           <a href="#playlists" data-tier="full vinko afterparty">Playlists</a>
-          <a href="#expl-sta" data-tier="full vinko afterparty">St Albans</a>
-          <a href="#expl-ldn" data-tier="full vinko afterparty">London</a>
-          <a href="#expl-day" data-tier="full vinko afterparty">England Day Trips</a>
-          <a href="#expl-eur" data-tier="full vinko afterparty">Europe</a>
+          <a href="#games" data-tier="full vinko afterparty">In-Flight Entertainment</a>
         </div>
       </div>
       <div class="ngroup">

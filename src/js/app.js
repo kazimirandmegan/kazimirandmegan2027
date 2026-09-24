@@ -323,9 +323,8 @@ export function boot() {
 
   /* ---------- easter eggs ---------- */
   /* 1. the wax seal */
-  document.getElementById("seal-btn").addEventListener("click", ()=>{
-    location.hash = "#home"; petalsBurst(120);
-  });
+  const sealBtn = document.getElementById("seal-btn");
+  if(sealBtn) sealBtn.addEventListener("click", ()=>{ location.hash = "#home"; petalsBurst(120); });
   /* 2. type "budmo" anywhere */
   let typed = "";
   addEventListener("keydown", e=>{
@@ -335,7 +334,8 @@ export function boot() {
   });
   /* 3. Kiko's paw in the footer */
   let pawCount = 0;
-  document.getElementById("paw-btn").addEventListener("click", ()=>{
+  const pawBtn = document.getElementById("paw-btn");
+  if(pawBtn) pawBtn.addEventListener("click", ()=>{
     pawCount++;
     emojiBurst(["🐾"], 10);
     toast(pawCount < 3 ? "Woof. Kiko has inspected this website and approves."
@@ -349,12 +349,12 @@ export function boot() {
       pressed++;
       if(pressed === 1){
         document.body.classList.add("disco");
-        emojiBurst(["🪩","💃","🕺"], 18);
+        emojiBurst(["🪩","💃","🕺"], 54);
         toast("You had ONE job. 🪩 Welcome to the (very brief) disco.");
-        setTimeout(()=>document.body.classList.remove("disco"), 3800);
+        setTimeout(()=>document.body.classList.remove("disco"), 2200);
         myst.textContent = "You pressed the button";
       } else {
-        emojiBurst(["🪩"], 8);
+        emojiBurst(["🪩"], 24);
         toast("The button forgives you. The button always knew.");
       }
     });
@@ -582,6 +582,50 @@ export function boot() {
   const MAPS = buildMaps(STORY_PINS, STORY_LINES);
   
   const mapRefs = {};
+
+  /* ---- shared GPS state across all explore maps ---- */
+  let gpsWatch = null, gpsLastPos = null;
+  const gpsHandlers = []; /* [{map, gpsBtn, locMarker, locCircle}] */
+
+  function gpsApplyPos(h, lat, lng, acc){
+    if(!h.locCircle) h.locCircle = L.circle([lat,lng],{radius:acc,color:'#4285F4',fillColor:'#4285F4',fillOpacity:.12,weight:1,interactive:false}).addTo(h.map);
+    else h.locCircle.setLatLng([lat,lng]).setRadius(acc);
+    if(!h.locMarker){
+      h.locMarker = L.circleMarker([lat,lng],{radius:8,color:'#fff',weight:2,fillColor:'#4285F4',fillOpacity:1}).addTo(h.map).bindPopup('You are here');
+    } else { h.locMarker.setLatLng([lat,lng]); }
+    h.gpsBtn.textContent='📍 Live'; h.gpsBtn.classList.add('gps-active');
+  }
+
+  function gpsRemove(h){
+    if(h.locMarker){ h.map.removeLayer(h.locMarker); h.locMarker=null; }
+    if(h.locCircle){ h.map.removeLayer(h.locCircle); h.locCircle=null; }
+    h.gpsBtn.textContent='📍 My location'; h.gpsBtn.classList.remove('gps-active');
+  }
+
+  function gpsStartAll(){
+    if(!navigator.geolocation) return;
+    gpsHandlers.forEach(h=>{ h.gpsBtn.textContent='📍 Locating…'; });
+    const firstFix = {done:false};
+    gpsWatch = navigator.geolocation.watchPosition(pos=>{
+      const {latitude:lat,longitude:lng,accuracy:acc}=pos.coords;
+      const isFirst=!firstFix.done; firstFix.done=true;
+      gpsLastPos={lat,lng,acc};
+      gpsHandlers.forEach(h=>{
+        gpsApplyPos(h,lat,lng,acc);
+        if(isFirst && h.map.getContainer().offsetParent!==null) h.map.setView([lat,lng],Math.max(h.map.getZoom(),15));
+      });
+    }, ()=>{
+      gpsWatch=null; gpsLastPos=null;
+      gpsHandlers.forEach(h=>{ h.gpsBtn.textContent='📍 My location'; h.gpsBtn.classList.remove('gps-active'); });
+    },{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+  }
+
+  function gpsStopAll(){
+    if(gpsWatch!==null){ navigator.geolocation.clearWatch(gpsWatch); gpsWatch=null; }
+    gpsLastPos=null;
+    gpsHandlers.forEach(h=>gpsRemove(h));
+  }
+
   function initMapFor(route){
     const cfg = MAPS[route]; if(!cfg) return;
     /* the atlas re-pulls live data every visit so new RSVPs show up */
@@ -667,29 +711,21 @@ export function boot() {
         else if(hits.length>1){ try{ map.fitBounds(L.featureGroup(hits.map(({m})=>m)).getBounds().pad(.3)); }catch(e){} }
       });
 
-      /* GPS live location */
-      let locMarker=null, locCircle=null, locWatch=null;
+      /* GPS live location — shared across all explore maps */
+      const gpsH = {map, gpsBtn, locMarker:null, locCircle:null};
+      gpsHandlers.push(gpsH);
+
+      /* if GPS is already live when this map opens, show dot immediately */
+      if(gpsWatch!==null && gpsLastPos){
+        const {lat,lng,acc}=gpsLastPos;
+        gpsApplyPos(gpsH,lat,lng,acc);
+        map.setView([lat,lng],Math.max(map.getZoom(),15));
+      }
+
       gpsBtn.addEventListener('click', ()=>{
         if(!navigator.geolocation){ gpsBtn.title='Location unavailable in this browser'; return; }
-        if(locWatch!==null){
-          navigator.geolocation.clearWatch(locWatch); locWatch=null;
-          if(locMarker){ map.removeLayer(locMarker); locMarker=null; }
-          if(locCircle){ map.removeLayer(locCircle); locCircle=null; }
-          gpsBtn.classList.remove('gps-active');
-          gpsBtn.textContent='📍 My location';
-          return;
-        }
-        gpsBtn.textContent='📍 Locating…';
-        locWatch = navigator.geolocation.watchPosition(pos=>{
-          const {latitude:lat,longitude:lng,accuracy:acc}=pos.coords;
-          gpsBtn.textContent='📍 Live'; gpsBtn.classList.add('gps-active');
-          if(!locCircle) locCircle=L.circle([lat,lng],{radius:acc,color:'#4285F4',fillColor:'#4285F4',fillOpacity:.12,weight:1,interactive:false}).addTo(map);
-          else locCircle.setLatLng([lat,lng]).setRadius(acc);
-          if(!locMarker){
-            locMarker=L.circleMarker([lat,lng],{radius:8,color:'#fff',weight:2,fillColor:'#4285F4',fillOpacity:1}).addTo(map).bindPopup('You are here');
-            map.setView([lat,lng],Math.max(map.getZoom(),15));
-          } else { locMarker.setLatLng([lat,lng]); }
-        }, ()=>{ gpsBtn.textContent='📍 My location'; locWatch=null; },{enableHighAccuracy:true,maximumAge:5000});
+        if(gpsWatch!==null){ gpsStopAll(); return; }
+        gpsStartAll();
       });
     }
 
@@ -1421,7 +1457,8 @@ export function boot() {
     el.innerHTML = ""; songList().forEach(t=>{ const c=document.createElement("span"); c.textContent="🎵 "+t; el.appendChild(c); });
   }
   songRender();
-  document.getElementById("song-add").addEventListener("click", ()=>{
+  const songAddBtn = document.getElementById("song-add");
+  if(songAddBtn) songAddBtn.addEventListener("click", ()=>{
     const v = document.getElementById("song-in").value.trim(); if(!v) return;
     const l = songList(); l.push(v); lstore.set("km-songs", JSON.stringify(l));
     document.getElementById("song-in").value = ""; songRender(); emojiBurst(["🎵","🎶"],8);
@@ -1431,21 +1468,24 @@ export function boot() {
         .catch(()=>toast("Saved here — we'll try the DJ booth again next time you're online."));
     }
   });
-  if(CLOUD){
-    document.getElementById("song-mail").style.display = "none";
-    const sn = document.querySelector("#song-list + .devnote, .songchips + .devnote");
-    if(sn) sn.textContent = "Requests go straight to us the moment you add them (and stay listed here for your own records). The Macarena clause of the terms and conditions applies.";
-  }
-  if(SETTINGS.songFormUrl) document.getElementById("song-mail").textContent = "Submit my requests";
-  document.getElementById("song-mail").addEventListener("click", ()=>{
-    const l = songList();
-    if(!l.length){ toast("Add a request or two first — the dance floor is counting on you."); return; }
-    if(SETTINGS.songFormUrl){
-      window.open(SETTINGS.songFormUrl.replace("{song}", encodeURIComponent(l.join("; "))).replace("{name}", encodeURIComponent(NAME)), "_blank", "noopener");
-      return;
+  const songMailBtn = document.getElementById("song-mail");
+  if(songMailBtn){
+    if(CLOUD){
+      songMailBtn.style.display = "none";
+      const sn = document.querySelector("#song-list + .devnote, .songchips + .devnote");
+      if(sn) sn.textContent = "Requests go straight to us the moment you add them (and stay listed here for your own records). The Macarena clause of the terms and conditions applies.";
     }
-    location.href = "mailto:"+SETTINGS.contactEmail+"?subject="+encodeURIComponent("Song requests!")+"&body="+encodeURIComponent(l.join("\n"));
-  });
+    if(SETTINGS.songFormUrl) songMailBtn.textContent = "Submit my requests";
+    songMailBtn.addEventListener("click", ()=>{
+      const l = songList();
+      if(!l.length){ toast("Add a request or two first — the dance floor is counting on you."); return; }
+      if(SETTINGS.songFormUrl){
+        window.open(SETTINGS.songFormUrl.replace("{song}", encodeURIComponent(l.join("; "))).replace("{name}", encodeURIComponent(NAME)), "_blank", "noopener");
+        return;
+      }
+      location.href = "mailto:"+SETTINGS.contactEmail+"?subject="+encodeURIComponent("Song requests!")+"&body="+encodeURIComponent(l.join("\n"));
+    });
+  }
 
   /* ============================================================
      THE BRIDAL PARTY — TOP TRUMPS ✏️ EDIT this list.
@@ -1483,8 +1523,8 @@ export function boot() {
     });
     const fx = document.getElementById("tpb-facts");
     fx.innerHTML = "";
-    const p1 = document.createElement("p"); p1.innerHTML = "<strong>Known for:</strong> "; p1.appendChild(document.createTextNode(m.known)); fx.appendChild(p1);
-    const p2 = document.createElement("p"); p2.innerHTML = "<strong>Classified intel:</strong> "; p2.appendChild(document.createTextNode(m.fact)); fx.appendChild(p2);
+    const p1 = document.createElement("p"); p1.innerHTML = "<strong>Connection:</strong> "; p1.appendChild(document.createTextNode(m.connection)); fx.appendChild(p1);
+    if(m.weddingRole){ const p2 = document.createElement("p"); p2.innerHTML = "<strong>Wedding Role:</strong> "; p2.appendChild(document.createTextNode(m.weddingRole)); fx.appendChild(p2); }
     tpOv.classList.add("open");
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       st.querySelectorAll(".fill").forEach(f=>f.style.width = f.dataset.w+"%");
