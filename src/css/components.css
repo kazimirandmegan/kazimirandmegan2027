@@ -115,6 +115,7 @@ nav.links{align-items:center}
 .wx-temp{font-family:"Cormorant Garamond",serif;font-size:2.5rem;color:var(--peri-deep);line-height:1}
 .wx-meta{font-size:.92rem;color:var(--ink-soft)}
 .wx-src{font-size:.78rem;color:var(--ink-soft);margin-left:auto;align-self:flex-end}
+.wx-outfit{font-size:.92rem;color:var(--ink);margin-top:.5rem}
 
 /* ---------- st albans map ---------- */
 #stamap{height:430px;border:1px solid var(--rule);z-index:1}
@@ -215,8 +216,9 @@ nav.links{align-items:center}
 @keyframes tick{to{transform:translateX(-100%)}}
 
 /* ---------- top trumps ---------- */
-.tp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1.1rem;margin:1.4rem 0}
-.tp-card{border:1px solid var(--rule);background:linear-gradient(#fff,#F7F4EC);cursor:pointer;text-align:center;padding:0 0 .8rem;box-shadow:var(--shadow);transition:transform .15s}
+.tp-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:1.1rem;margin:1.4rem 0}
+.tp-grid-dogs{display:flex;flex-wrap:wrap;justify-content:center;gap:1.1rem;margin:.3rem 0 1.4rem}
+.tp-card{flex:0 0 160px;border:1px solid var(--rule);background:linear-gradient(#fff,#F7F4EC);cursor:pointer;text-align:center;padding:0 0 .8rem;box-shadow:var(--shadow);transition:transform .15s}
 @media (hover:hover) and (pointer:fine){
   .tp-card:hover{transform:translateY(-4px) rotate(-.6deg)}
 }
@@ -228,7 +230,7 @@ nav.links{align-items:center}
 #tp-overlay.open{display:flex}
 .tp-big{background:var(--card);border:2px solid var(--gold-soft);max-width:360px;width:100%;box-shadow:var(--shadow);position:relative;max-height:92vh;overflow:auto}
 .tp-band{background:var(--peri-deep);color:#fff;padding:.7rem 2.4rem .7rem 1rem;font-family:"Cormorant Garamond",serif;letter-spacing:.12em;display:flex;justify-content:space-between;gap:.6rem;font-size:.92rem;text-transform:uppercase}
-.tp-big .tp-face{aspect-ratio:16/10;font-size:4rem;border-bottom:3px solid var(--gold)}
+.tp-big .tp-face{aspect-ratio:1/1;font-size:4rem;border-bottom:3px solid var(--gold)}
 .tp-stats{padding:1rem 1.1rem .4rem}
 .tp-stat{margin:.55rem 0}
 .tp-stat .lab{display:flex;justify-content:space-between;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
@@ -349,6 +351,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .ukraine-salute{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:2rem;text-align:center}
 .ukraine-flag{font-size:8rem;line-height:1}
 .ukraine-text{font-family:"Cormorant Garamond",serif;font-size:clamp(2.8rem,8vw,6rem);font-weight:600;color:#005BBB;letter-spacing:.04em}
+.ukraine-hint{font-size:.95rem;color:var(--ink-soft);font-style:italic}
 
 /* ---------- phone polish ---------- */
 @media (max-width:480px){
@@ -358,7 +361,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
   .btn-row{gap:.65rem}
   .info-grid{grid-template-columns:1fr}
   .euro-grid{grid-template-columns:1fr}
-  .tp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  .tp-card{flex:0 0 140px}
   .sheet{margin:1.2rem .6rem 2.5rem;padding:2.2rem clamp(.9rem,4vw,1.4rem) 2.4rem}
   .hero-date .hd-rule{flex:0 1 48px}
   header{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}

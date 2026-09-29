@@ -13,7 +13,7 @@ export const SETTINGS = {
   /* Countdown target: year, month (5 = May), day, hour, minute */
   weddingDate: { year: 2027, month: 5, day: 29, hour: 12, minute: 0 },
 
-  contactEmail: "PLACEHOLDER-email@example.com",
+  contactEmail: "kazimirandmegan@gmail.com",
   whatsappLink: "#PLACEHOLDER-WHATSAPP-GROUP-LINK",
   spotifyLink:  "",                    /* "" hides the playlist card */
   vyshyvankaCode: "[PLACEHOLDER CODE]",
@@ -110,7 +110,7 @@ export const SETTINGS = {
     { place: "Hoedspruit, South Africa", lat: -24.3619, lng: 30.9571, cat: "travel",
       note: "Safari with R&C", img: "" },
     { place: "Dataw Island, SC", lat: 32.4163, lng: -80.4710, cat: "travel",
-      note: "Meet with the Molasses (Megan family friend)", img: "" },
+      note: "Met up with the Molassos (Megan's family friend)", img: "" },
     { place: "New York City, NY", lat: 40.7128, lng: -74.0060, cat: "travel",
       note: "Sri & Anna are the best hosts", img: "" },
     { place: "Raleigh, NC", lat: 35.7796, lng: -78.6382, cat: "travel",
@@ -131,11 +131,7 @@ export const SETTINGS = {
 
   /* ---- Playlists ✏️ EDIT ---- */
   sharedPlaylist: "https://open.spotify.com/playlist/6KxPYGdkbWsgduZPrzRgj8",   /* collaborative Spotify playlist — guests add songs there */
-  playlists: [          /* extra playlists to embed; leave url "" for a placeholder card */
-    { title: "Getting-ready mood", url: "" },
-    { title: "Golden hour at the palace", url: "" },
-    { title: "Dance floor, no mercy", url: "" }
-  ],
+  playlists: [],
 
   /* ---- Guestbook wall ✏️ EDIT: paste entries guests email you and they
      appear for everyone. type: "memory" | "advice" | "wish".

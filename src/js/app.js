@@ -225,6 +225,10 @@ export function boot() {
   if(faqEmail){ faqEmail.href = "mailto:"+SETTINGS.contactEmail; }
   if(faqEmailVal){ faqEmailVal.textContent = SETTINGS.contactEmail; }
   if(faqWa){ faqWa.href = SETTINGS.whatsappLink; }
+  const rsvpWa = document.getElementById("whatsapp-join-btn");
+  if(rsvpWa){ rsvpWa.href = SETTINGS.whatsappLink; }
+  const homeWa = document.getElementById("home-wa-btn");
+  if(homeWa){ homeWa.href = SETTINGS.whatsappLink; }
   const vy = document.getElementById("vyshyvanka-code");
   if(vy) vy.textContent = SETTINGS.vyshyvankaCode;
   if(SETTINGS.spotifyLink){
@@ -341,7 +345,15 @@ export function boot() {
     toast(pawCount < 3 ? "Woof. Kiko has inspected this website and approves."
                        : "Kiko says that's enough attention. (It is never enough attention.)");
   });
-  /* 4. the button that says not to press it */
+  /* 4. Ukrainian flag burst */
+  const ukFlag = document.getElementById("ukraine-flag");
+  if(ukFlag){
+    const fireUkraine = ()=>{ emojiBurst(["🇺🇦","🌻","💛","💙","✨","🎉","🌟","💪","❤️","🎊"], 80); };
+    ukFlag.addEventListener("click", fireUkraine);
+    ukFlag.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); fireUkraine(); }});
+  }
+
+  /* 5. the button that says not to press it */
   const myst = document.getElementById("mystery-btn");
   if(myst){
     let pressed = 0;
@@ -472,7 +484,7 @@ export function boot() {
     const starters = TIER==="afterparty"
       ? ["Last trains home?","Where's the after party?","What should I wear?"]
       : TIER==="vinko"
-      ? ["What is the Vinkoplytenna?","What should I wear?","Which airport?"]
+      ? ["What is the Vinkopletyny?","What should I wear?","Which airport?"]
       : ["Which airport?","Last trains home?","What should I wear?"];
     chips.innerHTML = "";
     starters.forEach(s=>{
@@ -533,7 +545,6 @@ export function boot() {
       .then(r=>r.json()).then(d=>{
         const c = d.current, day = d.daily;
         const [ico,txt] = WXC[c.weather_code] || ["🌡","Weather"];
-        const isAmericans = !!document.getElementById("page-americans") && document.getElementById("page-americans").classList.contains("visible");
         const tC = Math.round(c.temperature_2m);
         const tF = Math.round(c.temperature_2m * 9/5 + 32);
         const feelC = Math.round(c.apparent_temperature);
@@ -542,17 +553,22 @@ export function boot() {
         const maxC = Math.round(day.temperature_2m_max[0]);
         const minF = Math.round(day.temperature_2m_min[0] * 9/5 + 32);
         const maxF = Math.round(day.temperature_2m_max[0] * 9/5 + 32);
-        const unit = isAmericans ? "°F" : "°C";
-        const tempStr = isAmericans ? tF+"°F" : tC+"°C ("+tF+"°F)";
-        const feelStr = isAmericans ? feelF+unit : feelC+unit;
-        const minStr = isAmericans ? minF : minC;
-        const maxStr = isAmericans ? maxF : maxC;
-        if(mini) mini.textContent = ico+" "+tempStr+" · "+txt;
+        const rainChance = day.precipitation_probability_max[0];
+        let outfit;
+        if(tC >= 24)      outfit = "Short sleeves or a summer dress — it's a warm one. Sunscreen advised.";
+        else if(tC >= 18) outfit = "Light layers — a cardigan or light jacket over your outfit will do nicely.";
+        else if(tC >= 12) outfit = "A proper jacket is a good call. Comfortable closed shoes recommended.";
+        else if(tC >= 6)  outfit = "Coat weather. Layer up — a scarf wouldn't go amiss.";
+        else              outfit = "Full winter coat and serious layers. Welcome to Britain.";
+        if(rainChance >= 60)      outfit += " Rain is likely — bring an umbrella.";
+        else if(rainChance >= 35) outfit += " Some rain possible — an umbrella in the bag wouldn't hurt.";
+        if(mini) mini.textContent = ico+" "+tC+"°C ("+tF+"°F) · "+txt;
         if(card) card.innerHTML =
           '<div class="wx-big">'+ico+'</div>'+
-          '<div><div class="wx-temp">'+tempStr+'</div>'+
-          '<div class="wx-meta">'+txt+' · feels like '+feelStr+' · wind '+Math.round(c.wind_speed_10m)+' km/h</div>'+
-          '<div class="wx-meta">Today: '+minStr+'–'+maxStr+unit+' · rain chance '+day.precipitation_probability_max[0]+'%</div></div>'+
+          '<div><div class="wx-temp">'+tF+'°F ('+tC+'°C)</div>'+
+          '<div class="wx-meta">'+txt+' · feels like '+feelF+'°F ('+feelC+'°C) · wind '+Math.round(c.wind_speed_10m)+' km/h</div>'+
+          '<div class="wx-meta">Today: '+minF+'–'+maxF+'°F ('+minC+'–'+maxC+'°C) · rain chance '+rainChance+'%</div>'+
+          '<div class="wx-outfit">👗 Outfit suggestion: '+outfit+'</div></div>'+
           '<div class="wx-src">live · refreshes every 15 min · open-meteo.com</div>';
       }).catch(()=>{
         if(mini) mini.textContent = "🌦 the skies are being coy — live weather appears once the site is online";
@@ -1494,6 +1510,7 @@ export function boot() {
   
   (function(){
     const grid = document.getElementById("tp-grid"); if(!grid) return;
+    const gridDogs = document.getElementById("tp-grid-dogs");
     PARTY.forEach((m,i)=>{
       const c = document.createElement("button");
       c.type = "button"; c.className = "tp-card";
@@ -1504,7 +1521,8 @@ export function boot() {
       c.querySelector(".tp-role").textContent = m.role;
       c.querySelector("h4").textContent = m.name;
       c.addEventListener("click", ()=>tpOpen(m));
-      grid.appendChild(c);
+      const isDog = m.role === "Dog of Honour";
+      (isDog && gridDogs ? gridDogs : grid).appendChild(c);
     });
   })();
   const tpOv = document.getElementById("tp-overlay");
@@ -1513,6 +1531,7 @@ export function boot() {
     document.getElementById("tpb-name").textContent = m.name;
     const face = document.getElementById("tpb-face");
     face.innerHTML = '<span>'+(m.name||"?").replace("[NAME]","?").charAt(0)+'</span><img src="'+m.img+'" alt="" onerror="this.remove()">';
+    if(m.imgPos){ const fi = face.querySelector("img"); if(fi) fi.style.objectPosition = m.imgPos; }
     const st = document.getElementById("tpb-stats"); st.innerHTML = "";
     m.stats.forEach(([lab,val])=>{
       const d = document.createElement("div"); d.className = "tp-stat";
