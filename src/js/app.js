@@ -31,6 +31,10 @@ export function boot() {
   let NAME = "Guest";   /* set at the gate; personalises the whole site */
 
   /* ---------- router ---------- */
+  let pendingAnchor = null;
+  /* Filled in once the pin lists are built. Declared up here because a
+     returning guest is unlocked, and show() runs, before that build. */
+  let MAPS = {};
   function show(route){
     if(!route) route = "home";
     /* Unknown hashes (e.g. placeholder links awaiting real URLs) are
@@ -54,9 +58,41 @@ export function boot() {
     if(document.activeElement && document.activeElement.closest && document.activeElement.closest(".ngroup")) document.activeElement.blur();
     if(MAPS[route]) setTimeout(()=>{ try{ initMapFor(route); }catch(e){} }, 80);
     if(route === "games") setTimeout(()=>{ try{ gamesInit(); }catch(e){} }, 60);
-    if(route === "rsvp") setTimeout(()=>{ try{ rsvpInit(); }catch(e){} }, 40);
+    if(route === "rsvp") setTimeout(()=>{ try{ rsvpInit(); }catch(e){ console.error(e); } }, 40);
     window.scrollTo(0,0);
+    /* Home week-calendar taps set this, then change the hash. The day
+       cards live on #week, which is display:none until this route shows,
+       so the scroll has to happen after the page is actually visible. */
+    if(pendingAnchor){
+      const id = pendingAnchor;
+      pendingAnchor = null;
+      if(route === "week"){
+        /* Fade-in uses a transform for 0.5s, and webfonts can still be
+           shifting the layout after that. Measure once the fade is over,
+           then again once fonts have settled, so the jump lands on the day. */
+        const jumpToDay = ()=>{
+          const jump = document.getElementById(id);
+          if(!jump) return;
+          const top = jump.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo(0, Math.max(0, top));
+        };
+        setTimeout(jumpToDay, 650);
+        setTimeout(jumpToDay, 1400);
+      }
+    }
   }
+  document.addEventListener("click", e=>{
+    const dayBtn = e.target.closest && e.target.closest("[data-week-day]");
+    if(!dayBtn) return;
+    const id = dayBtn.getAttribute("data-week-day");
+    if(!id || !document.getElementById(id)) return;
+    pendingAnchor = id;
+    /* replaceState, not location.hash: assigning the hash makes the
+       browser scroll to the top again a moment later and undo the jump. */
+    const onWeek = (location.hash||"").replace(/^#/,"") === "week";
+    if(!onWeek) history.replaceState(null, "", "#week");
+    show("week");
+  });
   window.addEventListener("hashchange", ()=>{ if(TIER) show(location.hash.replace("#","")); });
   /* iOS Safari often swallows hash-link taps inside a transformed / overflow
      drawer — route explicitly so Keepsakes → In-Flight Entertainment etc. work. */
@@ -137,6 +173,8 @@ export function boot() {
     return null;
   }
   function unlock(tier, quiet){
+    lstore.set("km-tier", tier);
+    store.set("km-tier", tier);
     applyTier(tier);
     gate.style.display = "none";
     document.getElementById("site-header").style.display = "";
@@ -161,7 +199,6 @@ export function boot() {
       /* the NAME personalises greetings, the dashboard, games and the concierge */
       NAME = document.getElementById("gname").value.trim() || "Guest";
       lstore.set("km-name", NAME);
-      store.set("km-tier", tier);
       unlock(tier);
     } else {
       document.getElementById("pw-err").textContent = "That's not quite it — check your invitation. Capitals and spaces don't matter.";
@@ -172,8 +209,9 @@ export function boot() {
   document.getElementById("gate-form").addEventListener("submit", e=>{ e.preventDefault(); tryPassword(); });
   document.getElementById("pw").addEventListener("input", ()=>{ document.getElementById("pw-err").textContent=""; });
   NAME = lstore.get("km-name") || "Guest";
-  const savedTier = store.get("km-tier");
-  if(savedTier && ACCESS[savedTier]) unlock(savedTier, true);
+  const savedTier = lstore.get("km-tier") || store.get("km-tier");
+  /* Restored at the end of boot, once toast, RSVP and the maps exist.
+     Unlocking here would call those before their bindings are ready. */
 
   /* ---------- countdown ---------- */
   const W = SETTINGS.weddingDate;
@@ -595,7 +633,7 @@ export function boot() {
      are drawn automatically from every "from" pin to the "home" pin. */
   const STORY_PINS = buildStoryPins(SETTINGS.storyMap);
   const STORY_LINES = buildStoryLines(STORY_PINS);
-  const MAPS = buildMaps(STORY_PINS, STORY_LINES);
+  MAPS = buildMaps(STORY_PINS, STORY_LINES);
   
   const mapRefs = {};
 
@@ -987,12 +1025,15 @@ export function boot() {
       });
       document.getElementById("rsvp-ifyes").style.display = attending==="yes" ? "" : "none";
       const _ifd2 = document.getElementById("rsvp-ifdecline"); if(_ifd2) _ifd2.style.display = attending==="no" ? "" : "none";
+      const extra = (d.details && typeof d.details === "object") ? d.details : {};
       document.getElementById("r-email").value = d.email || "";
       document.getElementById("r-mobile").value = d.mobile || "";
-      const rStreet = document.getElementById("r-street"); if(rStreet) rStreet.value = d.street || "";
+      const rStreet = document.getElementById("r-street"); if(rStreet) rStreet.value = d.street || extra.street || "";
       const rCity = document.getElementById("r-city"); if(rCity) rCity.value = d.city || "";
       const rCountry = document.getElementById("r-country"); if(rCountry) rCountry.value = d.country || "";
-      const rPostcode = document.getElementById("r-postcode"); if(rPostcode) rPostcode.value = d.postcode || "";
+      const rPostcode = document.getElementById("r-postcode"); if(rPostcode) rPostcode.value = d.postcode || extra.postcode || "";
+      const declineEl = document.getElementById("r-decline-msg");
+      if(declineEl) declineEl.value = d.decline_message || extra.decline_message || "";
       if(d.party_size){ sizeSel.value = Math.min(6, Math.max(1, +d.party_size)); }
       buildGuestRows(d.guests || []);                 /* prefill saved guests */
       events.forEach(ev=>{
@@ -1002,10 +1043,12 @@ export function boot() {
       const apAftEl = document.getElementById("r-afterparty"); if(apAftEl) apAftEl.checked = !!d.afterparty;
       document.getElementById("r-activities").checked = !!d.activities;
       if(actSub) actSub.style.display = !!d.activities ? "" : "none";
-      if(d.activity_interests){ d.activity_interests.split(",").forEach(v=>{ const c=document.querySelector('[name="r-act-sub"][value="'+v+'"]'); if(c) c.checked=true; }); }
+      const actInterests = d.activity_interests || extra.activity_interests || "";
+      if(actInterests){ String(actInterests).split(",").forEach(v=>{ const c=document.querySelector('[name="r-act-sub"][value="'+v+'"]'); if(c) c.checked=true; }); }
       const travelChkEl = document.getElementById("r-travelafter"); if(travelChkEl) travelChkEl.checked = !!d.travelling_after;
       if(travelSub) travelSub.style.display = !!d.travelling_after ? "" : "none";
-      if(d.travel_interests){ d.travel_interests.split(",").forEach(v=>{ const c=document.querySelector('[name="r-travel-sub"][value="'+v+'"]'); if(c) c.checked=true; }); }
+      const travelInterests = d.travel_interests || extra.travel_interests || "";
+      if(travelInterests){ String(travelInterests).split(",").forEach(v=>{ const c=document.querySelector('[name="r-travel-sub"][value="'+v+'"]'); if(c) c.checked=true; }); }
       showSaved(d);
     }
 
@@ -1024,10 +1067,20 @@ export function boot() {
       travelChk.addEventListener("change", ()=>{ travelSub.style.display = travelChk.checked ? "" : "none"; });
     }
 
-    /* fetch this household's existing RSVP by their gate name */
+    /* Prefer the lead name from the last RSVP saved on this device.
+       The gate name is often a nickname, and the sheet is keyed by the
+       name typed on the form. Fall back to the gate name if that misses. */
+    function rsvpLookupName(){
+      return lstore.get("km-rsvp-name") || (NAME && NAME!=="Guest" ? NAME : "");
+    }
     function loadForName(){
-      if(!CLOUD || !NAME || NAME==="Guest") return;
-      cloudGet("rsvp", {name: NAME}).then(d=>{ if(d) applyLoaded(d); }).catch(()=>{});
+      const primary = rsvpLookupName();
+      if(!CLOUD || !primary) return;
+      cloudGet("rsvp", {name: primary}).then(d=>{
+        if(d){ applyLoaded(d); return; }
+        if(NAME && NAME!=="Guest" && norm(NAME)!==norm(primary))
+          return cloudGet("rsvp", {name: NAME}).then(d2=>{ if(d2) applyLoaded(d2); });
+      }).catch(()=>{});
     }
     loadForName();
 
@@ -1039,7 +1092,8 @@ export function boot() {
       if(!attending){ err.textContent = "Please let us know if you can make it."; return; }
 
       const declineMsg = document.getElementById("r-decline-msg");
-      const payload = { action:"rsvp", name:name, attending:attending, decline_message: attending==="no" && declineMsg ? declineMsg.value.trim() : "" };
+      const declineNote = attending==="no" && declineMsg ? declineMsg.value.trim() : "";
+      const payload = { action:"rsvp", name:name, attending:attending, decline_message: declineNote };
       if(attending === "yes"){
         payload.email = document.getElementById("r-email").value.trim();
         payload.mobile = document.getElementById("r-mobile").value.trim();
@@ -1068,19 +1122,32 @@ export function boot() {
           const box = evWrap.querySelector('[data-ev="'+ev.k+'"]');
           payload[ev.k] = !!(box && box.checked);
         });
-        payload.afterparty = document.getElementById("r-afterparty").checked;
+        const apEl = document.getElementById("r-afterparty");
+        payload.afterparty = !!(apEl && apEl.checked);
         payload.activities = document.getElementById("r-activities").checked;
         const actSubs = document.querySelectorAll('[name="r-act-sub"]:checked');
         payload.activity_interests = Array.from(actSubs).map(c=>c.value).join(",");
         payload.travelling_after = document.getElementById("r-travelafter").checked;
         const travelSubs = document.querySelectorAll('[name="r-travel-sub"]:checked');
         payload.travel_interests = Array.from(travelSubs).map(c=>c.value).join(",");
+        /* The live script stores full_address from `address` and a spare
+           JSON blob from `details`. Street and postcode are not columns. */
+        payload.address = [payload.street, payload.postcode].filter(Boolean).join(", ");
+        payload.details = {
+          street: payload.street,
+          postcode: payload.postcode,
+          activity_interests: payload.activity_interests,
+          travel_interests: payload.travel_interests
+        };
+      } else {
+        payload.details = { decline_message: declineNote };
       }
 
       const btn = document.getElementById("r-submit"); const was = btn.textContent;
       btn.disabled = true; btn.textContent = "Sending…";
       cloudPost(payload)
         .then(()=>{
+          lstore.set("km-rsvp-name", name);
           petalsBurst(60, typeof GOLD!=="undefined"?GOLD:null);
           toast(attending==="yes" ? "RSVP received — thank you! 💛" : "Thank you for letting us know 🕊");
           RSVP_STATE = rsvpObjFromPayload(payload);
@@ -1119,9 +1186,11 @@ export function boot() {
   function rsvpSummaryHtml(d, events){
     if(!d) return "";
     if(d.attending === "no"){
-      return '<p class="rsvp-summary">You\'ve let us know you sadly can\'t make it. We\'ll miss you — thank you for replying.</p>';
+      const note = d.decline_message || (d.details && d.details.decline_message) || "";
+      return '<p class="rsvp-summary">You\'ve let us know you sadly can\'t make it. We\'ll miss you — thank you for replying.'+(note ? '<br>'+esc(note) : '')+'</p>';
     }
     const evList = (events||RSVP_EVENTS.full).filter(ev=>d[ev.k]).map(ev=>ev.label.split(" — ")[0]);
+    if(d.afterparty) evList.push("After party");
     const g = (d.guests||[]).filter(x=>x && x.name);
     let s = '<div class="rsvp-summary">';
     s += '<strong>'+esc(d.name)+'</strong> — joyfully attending 💛<br>';
@@ -2248,4 +2317,6 @@ export function boot() {
       setTimeout(preloadBts,6000);
     }
   })();
+
+  if(savedTier && ACCESS[savedTier]) unlock(savedTier, true);
 }

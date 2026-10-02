@@ -51,28 +51,46 @@
       <a class="btn ghost" id="home-wa-btn" href="#" target="_blank" rel="noopener">💬 Join the WhatsApp group</a>
     </div>
 
-    <!-- Wedding week at-a-glance calendar -->
-    <div class="wcal" role="navigation" aria-label="Wedding week at a glance">
+    <!-- Wedding week at-a-glance calendar. Full guests jump into #week.
+         Other invitations never have those day cards, so they get their own event instead. -->
+    <div class="wcal" data-tier="full" role="navigation" aria-label="Wedding week at a glance">
       <div class="wcal-title">The Wedding Week · May 2027</div>
       <table>
         <tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
         <tr>
           <td class="blank"></td>
           <td class="blank"></td>
-          <td><button type="button" onclick="document.getElementById('day-25').scrollIntoView({behavior:'smooth'})"><span class="wc-day">25</span><span class="wc-ev">Explore</span></button></td>
-          <td><button type="button" onclick="document.getElementById('day-26').scrollIntoView({behavior:'smooth'})"><span class="wc-day">26</span><span class="wc-ev">St Albans Day</span></button></td>
-          <td class="big"><button type="button" onclick="document.getElementById('day-27').scrollIntoView({behavior:'smooth'})"><span class="wc-day">27</span><span class="wc-ev">Vinkopletyny 🌿</span></button></td>
-          <td><button type="button" onclick="document.getElementById('day-28').scrollIntoView({behavior:'smooth'})"><span class="wc-day">28</span><span class="wc-ev">Rehearsal</span></button></td>
-          <td class="big"><button type="button" onclick="document.getElementById('day-29').scrollIntoView({behavior:'smooth'})"><span class="wc-day">29</span><span class="wc-ev">The Wedding 💍</span></button></td>
+          <td><button type="button" data-week-day="day-25"><span class="wc-day">25</span><span class="wc-ev">Explore</span></button></td>
+          <td><button type="button" data-week-day="day-26"><span class="wc-day">26</span><span class="wc-ev">St Albans Day</span></button></td>
+          <td class="big"><button type="button" data-week-day="day-27"><span class="wc-day">27</span><span class="wc-ev">Vinkopletyny</span></button></td>
+          <td><button type="button" data-week-day="day-28"><span class="wc-day">28</span><span class="wc-ev">Rehearsal</span></button></td>
+          <td class="big"><button type="button" data-week-day="day-29"><span class="wc-day">29</span><span class="wc-ev">The Wedding</span></button></td>
         </tr>
         <tr>
-          <td><button type="button" onclick="document.getElementById('day-30').scrollIntoView({behavior:'smooth'})"><span class="wc-day">30</span><span class="wc-ev">Sunday Brunch</span></button></td>
-          <td><button type="button" onclick="document.getElementById('day-31').scrollIntoView({behavior:'smooth'})"><span class="wc-day">31</span><span class="wc-ev">Hang-out Day</span></button></td>
+          <td><button type="button" data-week-day="day-30"><span class="wc-day">30</span><span class="wc-ev">Sunday Brunch</span></button></td>
+          <td><button type="button" data-week-day="day-31"><span class="wc-day">31</span><span class="wc-ev">Hang-out Day</span></button></td>
           <td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td>
         </tr>
       </table>
     </div>
-    <p class="note" style="text-align:center;margin-top:-.4rem">Tap any day to jump to the full details.</p>
+    <p class="note" data-tier="full" style="text-align:center;margin-top:-.4rem">Tap any day to jump to the full details.</p>
+
+    <div class="wcal" data-tier="vinko" role="navigation" aria-label="Your celebration">
+      <div class="wcal-title">Thursday 27 May</div>
+      <p style="text-align:center;margin:.2rem 0 .9rem">Vinkopletyny, the pre-wedding celebration.</p>
+      <div class="btn-row" style="justify-content:center;margin:0">
+        <a class="btn primary" href="#vinko">See the celebration</a>
+      </div>
+    </div>
+
+    <div class="wcal" data-tier="afterparty" role="navigation" aria-label="Your evening">
+      <div class="wcal-title">Saturday 29 May</div>
+      <p style="text-align:center;margin:.2rem 0 .9rem">You are with us for the evening reception and the after party.</p>
+      <div class="btn-row" style="justify-content:center;margin:0">
+        <a class="btn ghost" href="#reception">Evening reception</a>
+        <a class="btn ghost" href="#afterparty">After party</a>
+      </div>
+    </div>
 
     <!-- PHOTO SLOT: add your photo as  images_home.jpg  -->
     <figure class="photo-slot">

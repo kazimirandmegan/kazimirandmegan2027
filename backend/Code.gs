@@ -186,6 +186,38 @@ const RSVP_HEADERS = ["updated","name","key","attending","party_size",
   "breakfast","evening","afterparty","activities","travelling_after","guests_json",
   "full_address","details_json"];
 
+/* Street, postcode, activity ticks and the decline note are not sheet
+   columns. Keep them in details_json, and build full_address from street
+   plus postcode when the client did not send a single address string.
+   Accepts either the nested `details` object or the same fields flat. */
+function rsvpDetails_(b) {
+  var src = (b.details && typeof b.details === "object") ? b.details : {};
+  function keep(key, max) {
+    var fromDetails = src[key] != null ? String(src[key]).trim() : "";
+    var fromFlat = b[key] != null ? String(b[key]).trim() : "";
+    var raw = fromDetails || fromFlat;
+    return raw ? clean_(raw, max) : "";
+  }
+  var out = {};
+  var street = keep("street", 200);
+  var postcode = keep("postcode", 40);
+  var decline = keep("decline_message", 2000);
+  var acts = keep("activity_interests", 400);
+  var travel = keep("travel_interests", 200);
+  if (street) out.street = street;
+  if (postcode) out.postcode = postcode;
+  if (decline) out.decline_message = decline;
+  if (acts) out.activity_interests = acts;
+  if (travel) out.travel_interests = travel;
+  return out;
+}
+
+function rsvpAddress_(b, details) {
+  var addr = clean_(b.address, 400);
+  if (addr) return addr;
+  return [details.street, details.postcode].filter(Boolean).join(", ").slice(0, 400);
+}
+
 function saveRsvp_(b) {
   const name = clean_(b.name, MAX_NAME);
   if (!name) throw new Error("missing lead name");
@@ -194,10 +226,13 @@ function saveRsvp_(b) {
   /* geocode the address to a rough lat/lng + tidy city/country, so the
      atlas can place a pin and measure distance. We deliberately keep
      ONLY city + country for public display; the full address stays in
-     its own column for the couple. */
+     its own column for the couple. Street and postcode are not their own
+     columns — they travel in `address`, with a copy inside details_json
+     so the website can put them back in the right boxes on edit. */
   var city = clean_(b.city, 120), country = clean_(b.country, 120);
   var lat = "", lng = "";
-  const addr = clean_(b.address, 400);
+  const details = rsvpDetails_(b);
+  const addr = rsvpAddress_(b, details);
   if (addr || city || country) {
     try {
       const q = [addr, city, country].filter(String).join(", ");
@@ -227,7 +262,7 @@ function saveRsvp_(b) {
     yesno_(b.activities), yesno_(b.travelling_after),
     JSON.stringify(b.guests || []).slice(0, 8000),
     addr,
-    JSON.stringify(b.details || {}).slice(0, 4000)
+    JSON.stringify(details).slice(0, 4000)
   ];
 
   /* upsert: find an existing row with this key and overwrite it */
