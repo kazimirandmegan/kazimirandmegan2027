@@ -80,7 +80,7 @@ Then open `http://localhost:5173`.
 | Wording on a specific page | The matching file under [`src/pages/`](src/pages/) |
 | Photos | Drop files into [`public/`](public/) using the names in [`docs/PHOTO-CHECKLIST.md`](docs/PHOTO-CHECKLIST.md) |
 | Bridal party Top Trumps stats | [`src/data/party.js`](src/data/party.js) |
-| Connie’s answers (the chat helper) | [`src/data/concierge-kb.js`](src/data/concierge-kb.js) |
+| Connie’s answers (used when no OpenAI key is set) | [`src/data/concierge-kb.js`](src/data/concierge-kb.js) |
 | Quiz / crossword / hunt riddles | [`src/data/quiz.js`](src/data/quiz.js), [`src/data/crossword.js`](src/data/crossword.js), [`src/data/hunt.js`](src/data/hunt.js) |
 | Explore map pins | [`src/data/maps/`](src/data/maps/) |
 
@@ -147,7 +147,7 @@ Guests move between pages with the menu (and `#` links). Some pages only appear 
 |-------|----------------|
 | **Password gate** | Asks for name + password before the site opens |
 | **Navigation** | Desktop menus and the mobile drawer |
-| **Connie** | Chat helper for trains, dress codes, timings, and more |
+| **Connie** | Chat helper for trains, dress codes, timings, and more. Uses OpenAI when a key is configured; otherwise the built-in answers |
 | **Maps** | Interactive Leaflet maps on story / explore / atlas pages |
 | **Weather** | Live St Albans forecast (Open-Meteo) |
 | **Countdown** | Days-until-the-wedding on the home page |
@@ -187,6 +187,18 @@ npm run build
 3. Deploy the **`dist/`** folder to Netlify (drag-and-drop, or connect the GitHub repo with publish directory `dist` — see `netlify.toml`).
 
 Optional: to make guestbook pins, RSVPs, and game scores live for everyone, use the Google Apps Script in [`backend/Code.gs`](backend/Code.gs) and paste the web app URL into `SETTINGS.cloudUrl`. Details are in the developer notes.
+
+### Ask Connie with OpenAI
+
+Connie answers from the built-in notes in [`src/data/concierge-kb.js`](src/data/concierge-kb.js) until an OpenAI key is available. With a key, she answers from the pages that guest can see (plus those notes, the maps, and the bridal party), using `gpt-4.1-mini`. The key stays on the server. Do not put it in `settings.js`.
+
+| Where you are testing | Where to put `OPENAI_API_KEY` |
+|-----------------------|-------------------------------|
+| This computer (`npm run dev` or the launcher) | A `.env` file in this folder. Copy [`.env.example`](.env.example). |
+| The live Google Apps Script backend | Apps Script → Project Settings → Script properties. Redeploy the web app as a new version. |
+| Netlify, connected to this repo | Site settings → Environment variables |
+
+If the key is missing, or the AI call fails, Connie quietly uses the built-in answers.
 
 ---
 

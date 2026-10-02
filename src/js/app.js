@@ -8,6 +8,7 @@ import { parseCsv, CLOUD, cloudGet, cloudPost } from "./cloud.js";
 import { ACCESS, tierHasCatering } from "./tier.js";
 import { QUIZ } from "../data/quiz.js";
 import { KB, SYN } from "../data/concierge-kb.js";
+import { createConnie } from "./concierge-ai.js";
 import { PARTY } from "../data/party.js";
 import { HUNT } from "../data/hunt.js";
 import { XW_WORDS } from "../data/crossword.js";
@@ -445,10 +446,11 @@ export function boot() {
 
   /* ============================================================
      THE WEDDING CONCIERGE ✏️ EDIT — add entries to the knowledge
-     base below. Each entry: keywords it listens for, the answer,
-     and which tiers may hear it (omit tiers = everyone).
-     It matches keywords offline — no accounts, no costs, works
-     even with no signal. It only knows what's written here.
+     base in src/data/concierge-kb.js. Each entry: keywords it
+     listens for, the answer, and which tiers may hear it
+     (omit tiers = everyone). Those answers are used directly when
+     no OpenAI key is configured, and they are also part of the
+     context when Connie is answering with the model.
      ============================================================ */
   
   const FALLBACK = "I'm Connie, and I only know what's written on this website — but I know all of it. Try me on trains, taxis, airports, hotels, parking, timings, what to wear, the food, the Ukrainian celebration, day trips to London or Europe, the guestbook, or the games. For anything I can't answer, the humans check their email (Contact page) more often than they'd like to admit.";
@@ -487,19 +489,42 @@ export function boot() {
     return ranked[0].e.a;
   }
 
+  const connie = createConnie({
+    getTier: () => TIER,
+    getName: () => NAME,
+    localAnswer: answer,
+  });
+
   const fab = document.getElementById("chat-fab"), panel = document.getElementById("chat-panel"),
         log = document.getElementById("chat-log"), input = document.getElementById("chat-input"),
         veil = document.getElementById("chat-veil");
+  let chatBusy = false;
   function addMsg(text, who){
     const d = document.createElement("div");
     d.className = "msg "+who; d.textContent = text;
     log.appendChild(d); log.scrollTop = log.scrollHeight;
+    return d;
   }
-  function send(qText){
+  async function send(qText){
+    if(chatBusy) return;
     const q = (qText !== undefined ? qText : input.value).trim();
     if(!q) return;
+    chatBusy = true;
     addMsg(q, "user"); input.value = "";
-    setTimeout(()=>addMsg(answer(q), "bot"), 420);
+    input.disabled = true;
+    const pending = addMsg("One moment…", "bot");
+    pending.classList.add("pending");
+    try {
+      pending.textContent = await connie.reply(q);
+    } catch (e) {
+      pending.textContent = answer(q);
+    } finally {
+      pending.classList.remove("pending");
+      chatBusy = false;
+      input.disabled = false;
+      log.scrollTop = log.scrollHeight;
+      try { input.focus(); } catch (e) {}
+    }
   }
   function setChatOpen(on){
     panel.classList.toggle("open", on);
