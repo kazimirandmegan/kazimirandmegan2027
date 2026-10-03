@@ -13,10 +13,39 @@
 
     <div class="game-card">
       <h3 style="margin-top:0">Kiko Dash 🐕</h3>
-      <p>Kiko has escaped with both wedding rings swinging from her necklace. Jump the wedding admin — wax seals, RSVP envelopes, rogue hydrangeas — through four scenes, a new one every 250&nbsp;metres. <strong>Tap / click / space</strong> to jump; a quick tap hops, holding jumps higher.</p>
-      <div id="dash-canvas-wrap"><canvas id="kiko-canvas" width="800" height="220" aria-label="Kiko Dash game — tap or press space to jump"></canvas></div>
+      <p>Kiko has escaped with both wedding rings swinging from her necklace. Jump the wedding admin through four scenes — a new one every 250&nbsp;metres — and keep the rings from the paperwork.</p>
+      <details class="kd-how">
+        <summary>How to play</summary>
+        <div class="kd-how-body">
+          <p><strong>Space, up, or tap</strong> jumps (hold for a higher hop). <strong>Down</strong> ducks a tossed bouquet, or drops her faster out of a jump. On a phone, tap <strong>Tap to Play</strong> for full screen in landscape — Jump and Duck sit over the game.</p>
+          <p>Spare rings hang in the air: catch them, and three in a row completes the set. A whisker of a miss still counts. A glowing barvinok lets her breeze through the admin for a moment.</p>
+          <p><strong>3D mode</strong> runs the same chase with lights, bloom, and a proper little world. Scores and levels stay shared.</p>
+        </div>
+      </details>
+      <div id="dash-canvas-wrap">
+        <canvas id="kiko-canvas" width="800" height="220" aria-label="Kiko Dash game. Space or up to jump, down to duck, catch the rings"></canvas>
+        <div id="kd-cheers" class="kd-cheers" aria-live="polite"></div>
+        <button type="button" class="kd-tap" id="kd-tap">Tap to Play</button>
+        <button type="button" class="kd-fs-exit" id="kd-exit" aria-label="Exit full screen">Exit</button>
+        <button type="button" class="btn primary kd-fs-3d" id="kd-3d-fs" aria-pressed="false">3D mode</button>
+        <button type="button" class="kd-gate" id="kd-gate" aria-label="Full screen gate">
+          <span class="kd-gate-card">
+            <span class="kd-gate-kicker" id="kd-gate-kicker">Landscape</span>
+            <span class="kd-gate-title" id="kd-gate-title">Turn your phone sideways</span>
+            <span class="kd-gate-note" id="kd-gate-note">Then tap for full screen</span>
+          </span>
+        </button>
+        <div class="kd-fs-pad">
+          <button type="button" class="kd-fs-jump" id="kd-jump" aria-label="Jump"><span class="kd-fs-label">Jump</span></button>
+          <button type="button" class="kd-fs-duck" id="kd-duck" aria-label="Duck or drop"><span class="kd-fs-label">Duck</span></button>
+        </div>
+      </div>
+      <div class="kd-controls">
+        <button class="btn primary kd-ctl" id="kd-3d" type="button" aria-pressed="false">3D mode</button>
+      </div>
       <div class="kd-hud">
         <span class="kd-score" id="kd-score">000 m</span>
+        <span class="kd-score kd-gems" id="kd-gems" hidden>✦ 0</span>
         <span class="kd-level" id="kd-level">LVL 1 · ST ALBANS</span>
         <span class="kd-score">BEST <span id="kd-best">000</span> m</span>
         <button class="btn ghost" id="kd-mail" type="button">Email my best score</button>
