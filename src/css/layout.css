@@ -8,7 +8,7 @@
 #gate form{margin:0}
 #gate input{width:100%;margin:.28rem 0;padding:.9rem 1rem;font-family:inherit;font-size:1.05rem;text-align:center;border:1px solid var(--rule);background:#fff;color:var(--ink);letter-spacing:.12em;outline:none;transition:border-color .2s}
 #gate input:focus{border-color:var(--peri)}
-#gate button{margin-top:1rem;width:100%;padding:.85rem 1rem;cursor:pointer;font-family:"Cormorant Garamond",serif;font-size:1.05rem;letter-spacing:.28em;text-transform:uppercase;background:var(--peri-deep);color:#FBF9F2;border:none;transition:background .2s}
+#gate button{margin-top:1rem;width:100%;padding:.85rem 1rem;min-height:48px;cursor:pointer;font-family:"Cormorant Garamond",serif;font-size:1.05rem;letter-spacing:.28em;text-transform:uppercase;background:var(--peri-deep);color:#FBF9F2;border:none;transition:background .2s}
 #gate button:hover{background:var(--ink)}
 #gate .gate-err{color:#A2543F;font-size:.92rem;min-height:1.3em;margin-top:.7rem}
 #gate .gate-hint{font-size:.9rem;color:var(--ink-soft);margin-top:.9rem;font-style:italic}
@@ -37,7 +37,15 @@ nav.links a.active{color:var(--peri-deep);border-bottom-color:var(--gold-soft)}
 #nav-veil{position:fixed;inset:0;z-index:1150;background:rgba(65,80,122,.32);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s ease}
 #nav-veil.show{opacity:1;pointer-events:auto}
 body.nav-locked{overflow:hidden}
-body.chat-open{overflow:hidden;touch-action:none}
+/* The chat button sits on the corner of the runner. Hide it while that page is open. */
+@media (max-width:1024px){
+  body.on-games #chat-fab, body.on-games #chat-nudge{visibility:hidden;pointer-events:none}
+}
+/* Lock page scroll under the chat; keep pan-y on #chat-log so messages still scroll */
+body.chat-open{overflow:hidden;position:fixed;inset:0;width:100%}
+body.chat-open header,
+body.chat-open #nav-veil,
+body.chat-open nav.links{visibility:hidden;pointer-events:none}
 @media (max-width:1024px){
   /* backdrop-filter on the header would trap the fixed drawer inside
      it, so on phones the header goes near-opaque instead */
@@ -71,12 +79,17 @@ main{position:relative;z-index:1}
 .page{display:none;animation:fadeUp .5s ease both}
 .page.visible{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.sheet{max-width:980px;margin:2.2rem auto 3.5rem;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);position:relative;padding:3.2rem clamp(1.1rem,5vw,4rem) 3.4rem}
+.sheet{max-width:980px;margin:2.2rem auto 3.5rem;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);position:relative;padding:3.2rem clamp(1.1rem,5vw,4rem) 3.4rem;overflow-wrap:break-word}
 .sheet::after{content:"";position:absolute;inset:10px;border:1px solid var(--rule);pointer-events:none}
 .corner{position:absolute;width:158px;height:158px;pointer-events:none;opacity:.9;z-index:2;object-fit:contain}
 .corner.tl{top:-30px;left:-8px;transform:rotate(33deg)}
 .corner.br{bottom:-30px;right:-8px;transform:rotate(192deg)}
-@media(max-width:640px){.corner{width:101px;height:101px}}
+@media(max-width:640px){
+  .corner{width:72px;height:72px}
+  .corner.tl{top:-8px;left:4px}
+  .corner.br{bottom:-8px;right:4px}
+  .sheet{padding-top:4.2rem}
+}
 .gate-card .corner{width:85px;height:85px}
 .gate-card .corner.tl{top:-20px;left:-10px;transform:rotate(168deg)}
 .gate-card .corner.br{bottom:-20px;right:-10px}
@@ -153,6 +166,7 @@ p{margin:.6rem 0}
 .rsvp-diet-grid .rsvp-check{flex:0 1 auto;margin:.15rem 0;padding:.4rem .65rem;border:1px solid var(--rule);background:#fff;min-height:44px;align-items:center}
 .rsvp-diet-grid .rsvp-check input:checked~span{color:var(--peri-deep);font-weight:500}
 .rsvp-other-in{margin-top:.4rem;width:100%;padding:.65rem .7rem;font-family:inherit;font-size:16px;border:1px solid var(--rule);background:#fff;color:var(--ink)}
+.rsvp-note{display:block;width:100%;margin-top:.4rem;padding:.7rem .85rem;font-family:inherit;font-size:16px;border:1px solid var(--rule);background:#FFFDF6;color:var(--ink);resize:vertical;min-height:6rem}
 .rsvp-events .rsvp-check{padding:.55rem .3rem;border-bottom:1px dotted var(--rule)}
 .rsvp-events .rsvp-check:last-child{border-bottom:none}
 .rsvp-err{color:#A2543F;font-size:.9rem;min-height:1.2em;margin:.3rem 0 .6rem;font-style:italic}
@@ -228,16 +242,28 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .wcal-title{text-align:center;font-family:"Cormorant Garamond",serif;font-size:1.35rem;color:var(--peri-deep);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.55rem}
 .wcal table{width:100%;border-collapse:collapse;table-layout:fixed;position:relative;z-index:1}
 .wcal th{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink);padding:.4rem 0;border-bottom:1px solid var(--rule);font-weight:500}
-.wcal td{border:1px solid var(--rule);height:66px;vertical-align:top;padding:0}
+.wcal td{border:1px solid var(--rule);height:auto;min-height:78px;vertical-align:top;padding:0}
 .wcal td.blank{background:transparent;border:1px dotted var(--rule);opacity:.45}
-.wcal td button{display:block;width:100%;height:100%;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--ink);padding:.35rem .2rem;text-align:center;transition:background .15s}
+.wcal td button{display:block;width:100%;min-height:78px;height:100%;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--ink);padding:.4rem .3rem;text-align:center;transition:background .15s}
 .wcal td button:hover{background:rgba(147,168,216,.14)}
 .wcal .wc-day{font-family:"Cormorant Garamond",serif;font-size:1.25rem;color:var(--peri-deep);line-height:1.05;display:block}
-.wcal .wc-ev{display:block;font-size:.72rem;letter-spacing:.03em;color:var(--ink-soft);line-height:1.3;margin-top:.18rem;overflow:hidden;overflow-wrap:anywhere;word-break:break-word}
+.wcal .wc-ev{display:block;font-size:.78rem;letter-spacing:.02em;color:var(--ink-soft);line-height:1.25;margin-top:.18rem;overflow-wrap:anywhere}
 .wcal td.big{background:rgba(179,148,92,.12);border-color:var(--gold-soft)}
 .wcal td.big .wc-day{color:var(--gold-ink);font-weight:600}
 .wcal td.big .wc-ev{color:var(--gold-ink)}
-@media(max-width:560px){.wcal td{height:auto;min-height:58px}.wcal .wc-ev{font-size:.72rem}.wcal-title{font-size:1.1rem}.wcal th{font-size:.72rem;letter-spacing:.08em}}
+/* Phone portrait AND short landscape: a 7-column month shreds labels.
+   Turn event days into a tappable list and hide the empty squares. */
+@media (max-width:640px), (max-height:500px) and (max-width:1024px){
+  .wcal{padding:.85rem .7rem 1rem}
+  .wcal-title{font-size:1.05rem;letter-spacing:.12em}
+  .wcal table,.wcal tbody{display:block;width:100%}
+  .wcal tr{display:flex;flex-direction:column}
+  .wcal th,.wcal td.blank{display:none}
+  .wcal td{display:block;min-height:0;border:none;border-bottom:1px solid var(--rule)}
+  .wcal td button{display:flex;align-items:center;justify-content:flex-start;gap:.75rem;min-height:52px;height:auto;padding:.7rem .35rem;text-align:left}
+  .wcal .wc-day{width:2.6rem;flex:none;font-size:1.45rem;text-align:center}
+  .wcal .wc-ev{margin:0;font-size:1.02rem;line-height:1.3;text-align:left}
+}
 /* home-page full-month calendar variant */
 .wcal-home td{height:44px}
 .wcal-home td.wday{opacity:.28;pointer-events:none}
@@ -263,7 +289,7 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .fest.bd .medal .dn{font-size:.92rem;letter-spacing:.02em;text-align:center;line-height:1.15;padding:0 .2rem}
 .fest.bd .fest-card .fc-sub{margin-bottom:.1rem}
 .fest.bd .bus-egg{text-decoration:underline dotted var(--gold);cursor:pointer}
-@media(max-width:560px){
+@media (max-width:640px), (max-height:500px) and (max-width:1024px){
   .fest{padding-left:64px}
   .fest::before{left:24px}
   .fest-day .medal{left:-64px;width:50px;height:50px}
@@ -271,8 +297,12 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
   .fest-ev{flex-direction:column;gap:.1rem}
   .fest-ev .fe-t{width:auto}
   .tag{white-space:normal;margin:.2rem 0 0;display:inline}
+  /* times such as "1.30 pm" don't fit a 50px coin */
+  .fest.bd{padding-left:78px}
+  .fest.bd::before{left:30px}
+  .fest.bd .medal{left:-78px;width:64px;height:64px}
+  .fest.bd .medal .dn{font-size:.78rem}
 }
-
 /* departure board */
 .board{background:#20263B;color:#F4C64D;font-family:"Courier New",monospace;padding:1.2rem 1.3rem;margin:1.2rem 0;border:6px solid #171B2B;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .board .board-top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:.7rem}
@@ -284,10 +314,17 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .board .ontime{color:#7FD98B}
 .board-links{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem}
 .board-links a{color:#9BA6C9;font-size:.8rem}
+@media(max-width:560px){
+  .board{padding:.85rem .55rem;border-width:4px}
+  .board-strip{margin:0 -.55rem .7rem;letter-spacing:.06em;font-size:.68rem;padding:.4rem .55rem}
+  .board table{min-width:0;font-size:.82rem}
+  .board td,.board th{padding:.32rem .28rem;white-space:normal}
+  .board th{letter-spacing:.08em}
+}
 
 /* accordion */
 .acc{border:1px solid var(--rule);background:#fff;margin:.6rem 0}
-.acc summary{cursor:pointer;padding:.95rem 1.15rem;font-family:"Cormorant Garamond",serif;font-size:1.18rem;color:var(--peri-deep);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.acc summary{cursor:pointer;padding:.95rem 1.15rem;min-height:48px;font-family:"Cormorant Garamond",serif;font-size:1.18rem;color:var(--peri-deep);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem}
 .acc summary::-webkit-details-marker{display:none}
 .acc summary::after{content:"+";color:var(--gold);font-size:1.3rem;flex:none}
 .acc[open] summary::after{content:"–"}
@@ -297,12 +334,12 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 .fun-card{border:1px solid var(--rule);background:#fff;padding:1.4rem 1.4rem 1.2rem;margin:1.4rem 0}
 .quiz-q{font-family:"Cormorant Garamond",serif;font-size:1.25rem;color:var(--peri-deep);margin-bottom:.7rem}
 .quiz-opts{display:flex;flex-direction:column;gap:.5rem}
-.quiz-opts button{text-align:left;padding:.65rem .9rem;background:var(--ivory);border:1px solid var(--rule);cursor:pointer;font-family:inherit;font-size:.98rem;color:var(--ink);transition:all .15s}
+.quiz-opts button{text-align:left;padding:.75rem .9rem;min-height:44px;background:var(--ivory);border:1px solid var(--rule);cursor:pointer;font-family:inherit;font-size:1rem;color:var(--ink);transition:all .15s}
 .quiz-opts button:hover{border-color:var(--peri)}
 .quiz-opts button.right{background:#E7EFDF;border-color:var(--sage-deep)}
 .quiz-opts button.wrong{background:#F4E3DC;border-color:#C08A72}
 .quiz-fb{min-height:1.4em;font-style:italic;font-size:.95rem;margin-top:.6rem;color:var(--ink-soft)}
-.phrase-table{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:0;min-width:480px}
+.phrase-table{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:0}
 .phrase-table th{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink);text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--rule)}
 .phrase-table td{padding:.5rem .6rem;border-bottom:1px dotted var(--rule);vertical-align:top}
 .weather-meter{margin:1rem 0 .4rem}

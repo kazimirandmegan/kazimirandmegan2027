@@ -5,8 +5,14 @@ html{scroll-behavior:smooth;overflow-x:hidden;-webkit-text-size-adjust:100%;text
 body{overflow-x:hidden;overscroll-behavior-x:none}
 body{font-family:"EB Garamond",Georgia,serif;background:var(--ivory);color:var(--ink);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
 /* Stop iOS auto-zoom on focus (<16px) and double-tap zoom delay on controls */
-input,select,textarea{font-size:16px}
+input,select,textarea{font-size:16px !important}
 a,button,input,select,textarea,summary,label,[role="button"]{touch-action:manipulation}
+/* Prefer the dynamic viewport so sticky bars track the real phone chrome (desktop sheet only) */
+@supports (height: 100dvh){
+  @media (min-width:701px) and (min-height:501px){
+    #chat-panel{max-height:min(540px, calc(100dvh - 120px - env(safe-area-inset-bottom,0px)))}
+  }
+}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 60% 40% at 15% 8%,rgba(147,168,216,.10),transparent 60%),
              radial-gradient(ellipse 50% 35% at 88% 90%,rgba(154,169,139,.10),transparent 60%)}

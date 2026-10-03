@@ -26,7 +26,10 @@ body.patriot{animation:patriot .4s linear 8}
 .mem-frame figcaption{font-family:"Cormorant Garamond",serif;font-style:italic;padding:.55rem .3rem .75rem;font-size:1rem;color:var(--ink)}
 
 /* ---------- explore page maps ---------- */
-.xmap{height:400px;border:1px solid var(--rule);z-index:1}
-@media (max-width:640px){.xmap{height:300px}}
+.xmap,#stamap{height:clamp(380px,52dvh,560px);border:1px solid var(--rule);z-index:1}
+/* A short landscape phone should not spend the whole screen on the map */
+@media (max-height:520px){
+  .xmap,#stamap{height:clamp(200px,58dvh,280px)}
+}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

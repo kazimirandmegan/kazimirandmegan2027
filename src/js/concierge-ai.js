@@ -64,6 +64,48 @@ function kbText(tier) {
   return lines.length ? "# Curated answers\n" + lines.join("\n") : "";
 }
 
+/** Hash routes Connie can offer as markdown links: [Label](#route) */
+const PAGE_LINKS = [
+  ["home", "Home"],
+  ["rsvp", "RSVP"],
+  ["about", "About Us"],
+  ["party", "Bridal Party"],
+  ["generations", "Generations of Love"],
+  ["memory", "In Loving Memory"],
+  ["bts", "Behind the Scenes"],
+  ["thankyous", "Thank Yous"],
+  ["week", "Wedding Week"],
+  ["vinko", "Vinkopletyny"],
+  ["bigday", "The Big Day"],
+  ["ceremony", "Ceremony"],
+  ["breakfast", "Wedding Breakfast"],
+  ["reception", "Evening Reception"],
+  ["afterparty", "After Party"],
+  ["registry", "Registry"],
+  ["guestbook", "Guestbook"],
+  ["expl-sta", "Explore St Albans"],
+  ["expl-ldn", "Explore London"],
+  ["expl-day", "England Day Trips"],
+  ["expl-eur", "Explore Europe"],
+  ["playlists", "Playlists"],
+  ["games", "In-Flight Entertainment"],
+  ["faqs", "FAQs"],
+  ["stay", "Where to Stay"],
+  ["americans", "For Americans"],
+  ["ukraine", "For Ukrainians"],
+  ["workouts", "Wedding Workouts"],
+  ["atlas", "Guest Atlas"],
+  ["contact", "Contact"],
+];
+
+function pageLinksText() {
+  return (
+    "# Page links\n" +
+    "When pointing guests to a page, write markdown like [Stay page](#stay).\n" +
+    PAGE_LINKS.map(([id, label]) => "- [" + label + "](#" + id + ")").join("\n")
+  );
+}
+
 function buildSiteContext(tier, name) {
   const pages = Array.from(document.querySelectorAll("#site-main .page"))
     .map(pageToText)
@@ -77,6 +119,7 @@ function buildSiteContext(tier, name) {
       ? "WhatsApp group: " + SETTINGS.whatsappLink
       : "",
     SETTINGS.sharedPlaylist ? "Shared Spotify playlist: " + SETTINGS.sharedPlaylist : "",
+    pageLinksText(),
     kbText(tier),
     partyText(),
     storyText(),

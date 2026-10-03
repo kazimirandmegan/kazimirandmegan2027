@@ -36,6 +36,8 @@ export function boot() {
   /* Filled in once the pin lists are built. Declared up here because a
      returning guest is unlocked, and show() runs, before that build. */
   let MAPS = {};
+  /* Set once Kiko Dash exists, so leaving the games page can pause 3D. */
+  let onGamesVisibility = ()=>{};
   function show(route){
     if(!route) route = "home";
     /* Unknown hashes (e.g. placeholder links awaiting real URLs) are
@@ -58,7 +60,9 @@ export function boot() {
     }
     if(document.activeElement && document.activeElement.closest && document.activeElement.closest(".ngroup")) document.activeElement.blur();
     if(MAPS[route]) setTimeout(()=>{ try{ initMapFor(route); }catch(e){} }, 80);
-    if(route === "games") setTimeout(()=>{ try{ gamesInit(); }catch(e){} }, 60);
+    document.body.classList.toggle("on-games", route === "games");
+    if(route === "games") setTimeout(()=>{ try{ gamesInit(); onGamesVisibility(true); }catch(e){} }, 60);
+    else { try{ onGamesVisibility(false); }catch(e){} }
     if(route === "rsvp") setTimeout(()=>{ try{ rsvpInit(); }catch(e){ console.error(e); } }, 40);
     window.scrollTo(0,0);
     /* Home week-calendar taps set this, then change the hash. The day
@@ -186,12 +190,22 @@ export function boot() {
     personalise();
     if(NAME && NAME !== "Guest") toast((quiet ? "Welcome back, " : "Welcome, ") + NAME + " 🌸");
     if(!quiet) petalsBurst(90);
-    /* one-time nudge so nobody misses the concierge */
+    /* one-time nudge so nobody misses the concierge — never cover reading */
     if(store.get("km-nudge") !== "seen"){
       setTimeout(()=>{
-        if(!document.getElementById("chat-panel").classList.contains("open"))
-          document.getElementById("chat-nudge").classList.add("show");
-      }, 4000);
+        if(document.getElementById("chat-panel").classList.contains("open")) return;
+        if(document.body.classList.contains("on-games")) return;
+        const nudge = document.getElementById("chat-nudge");
+        nudge.classList.add("show");
+        const dismiss = ()=>{
+          if(!nudge.classList.contains("show")) return;
+          nudge.classList.remove("show");
+          store.set("km-nudge","seen");
+          removeEventListener("scroll", dismiss);
+        };
+        addEventListener("scroll", dismiss, {passive:true});
+        setTimeout(dismiss, 7000);
+      }, 3500);
     }
   }
   function tryPassword(){
@@ -453,7 +467,7 @@ export function boot() {
      context when Connie is answering with the model.
      ============================================================ */
   
-  const FALLBACK = "I'm Connie, and I only know what's written on this website — but I know all of it. Try me on trains, taxis, airports, hotels, parking, timings, what to wear, the food, the Ukrainian celebration, day trips to London or Europe, the guestbook, or the games. For anything I can't answer, the humans check their email (Contact page) more often than they'd like to admit.";
+  const FALLBACK = "I'm Connie, and I only know what's written on this website — but I know all of it. Try me on trains, taxis, airports, hotels, parking, timings, what to wear, the food, the Ukrainian celebration, day trips to London or Europe, the [Guestbook](#guestbook), or [In-Flight Entertainment](#games). For anything I can't answer, the humans check their email ([Contact](#contact)) more often than they'd like to admit.";
 
   /* light synonym map so guests' phrasing matches the keywords. Each line:
      if the question contains the term on the left, we also test the ones
@@ -499,9 +513,104 @@ export function boot() {
         log = document.getElementById("chat-log"), input = document.getElementById("chat-input"),
         veil = document.getElementById("chat-veil");
   let chatBusy = false;
+  /* Known hash routes + common phrases → clickable in-bot links */
+  const CHAT_ROUTES = {
+    home:"Home", rsvp:"RSVP", about:"About Us", party:"Bridal Party",
+    generations:"Generations of Love", memory:"In Loving Memory", bts:"Behind the Scenes",
+    thankyous:"Thank Yous", week:"Wedding Week", vinko:"Vinkopletyny", bigday:"The Big Day",
+    ceremony:"Ceremony", breakfast:"Wedding Breakfast", reception:"Evening Reception",
+    afterparty:"After Party", registry:"Registry", guestbook:"Guestbook",
+    "expl-sta":"Explore St Albans", "expl-ldn":"Explore London", "expl-day":"England Day Trips",
+    "expl-eur":"Explore Europe", playlists:"Playlists", games:"In-Flight Entertainment",
+    faqs:"FAQs", stay:"Where to Stay", americans:"For Americans", ukraine:"For Ukrainians",
+    workouts:"Wedding Workouts", atlas:"Guest Atlas", contact:"Contact"
+  };
+  const CHAT_PHRASES = [
+    {re:/\b(?:the\s+)?(?:Where to )?Stay page\b/gi, route:"stay"},
+    {re:/\b(?:the\s+)?FAQs? page\b/gi, route:"faqs"},
+    {re:/\b(?:the\s+)?Contact page\b/gi, route:"contact"},
+    {re:/\b(?:the\s+)?After Party page\b/gi, route:"afterparty"},
+    {re:/\b(?:the\s+)?RSVP page\b/gi, route:"rsvp"},
+    {re:/\b(?:the\s+)?Registry page\b/gi, route:"registry"},
+    {re:/\b(?:the\s+)?Ceremony page\b/gi, route:"ceremony"},
+    {re:/\b(?:the\s+)?Wedding Breakfast page\b/gi, route:"breakfast"},
+    {re:/\b(?:the\s+)?Evening Reception page\b/gi, route:"reception"},
+    {re:/\b(?:the\s+)?Bridal Party page\b/gi, route:"party"},
+    {re:/\b(?:the\s+)?Guestbook\b/gi, route:"guestbook"},
+    {re:/\b(?:the\s+)?Playlists? page\b/gi, route:"playlists"},
+    {re:/\b(?:the\s+)?(?:For )?Americans page\b/gi, route:"americans"},
+    {re:/\b(?:the\s+)?Thank Yous page\b/gi, route:"thankyous"},
+    {re:/\b(?:the\s+)?Guest Atlas\b/gi, route:"atlas"},
+    {re:/\bWedding Workouts\b/gi, route:"workouts"},
+    {re:/\bIn-Flight Entertainment(?:\s+(?:page|lounge))?\b/gi, route:"games"},
+    {re:/\b(?:the\s+)?Europe page\b/gi, route:"expl-eur"},
+    {re:/\b(?:the\s+)?(?:Pre-Wedding Celebration|Vinkopletyny) page\b/gi, route:"vinko"},
+    {re:/\bField Guide\b/gi, route:"expl-sta"}
+  ];
+  function makeChatLink(href, label){
+    const a = document.createElement("a");
+    a.className = "chat-link";
+    a.textContent = label;
+    if(/^https?:\/\//i.test(href)){
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+    } else {
+      const route = href.replace(/^#/, "");
+      a.href = "#" + route;
+      if(CHAT_ROUTES[route]) a.setAttribute("data-route", route);
+    }
+    return a;
+  }
+  function appendLinkedPlain(parent, text){
+    if(!text) return;
+    /* Find the earliest phrase or bare #route match and recurse */
+    let best = null;
+    for(const {re, route} of CHAT_PHRASES){
+      re.lastIndex = 0;
+      const m = re.exec(text);
+      if(m && (!best || m.index < best.index)){
+        best = {index:m.index, len:m[0].length, href:"#"+route, label:m[0]};
+      }
+    }
+    const hashRe = /#(home|rsvp|about|party|generations|memory|bts|thankyous|week|vinko|bigday|ceremony|breakfast|reception|afterparty|registry|guestbook|expl-sta|expl-ldn|expl-day|expl-eur|playlists|games|faqs|stay|americans|ukraine|workouts|atlas|contact)\b/g;
+    let hm;
+    while((hm = hashRe.exec(text))){
+      if(!best || hm.index < best.index){
+        const route = hm[1];
+        best = {index:hm.index, len:hm[0].length, href:"#"+route, label:CHAT_ROUTES[route] || route};
+      }
+    }
+    if(!best){
+      parent.appendChild(document.createTextNode(text));
+      return;
+    }
+    if(best.index > 0) parent.appendChild(document.createTextNode(text.slice(0, best.index)));
+    parent.appendChild(makeChatLink(best.href, best.label));
+    appendLinkedPlain(parent, text.slice(best.index + best.len));
+  }
+  function renderBotMessage(text){
+    const frag = document.createDocumentFragment();
+    const src = String(text || "");
+    const md = /\[([^\]]+)\]\((#[\w-]+|https?:\/\/[^)\s]+)\)/g;
+    let last = 0, m;
+    while((m = md.exec(src))){
+      appendLinkedPlain(frag, src.slice(last, m.index));
+      frag.appendChild(makeChatLink(m[2], m[1]));
+      last = m.index + m[0].length;
+    }
+    appendLinkedPlain(frag, src.slice(last));
+    return frag;
+  }
+  function setMsgContent(el, text, who){
+    el.replaceChildren();
+    if(who === "user") el.textContent = text;
+    else el.appendChild(renderBotMessage(text));
+  }
   function addMsg(text, who){
     const d = document.createElement("div");
-    d.className = "msg "+who; d.textContent = text;
+    d.className = "msg "+who;
+    setMsgContent(d, text, who);
     log.appendChild(d); log.scrollTop = log.scrollHeight;
     return d;
   }
@@ -515,9 +624,9 @@ export function boot() {
     const pending = addMsg("One moment…", "bot");
     pending.classList.add("pending");
     try {
-      pending.textContent = await connie.reply(q);
+      setMsgContent(pending, await connie.reply(q), "bot");
     } catch (e) {
-      pending.textContent = answer(q);
+      setMsgContent(pending, answer(q), "bot");
     } finally {
       pending.classList.remove("pending");
       chatBusy = false;
@@ -526,33 +635,91 @@ export function boot() {
       try { input.focus(); } catch (e) {}
     }
   }
+  function isPhoneChat(){
+    return window.matchMedia("(max-width:700px), (max-height:500px)").matches;
+  }
+  function clearChatSheetStyles(){
+    panel.style.top = "";
+    panel.style.left = "";
+    panel.style.right = "";
+    panel.style.bottom = "";
+    panel.style.width = "";
+    panel.style.height = "";
+    panel.style.maxHeight = "";
+    panel.style.paddingBottom = "";
+  }
+  function placeChatSheet(){
+    if(!panel.classList.contains("open") || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    if(isPhoneChat()){
+      /* Pin the panel to the visual viewport so the iOS keyboard shrinks the chat, not covers it */
+      const keyboardOpen = (window.innerHeight - vv.height) > 80;
+      panel.style.top = vv.offsetTop + "px";
+      panel.style.left = vv.offsetLeft + "px";
+      panel.style.right = "auto";
+      panel.style.bottom = "auto";
+      panel.style.width = vv.width + "px";
+      panel.style.height = vv.height + "px";
+      panel.style.maxHeight = "none";
+      panel.style.paddingBottom = keyboardOpen ? "0px" : "";
+      log.scrollTop = log.scrollHeight;
+      return;
+    }
+    const gap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    panel.style.bottom = gap ? gap + "px" : "";
+    panel.style.maxHeight = Math.min(vv.height * 0.88, vv.height - 12) + "px";
+  }
+  let chatScrollY = 0;
   function setChatOpen(on){
     panel.classList.toggle("open", on);
     fab.setAttribute("aria-expanded", on ? "true" : "false");
-    if(veil) veil.classList.toggle("show", on);
-    document.body.classList.toggle("chat-open", on);
+    if(veil) veil.classList.toggle("show", on && !isPhoneChat());
     if(on){
+      chatScrollY = window.scrollY || 0;
+      document.body.classList.add("chat-open");
+      document.body.style.top = "-" + chatScrollY + "px";
       document.getElementById("chat-nudge").classList.remove("show");
       store.set("km-nudge","seen");
       seedChat();
-      setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 50);
+      placeChatSheet();
+      /* Delay focus on phone so the fullscreen layout settles before the keyboard rises */
+      setTimeout(()=>{ try{ if(!isPhoneChat()) input.focus(); }catch(e){} }, 50);
+    } else {
+      document.body.classList.remove("chat-open");
+      document.body.style.top = "";
+      clearChatSheetStyles();
+      window.scrollTo(0, chatScrollY);
     }
   }
   function openChat(){ setChatOpen(true); }
   function closeChat(){ setChatOpen(false); }
   function seedChat(){
     if(log.childElementCount) return;
-    addMsg("Hello"+(NAME && NAME!=="Guest" ? ", "+NAME : "")+"! I'm Connie 🌸 — your Concierge for Nuptials, Networking, Itineraries & Events. I know this whole website inside out, so ask me anything: trains, hotels, timings, dress codes, the Ukrainian traditions, day trips, even what a 'Spoons' is.", "bot");
+    addMsg("Hello"+(NAME && NAME!=="Guest" ? ", "+NAME : "")+"! I'm Connie 🌸 — your Concierge for Nuptials, Networking, Itineraries & Events. I know this whole website inside out, so ask me anything: trains, hotels, timings, dress codes, the Ukrainian traditions, day trips, even what a 'Spoons' is. When a page helps, I'll drop you a clickable link — try [Stay](#stay), [FAQs](#faqs) or [Contact](#contact).", "bot");
     const chips = document.getElementById("chat-chips");
+    /* Short labels so all three fit on one phone row; full question still sent to Connie */
     const starters = TIER==="afterparty"
-      ? ["Last trains home?","Where's the after party?","What should I wear?"]
+      ? [
+          {label:"Last trains?", q:"Last trains home?"},
+          {label:"After party?", q:"Where's the after party?"},
+          {label:"What to wear?", q:"What should I wear?"}
+        ]
       : TIER==="vinko"
-      ? ["What is the Vinkopletyny?","What should I wear?","Which airport?"]
-      : ["Which airport?","Last trains home?","What should I wear?"];
+      ? [
+          {label:"Vinkopletyny?", q:"What is the Vinkopletyny?"},
+          {label:"What to wear?", q:"What should I wear?"},
+          {label:"Airport?", q:"Which airport?"}
+        ]
+      : [
+          {label:"Which airport?", q:"Which airport?"},
+          {label:"Last trains?", q:"Last trains home?"},
+          {label:"What to wear?", q:"What should I wear?"}
+        ];
     chips.innerHTML = "";
     starters.forEach(s=>{
-      const b = document.createElement("button"); b.type="button"; b.textContent = s;
-      b.addEventListener("click", ()=>send(s));
+      const b = document.createElement("button"); b.type="button"; b.textContent = s.label;
+      b.setAttribute("aria-label", s.q);
+      b.addEventListener("click", ()=>send(s.q));
       chips.appendChild(b);
     });
   }
@@ -573,6 +740,25 @@ export function boot() {
   if(veil) veil.addEventListener("click", closeChat);
   document.getElementById("chat-send").addEventListener("click", ()=>send());
   input.addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
+  addEventListener("keydown", e=>{
+    if(e.key === "Escape" && panel.classList.contains("open")) closeChat();
+  });
+  log.addEventListener("click", e=>{
+    const a = e.target.closest("a.chat-link");
+    if(!a || !log.contains(a)) return;
+    const href = a.getAttribute("href") || "";
+    if(!href.startsWith("#")) return; /* external links open normally */
+    e.preventDefault();
+    const route = href.slice(1);
+    closeChat();
+    if(route) location.hash = route;
+  });
+  if(window.visualViewport){
+    visualViewport.addEventListener("resize", placeChatSheet);
+    visualViewport.addEventListener("scroll", placeChatSheet);
+  }
+  addEventListener("resize", placeChatSheet);
+  addEventListener("orientationchange", ()=>setTimeout(placeChatSheet, 150));
 
   /* (storage wrappers `store` and `lstore` live near the top, by the router) */
 
@@ -661,6 +847,13 @@ export function boot() {
   MAPS = buildMaps(STORY_PINS, STORY_LINES);
   
   const mapRefs = {};
+  let mapResizeTimer;
+  addEventListener("resize", ()=>{
+    clearTimeout(mapResizeTimer);
+    mapResizeTimer = setTimeout(()=>{
+      Object.values(mapRefs).forEach(m=>{ try{ if(m) m.invalidateSize(); }catch(e){} });
+    }, 120);
+  });
 
   /* ---- shared GPS state across all explore maps ---- */
   let gpsWatch = null, gpsLastPos = null;
@@ -721,6 +914,30 @@ export function boot() {
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);
     (cfg.lines||[]).forEach(pts=>L.polyline(pts,{color:"#B3945C",weight:2,dashArray:"2 8",opacity:.85}).addTo(map));
 
+    /* On phones, one-finger pans steal the page scroll. Ask first. */
+    const mapWrap = el.parentElement;
+    let unlockMap = ()=>{};
+    const touchMap = matchMedia("(hover:none), (pointer:coarse)").matches
+      || ((navigator.maxTouchPoints||0) > 0 && matchMedia("(max-width:1024px)").matches);
+    if(mapWrap && mapWrap.classList.contains("map-wrap") && touchMap){
+      map.dragging.disable();
+      mapWrap.classList.add("is-locked");
+      let unlockBtn = mapWrap.querySelector(".map-unlock");
+      if(!unlockBtn){
+        unlockBtn = document.createElement("button");
+        unlockBtn.type = "button";
+        unlockBtn.className = "map-unlock";
+        unlockBtn.textContent = "Tap to explore map";
+        mapWrap.appendChild(unlockBtn);
+      }
+      unlockMap = ()=>{
+        if(!mapWrap.classList.contains("is-locked")) return;
+        map.dragging.enable();
+        mapWrap.classList.remove("is-locked");
+      };
+      unlockBtn.addEventListener("click", unlockMap);
+    }
+
     /* track markers for category filter + search */
     const allMarkers = [], catMarkers = {};
     function drop(p){
@@ -737,8 +954,7 @@ export function boot() {
     cfg.pins.forEach(drop);
 
     /* explore maps: inject search+GPS toolbar, wire legend filter */
-    if(/^expl-/.test(route)){
-      const mapWrap = el.parentElement;
+    if(/^expl-/.test(route) && mapWrap){
       const toolbar = document.createElement('div');
       toolbar.className = 'map-toolbar';
       toolbar.innerHTML =
@@ -786,6 +1002,7 @@ export function boot() {
         const hits = allMarkers.filter(({p})=>p.n.toLowerCase().includes(q)||(p.d&&p.d.toLowerCase().includes(q)));
         allMarkers.forEach(({m})=>m.setStyle({fillOpacity:.08,opacity:.18}));
         hits.forEach(({m})=>{ m.setStyle({fillOpacity:.95,opacity:1}); m.bringToFront(); });
+        if(hits.length){ unlockMap(); }
         if(hits.length===1){ map.setView([hits[0].p.lat,hits[0].p.lng],Math.max(map.getZoom(),14)); hits[0].m.openPopup(); }
         else if(hits.length>1){ try{ map.fitBounds(L.featureGroup(hits.map(({m})=>m)).getBounds().pad(.3)); }catch(e){} }
       });
@@ -804,6 +1021,7 @@ export function boot() {
       gpsBtn.addEventListener('click', ()=>{
         if(!navigator.geolocation){ gpsBtn.title='Location unavailable in this browser'; return; }
         if(gpsWatch!==null){ gpsStopAll(); return; }
+        unlockMap();
         gpsStartAll();
       });
     }
@@ -1945,10 +2163,51 @@ export function boot() {
   function xwEach(w, fn){                      /* iterate a word's cells */
     for(let i=0;i<w.a.length;i++) fn(w.d==="A" ? w.r : w.r+i, w.d==="A" ? w.c+i : w.c, w.a[i], i);
   }
+  function xwAt(r, c){ return xwCells[r+","+c] || null; }
+  function xwStep(r, c, dr, dc){
+    for(let i=0;i<XW_R+XW_C;i++){
+      r += dr; c += dc;
+      const hit = xwAt(r, c);
+      if(hit) return hit;
+    }
+    return null;
+  }
+  function xwNext(r, c){
+    c++;
+    while(r < XW_R){
+      const hit = xwAt(r, c);
+      if(hit) return hit;
+      c++;
+      if(c >= XW_C){ c = 0; r++; }
+    }
+    return null;
+  }
+  function xwPrev(r, c){
+    c--;
+    while(r >= 0){
+      const hit = xwAt(r, c);
+      if(hit) return hit;
+      c--;
+      if(c < 0){ c = XW_C-1; r--; }
+    }
+    return null;
+  }
+  function xwEnsure(inp){
+    const wrap = inp.closest(".xw-wrap");
+    const cell = inp.parentElement;
+    if(wrap && cell){
+      const cr = cell.getBoundingClientRect();
+      const wr = wrap.getBoundingClientRect();
+      if(cr.left < wr.left + 8 || cr.right > wr.right - 8){
+        wrap.scrollLeft += (cr.left + cr.width/2) - (wr.left + wr.width/2);
+      }
+    }
+    const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const box = inp.getBoundingClientRect();
+    if(box.bottom > vh - 12 || box.top < 64) inp.scrollIntoView({block:"center", inline:"nearest"});
+  }
   function xwInit(){
     const grid = document.getElementById("xw"); if(!grid || grid.childElementCount) return;
-    const cellPx = matchMedia("(max-width:640px)").matches ? 40 : 34;
-    grid.style.gridTemplateColumns = "repeat("+XW_C+", "+cellPx+"px)";
     const used = {}, nums = {};
     XW_WORDS.forEach(w=>{ xwEach(w,(r,c)=>{ used[r+","+c]=true; }); nums[w.r+","+w.c] = w.n; });
     let saved = {}; try{ saved = JSON.parse(lstore.get("km-xw")||"{}"); }catch(e){}
@@ -1958,12 +2217,31 @@ export function boot() {
       if(used[r+","+c]){
         if(nums[r+","+c]){ const n=document.createElement("span"); n.className="xn"; n.textContent=nums[r+","+c]; cell.appendChild(n); }
         const inp = document.createElement("input");
-        inp.maxLength = 1; inp.autocomplete="off"; inp.setAttribute("aria-label","crossword cell");
+        inp.maxLength = 1; inp.autocomplete="off"; inp.inputMode = "text"; inp.autocapitalize = "characters";
+        inp.setAttribute("aria-label","crossword cell");
+        inp.dataset.r = r; inp.dataset.c = c;
         inp.value = saved[r+","+c] || "";
+        inp.addEventListener("focus", ()=>xwEnsure(inp));
+        inp.addEventListener("keydown", e=>{
+          const rr = +inp.dataset.r, cc = +inp.dataset.c;
+          const step = {ArrowLeft:[0,-1], ArrowRight:[0,1], ArrowUp:[-1,0], ArrowDown:[1,0]}[e.key];
+          if(step){
+            e.preventDefault();
+            const nxt = xwStep(rr, cc, step[0], step[1]);
+            if(nxt){ nxt.focus(); xwEnsure(nxt); }
+          } else if(e.key === "Backspace" && !inp.value){
+            const prev = xwPrev(rr, cc);
+            if(prev){ e.preventDefault(); prev.focus(); xwEnsure(prev); }
+          }
+        });
         inp.addEventListener("input", ()=>{
-          inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g,"");
+          inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
           cell.classList.remove("ok","bad");
           saved[r+","+c] = inp.value; lstore.set("km-xw", JSON.stringify(saved));
+          if(inp.value){
+            const nxt = xwNext(+inp.dataset.r, +inp.dataset.c);
+            if(nxt){ nxt.focus(); xwEnsure(nxt); }
+          }
         });
         cell.appendChild(inp);
         xwCells[r+","+c] = inp;
@@ -2009,12 +2287,16 @@ export function boot() {
     cv.width = W*DPR; cv.height = H*DPR; cx.scale(DPR, DPR);
     let run=false, over=false, frame=0, speed=4.4, score=0;
     let ky=GY, kvy=0, obs=[], best = +(lstore.get("km-kd-best")||0);
+    /* down ducks under a flying bouquet and fast-falls; it must not scroll the page */
+    let ducking=false, duckHeld=false, view="2d", k3=null;
     /* responsiveness + level machinery:
        grace    — frames left in the obstacle-free level intro
        banner   — the "LEVEL N · NAME" card drawn on the canvas
        jumpBuf  — a press just before landing still jumps (input buffer)
        spawnIn  — frames until the next obstacle (delta-time safe)     */
     let grace=0, banner=null, jumpBuf=0, spawnIn=0, lastT=0;
+    /* rings are distance bonuses; level pace stays on the metres you actually run */
+    let gems=[], bonus=0, rings=0, streak=0, charm=0, milestone=0, bestSung=false;
     document.getElementById("kd-best").textContent = String(best).padStart(3,"0");
     function lb(){ try{ return JSON.parse(lstore.get("km-kd-lb")||"[]"); }catch(e){ return []; } }
     function lbRender(){
@@ -2039,14 +2321,90 @@ export function boot() {
     function spawn(){
       const kinds = LEVELS[level].obstacles;
       const k = kinds[(Math.random()*kinds.length)|0];
-      const w = k==="cake" ? 46 : k==="envelope" ? 52 : k==="flute" ? 18 : k==="wreath" ? 40 : k==="gift" ? 34 : 34;
-      const h = k==="flute" ? 52 : k==="cake" ? 48 : k==="wreath" ? 40 : 34;
-      obs.push({k, x: W+20, w, h});
+      let w = k==="cake" ? 46 : k==="envelope" ? 52 : k==="flute" ? 18 : k==="wreath" ? 40 : k==="gift" ? 34 : 34;
+      let h = k==="flute" ? 52 : k==="cake" ? 48 : k==="wreath" ? 40 : 34;
+      let foot = 0;
+      /* a tossed bouquet clears a duck and still catches a standing jump */
+      if(k==="hyd" && Math.random() < 0.58){ foot = 26; h = 30; w = 36; }
+      obs.push({k, x: W+20, w, h, foot});
+      /* a spare ring just past the obstacle, or a rare glowing barvinok */
+      if(Math.random() < 0.08) gems.push({k:"charm", x: W+96, y: GY - (62 + Math.random()*36)});
+      else if(Math.random() < 0.55) gems.push({k:"ring", x: W+64 + Math.random()*36, y: GY - (62 + Math.random()*36)});
+    }
+    function shown(){ return score + bonus; }
+    function cheers(text){
+      const host = document.getElementById("kd-cheers");
+      if(!host || !text) return;
+      const el = document.createElement("span");
+      el.className = "kd-cheer";
+      el.textContent = text;
+      host.appendChild(el);
+      while(host.children.length > 3) host.firstChild.remove();
+      setTimeout(()=>{ el.remove(); }, 1200);
+    }
+    function paintGems(info){
+      const g = document.getElementById("kd-gems");
+      if(!g) return;
+      const n = info && info.rings || 0;
+      const on = !!(info && info.charm);
+      g.hidden = !n && !on;
+      g.classList.toggle("is-charm", on);
+      g.textContent = on ? (n ? "✦ "+n+" · BARVINOK" : "✦ BARVINOK") : ("✦ "+n);
+    }
+    function award(n, label){ bonus += n; cheers(label); }
+    function noteBest(metres){
+      if(!(best > 0) || metres <= best) return;
+      if(!bestSung){ bestSung = true; cheers("New best"); }
+      document.getElementById("kd-best").textContent = String(metres).padStart(3,"0");
+    }
+    function syncTheme(){
+      const w = document.getElementById("dash-canvas-wrap");
+      if(!w || view === "3d") return;
+      if(level === 3) w.dataset.kdTheme = "night";
+      else delete w.dataset.kdTheme;
+    }
+    function drawGem(g){
+      const bob = Math.sin((frame + g.x) / 8) * 3;
+      cx.save(); cx.translate(g.x, g.y + bob);
+      if(g.k === "charm"){
+        cx.fillStyle = "rgba(147,168,216,.35)";
+        cx.beginPath(); cx.arc(0, 0, 16, 0, 7); cx.fill();
+        cx.fillStyle = "#93A8D8";
+        [[0,0],[7,-4],[-6,-3],[2,7],[-5,5]].forEach(([px,py])=>{ cx.beginPath(); cx.arc(px,py,4,0,7); cx.fill(); });
+      } else {
+        cx.strokeStyle = "#C6A15A"; cx.lineWidth = 2.4;
+        cx.beginPath(); cx.arc(0, 0, 7, 0, 7); cx.stroke();
+        cx.fillStyle = "#F4C64D";
+        cx.beginPath(); cx.arc(-2, -3, 1.3, 0, 7); cx.fill();
+      }
+      cx.restore();
     }
     /* ---- Kiko: a small black-and-white Japanese Chin ----------- */
     function drawKiko(){
       const x = 70, y = ky;
       cx.save(); cx.translate(x, y);
+      if(charm > 0){
+        const pulse = 0.55 + 0.45 * Math.sin(frame / 2.2);
+        cx.save();
+        cx.globalCompositeOperation = "lighter";
+        cx.fillStyle = `rgba(244,198,77,${0.18 + pulse * 0.16})`;
+        cx.beginPath(); cx.ellipse(2, -18, 46, 38, 0, 0, 7); cx.fill();
+        cx.fillStyle = `rgba(147,168,216,${0.22 + pulse * 0.2})`;
+        cx.beginPath(); cx.ellipse(2, -18, 34, 28, 0, 0, 7); cx.fill();
+        cx.strokeStyle = "#F4C64D"; cx.lineWidth = 3;
+        cx.globalAlpha = 0.55 + pulse * 0.4;
+        cx.beginPath(); cx.ellipse(2, -18, 40 + pulse * 4, 32 + pulse * 3, 0, 0, 7); cx.stroke();
+        cx.strokeStyle = "#93A8D8"; cx.lineWidth = 2;
+        cx.beginPath(); cx.ellipse(2, -18, 28 + pulse * 3, 22 + pulse * 2, 0, 0, 7); cx.stroke();
+        cx.restore();
+        cx.save();
+        cx.fillStyle = level === 3 ? "#F4C64D" : "#8A6F3F";
+        cx.font = "bold 11px Georgia"; cx.textAlign = "center";
+        cx.globalAlpha = 0.75 + pulse * 0.25;
+        cx.fillText("BARVINOK", 2, -52 - pulse * 3);
+        cx.restore();
+      }
+      if(ducking && ky >= GY-0.5) cx.scale(1.14, 0.58);
       const trot = run && ky>=GY ? Math.sin(frame/2.2)*4 : 0;
       /* plumed tail — her finest feature, held over the back */
       cx.strokeStyle="#fff"; cx.lineWidth=7; cx.lineCap="round";
@@ -2092,7 +2450,13 @@ export function boot() {
     }
     /* ---- wedding-flavoured obstacles ---------------------------- */
     function drawObs(o){
-      cx.save(); cx.translate(o.x, GY);
+      if(o.foot){
+        cx.save();
+        cx.fillStyle = level===3 ? "rgba(244,198,77,.2)" : "rgba(65,80,122,.16)";
+        cx.beginPath(); cx.ellipse(o.x+o.w*0.45, GY+3, Math.max(8, o.w*0.28), 3.2, 0, 0, 7); cx.fill();
+        cx.restore();
+      }
+      cx.save(); cx.translate(o.x, GY - (o.foot||0));
       const dark = level===3;
       if(o.k==="seal"){
         cx.fillStyle="#B3945C"; cx.beginPath(); cx.arc(17,-17,16,0,7); cx.fill();
@@ -2171,7 +2535,8 @@ export function boot() {
       level = lv;
       document.getElementById("kd-level").textContent = "LVL "+(level+1)+" · "+LEVELS[level].name;
       banner = { txt: "LEVEL "+(level+1), sub: LEVELS[level].name, t: GRACE_FRAMES };
-      grace = GRACE_FRAMES; obs = []; spawnIn = 20;
+      grace = GRACE_FRAMES; obs = []; gems = []; spawnIn = 20;
+      syncTheme();
     }
     function doJump(){ kvy = -10.8; jumpBuf = 0; }
     function press(){
@@ -2181,23 +2546,38 @@ export function boot() {
       else jumpBuf = 7;                                   /* buffer a press made just before landing */
     }
     function release(){ if(kvy < -4.2) kvy = -4.2; }      /* let go early = a shorter hop */
-    function reset(){ run=false; over=false; frame=0; speed=4.4; score=0; obs=[]; ky=GY; kvy=0;
-      grace=0; banner=null; jumpBuf=0; spawnIn=0;
-      level=0; document.getElementById("kd-level").textContent = "LVL 1 · ST ALBANS"; paint(); }
+    /* Down cuts a rising jump and, on the ground, flattens her under bouquets. */
+    function setDuck(on){
+      const next = !!on;
+      if(next && !ducking && kvy < -3) kvy = -3;
+      ducking = next;
+      if(!run) paint();
+    }
+    function reset(){ run=false; over=false; frame=0; speed=4.4; score=0; obs=[]; gems=[]; ky=GY; kvy=0;
+      grace=0; banner=null; jumpBuf=0; spawnIn=0; ducking = duckHeld;
+      bonus=0; rings=0; streak=0; charm=0; milestone=0; bestSung=false;
+      level=0; document.getElementById("kd-level").textContent = "LVL 1 · ST ALBANS";
+      const wrapEl = document.getElementById("dash-canvas-wrap");
+      if(wrapEl && view === "2d") wrapEl.classList.remove("is-charmed");
+      paintGems(null); syncTheme(); paint(); }
+    function recordScore(finalScore){
+      const s = finalScore|0;
+      if(s > best){ best = s; lstore.set("km-kd-best", best); document.getElementById("kd-best").textContent = String(best).padStart(3,"0"); }
+      const board = lb(); board.push({n: NAME, s: s});
+      board.sort((a,b)=>b.s-a.s); lstore.set("km-kd-lb", JSON.stringify(board.slice(0,5))); lbRender();
+      kdCloudSubmit(s);
+      toast(s>60 ? "Kiko made it "+s+"m with the rings! 🏆" : "Kiko tripped at "+s+"m. The rings are fine. Probably.");
+    }
     function gameOver(){
       run=false; over=true;
-      if(score > best){ best = score; lstore.set("km-kd-best", best); document.getElementById("kd-best").textContent = String(best).padStart(3,"0"); }
-      const board = lb(); board.push({n: NAME, s: score});
-      board.sort((a,b)=>b.s-a.s); lstore.set("km-kd-lb", JSON.stringify(board.slice(0,5))); lbRender();
-      kdCloudSubmit();
-      toast(score>60 ? "Kiko made it "+score+"m with the rings! 🏆" : "Kiko tripped at "+score+"m. The rings are fine. Probably.");
+      recordScore(shown());
     }
     function paint(){
       cx.clearRect(0,0,W,H);
       drawScene();
-      obs.forEach(drawObs); drawKiko();
+      obs.forEach(drawObs); gems.forEach(drawGem); drawKiko();
       cx.fillStyle = level===3 ? "#C9D2F0" : "#5B6788"; cx.font="12px Georgia"; cx.textAlign="left";
-      if(!run && !over) cx.fillText("Tap or press space — Kiko has the rings and no plan.", 16, 24);
+      if(!run && !over) cx.fillText("Jump the admin · catch the rings · down ducks.", 16, 24);
       if(banner && banner.t > 0){                          /* the level card, fading out */
         const a = Math.min(1, banner.t / 28);
         cx.save(); cx.globalAlpha = a; cx.textAlign = "center";
@@ -2211,11 +2591,13 @@ export function boot() {
         cx.restore();
       }
       if(over){ cx.textAlign="center"; cx.font="20px Georgia"; cx.fillStyle = level===3 ? "#F4C64D" : "#41507A";
-        cx.fillText("Paws. "+score+"m — tap to try again", W/2, 90); }
+        const extra = rings ? " · ✦ "+rings : "";
+        cx.fillText("Paws. "+shown()+"m"+extra+" — tap to try again", W/2, 90); }
     }
     function loop(now){
       /* delta-time physics: the game runs at the SAME speed on 60Hz
          laptops and 120Hz phones, and inputs land the frame they occur */
+      if(view !== "2d"){ lastT = now; requestAnimationFrame(loop); return; }
       const dt = lastT ? Math.min(2.6, (now - lastT) / 16.667) : 1;
       lastT = now;
       if(run){
@@ -2230,47 +2612,424 @@ export function boot() {
         }
         if(banner){ banner.t -= dt; if(banner.t <= 0) banner = null; }
         speed = 4.4 + score/50;
-        kvy += 0.58*dt; ky = Math.min(GY, ky + kvy*dt);
+        const falling = ducking && ky < GY-1 && kvy > 0;
+        kvy += (falling ? 1.45 : 0.58)*dt; ky = Math.min(GY, ky + kvy*dt);
         if(jumpBuf > 0){ jumpBuf -= dt; if(ky >= GY-0.5) doJump(); }
+        if(charm > 0) charm -= dt;
         obs.forEach(o=>o.x -= speed*dt);
+        gems.forEach(g=>g.x -= speed*dt);
         obs = obs.filter(o=>o.x > -80);
+        const duckedNow = ducking && ky >= GY-0.8;
+        const chestY = ky - (duckedNow ? 10 : 24);
+        for(const g of gems){
+          if(g.got) continue;
+          if(Math.abs(g.x - 70) < 26 && Math.abs(g.y - chestY) < 30){
+            g.got = true;
+            if(g.k === "charm"){ charm = 145; award(12, "Barvinok"); }
+            else {
+              rings++; streak++;
+              if(streak >= 3){ streak = 0; award(24, "The set!"); }
+              else award(8, "✦ +8");
+            }
+          } else if(g.k === "ring" && g.x < 48 && !g.missed){
+            g.missed = true; streak = 0;
+          }
+        }
+        gems = gems.filter(g => g.x > -40 && !g.got);
         score = Math.floor(frame/6);
         const lv = levelFor(score);
         if(lv !== level) enterLevel(lv);                  /* new scene, new card, safe stretch */
-        document.getElementById("kd-score").textContent = String(score).padStart(3,"0")+" m";
-        if(grace <= 0){
+        const mark = Math.floor(score / 100) * 100;
+        if(mark >= 100 && mark > milestone){ milestone = mark; cheers(mark + " m"); }
+        if(grace <= 0 && charm <= 0){
+          const ducked = duckedNow;
+          const kikoH = ducked ? 17 : 40;
+          const kikoTop = ky - kikoH;
           for(const o of obs){
-            const ow = o.w, oh = o.h;
-            if(70+14 > o.x+6 && 70-14 < o.x+ow-6 && ky > GY-oh+6){ gameOver(); break; }
+            const obsBottom = GY - (o.foot||0);
+            const obsTop = obsBottom - o.h;
+            const xHit = 70+12 > o.x+5 && 70-12 < o.x+o.w-5;
+            const yHit = ky > obsTop + 4 && kikoTop < obsBottom - 2;
+            if(xHit && yHit){ gameOver(); break; }
+            if(xHit && !o.near){
+              const closeOver = ky <= obsTop + 4 && ky >= obsTop - 16;
+              const closeUnder = (o.foot||0) > 0 && kikoTop >= obsBottom - 2 && kikoTop <= obsBottom + 16;
+              if(closeOver || closeUnder){ o.near = true; award(5, "Close!"); }
+            }
           }
         }
+        const metres = shown();
+        document.getElementById("kd-score").textContent = String(metres).padStart(3,"0")+" m";
+        paintGems({rings, charm: charm > 0});
+        noteBest(metres);
+        const wrapEl = document.getElementById("dash-canvas-wrap");
+        if(wrapEl && view === "2d") wrapEl.classList.toggle("is-charmed", charm > 0);
         paint();
       }
       requestAnimationFrame(loop);
     }
     paint(); requestAnimationFrame(loop);
-    cv.addEventListener("pointerdown", e=>{ e.preventDefault(); press(); });
-    cv.addEventListener("pointerup",   e=>{ e.preventDefault(); release(); });
-    cv.addEventListener("pointercancel", release);
+    function gamePlaying(){
+      if(view==="3d") return !!(k3 && k3.playing());
+      return run && !over;
+    }
+    function doPress(){ if(view==="3d" && k3) k3.jumpPress(); else press(); }
+    function doRelease(){ if(view==="3d" && k3) k3.jumpRelease(); else release(); }
+    function doDuck(on){ if(view==="3d" && k3) k3.setDuck(on); else setDuck(on); }
+    const modeBtn = document.getElementById("kd-3d");
+    const modeBtnFs = document.getElementById("kd-3d-fs");
+    const wrap = document.getElementById("dash-canvas-wrap");
+    const tapBtn = document.getElementById("kd-tap");
+    const exitBtn = document.getElementById("kd-exit");
+    const jumpBtn = document.getElementById("kd-jump");
+    const duckBtn = document.getElementById("kd-duck");
+    const phonePlay = ()=> matchMedia("(max-width:700px), (hover: none) and (pointer: coarse)").matches;
+    let fsOn = false;
+    function setModeUi(pressed, label, disabled){
+      [modeBtn, modeBtnFs].forEach(btn=>{
+        if(!btn) return;
+        btn.setAttribute("aria-pressed", pressed ? "true" : "false");
+        btn.textContent = label;
+        btn.disabled = !!disabled;
+      });
+    }
+    let fsMarker = null;
+    let hudMarker = null;
+    let fsLock = false;
+    let labelTimer = 0;
+    let fsTapSpent = false;
+    const hudEl = document.querySelector("#page-games .kd-hud");
+    const gateEl = document.getElementById("kd-gate");
+    const gateKicker = document.getElementById("kd-gate-kicker");
+    const gateTitle = document.getElementById("kd-gate-title");
+    const gateNote = document.getElementById("kd-gate-note");
+    function nativeFsEl(){
+      return document.fullscreenElement || document.webkitFullscreenElement || null;
+    }
+    function isPortrait(){
+      /* Prefer geometry over orientation MQ — Safari chrome changes fool matchMedia mid-rotate */
+      return window.innerHeight >= window.innerWidth;
+    }
+    function looksImmersive(){
+      /* Safari can keep fullscreenElement set while toolbars reclaim the viewport after rotate */
+      if(!nativeFsEl()) return false;
+      const vv = window.visualViewport;
+      if(!vv) return true;
+      const viewMin = Math.min(vv.width, vv.height);
+      const viewMax = Math.max(vv.width, vv.height);
+      const screenMin = Math.min(screen.width, screen.height);
+      const screenMax = Math.max(screen.width, screen.height);
+      return viewMin >= screenMin * 0.86 && viewMax >= screenMax * 0.88;
+    }
+    function fsReq(el){
+      if(!el) return null;
+      return el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen || null;
+    }
+    function requestNativeFs(){
+      /* Sync call in the tap turn — Safari ignores deferred fullscreen requests */
+      const targets = [wrap, document.documentElement, document.body].filter(Boolean);
+      for(const el of targets){
+        const req = fsReq(el);
+        if(!req) continue;
+        try{
+          const out = req.call(el, { navigationUI: "hide" });
+          return Promise.resolve(out).then(()=>looksImmersive()).catch(()=>false);
+        }catch(err){ /* try next */ }
+      }
+      return Promise.resolve(looksImmersive());
+    }
+    function leaveNativeFs(){
+      const cur = nativeFsEl();
+      if(!cur) return Promise.resolve();
+      const exit = document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
+      if(!exit) return Promise.resolve();
+      try{ return Promise.resolve(exit.call(document)).catch(()=>{}); }
+      catch(err){ return Promise.resolve(); }
+    }
+    function lockLandscape(){
+      try{
+        const o = screen.orientation;
+        if(o && o.lock) return Promise.resolve(o.lock("landscape")).catch(()=>{});
+      }catch(err){}
+      return Promise.resolve();
+    }
+    function unlockOrientation(){
+      try{
+        const o = screen.orientation;
+        if(o && o.unlock) o.unlock();
+      }catch(err){}
+    }
+    let lastVvArea = 0;
+    function syncGate(){
+      if(!wrap || !fsOn) return;
+      const portrait = isPortrait();
+      const immersive = looksImmersive();
+      const vv = window.visualViewport;
+      const area = vv ? vv.width * vv.height : 0;
+      /* Re-arm reclaim when Safari chrome eats the viewport again (often without a fullscreenchange). */
+      if(area && lastVvArea && area < lastVvArea * 0.94) fsTapSpent = false;
+      if(area) lastVvArea = area;
+      if(portrait || immersive) fsTapSpent = false;
+      /* Portrait always gated. Landscape: show until immersive, or until one tap has been tried. */
+      const need = portrait || (!immersive && !fsTapSpent);
+      wrap.classList.toggle("is-portrait", portrait);
+      wrap.classList.toggle("need-gate", need);
+      if(gateEl) gateEl.hidden = !need;
+      if(gateKicker && gateTitle && gateNote){
+        if(portrait){
+          gateKicker.textContent = "Landscape";
+          gateTitle.textContent = "Turn your phone sideways";
+          gateNote.textContent = "Then tap for full screen";
+        } else {
+          gateKicker.textContent = "Full screen";
+          gateTitle.textContent = "Tap for full screen";
+          gateNote.textContent = "Hides Safari’s search bar and tabs";
+        }
+      }
+      if(portrait){
+        duckHeld = false;
+        doDuck(false);
+      }
+    }
+    function gateTap(){
+      if(!fsOn) return;
+      if(isPortrait()){
+        syncGate();
+        return;
+      }
+      /* Must request fullscreen in this same gesture — then allow play even if Safari keeps a sliver of chrome */
+      requestNativeFs().then(()=>lockLandscape()).then(()=>{
+        fsTapSpent = true;
+        syncGate();
+      });
+    }
+    function ensureFsFromGesture(){
+      if(fsOn && !isPortrait() && !looksImmersive() && !fsTapSpent) gateTap();
+    }
+    function flashFsLabels(){
+      if(!wrap) return;
+      wrap.classList.remove("show-fs-labels");
+      void wrap.offsetWidth;
+      wrap.classList.add("show-fs-labels");
+      clearTimeout(labelTimer);
+      labelTimer = setTimeout(()=>{ wrap.classList.remove("show-fs-labels"); }, 1300);
+    }
+    function enterFs(){
+      if(!wrap || fsOn || fsLock) return;
+      fsOn = true;
+      fsTapSpent = false;
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      document.body.dataset.kdScroll = String(y);
+      document.documentElement.classList.add("kd-fs");
+      document.body.classList.add("kd-fs");
+      if(!fsMarker){
+        fsMarker = document.createComment("kd-fs");
+        wrap.parentNode.insertBefore(fsMarker, wrap);
+      }
+      document.body.appendChild(wrap);
+      wrap.classList.add("is-fs");
+      if(hudEl && hudEl.parentNode !== wrap){
+        if(!hudMarker){
+          hudMarker = document.createComment("kd-hud");
+          hudEl.parentNode.insertBefore(hudMarker, hudEl);
+        }
+        wrap.appendChild(hudEl);
+      }
+      document.body.classList.toggle("kd-view-3d", view === "3d");
+      wrap.classList.toggle("is-3d-hud", view === "3d");
+      /* Native FS only from the landscape gate tap — premature FS drops on rotate and hid the reclaim UI */
+      syncGate();
+      flashFsLabels();
+      if(k3 && view === "3d") k3.show();
+    }
+    function exitFs(){
+      if(!fsOn || fsLock) return;
+      fsLock = true;
+      fsOn = false;
+      clearTimeout(labelTimer);
+      wrap.classList.remove("is-fs", "is-3d-hud", "is-portrait", "show-fs-labels", "need-gate");
+      fsTapSpent = false;
+      if(gateEl) gateEl.hidden = true;
+      if(hudEl && hudMarker && hudMarker.parentNode) hudMarker.parentNode.insertBefore(hudEl, hudMarker);
+      if(fsMarker && fsMarker.parentNode) fsMarker.parentNode.insertBefore(wrap, fsMarker);
+      document.documentElement.classList.remove("kd-fs");
+      document.body.classList.remove("kd-fs", "kd-view-3d");
+      const y = parseFloat(document.body.dataset.kdScroll || "0") || 0;
+      delete document.body.dataset.kdScroll;
+      window.scrollTo(0, y);
+      duckHeld = false;
+      doDuck(false);
+      if(jumpBtn) jumpBtn.classList.remove("is-held");
+      if(duckBtn) duckBtn.classList.remove("is-held");
+      unlockOrientation();
+      leaveNativeFs().finally(()=>{ fsLock = false; });
+    }
+    addEventListener("resize", ()=>{ if(fsOn) syncGate(); });
+    addEventListener("orientationchange", ()=>{
+      fsTapSpent = false;
+      setTimeout(syncGate, 80);
+      setTimeout(syncGate, 350);
+    });
+    if(window.visualViewport){
+      visualViewport.addEventListener("resize", ()=>{ if(fsOn) syncGate(); });
+      visualViewport.addEventListener("scroll", ()=>{ if(fsOn) syncGate(); });
+    }
+    function onNativeFsChange(){
+      if(fsLock || !fsOn) return;
+      if(!looksImmersive()) fsTapSpent = false;
+      syncGate();
+    }
+    addEventListener("fullscreenchange", onNativeFsChange);
+    addEventListener("webkitfullscreenchange", onNativeFsChange);
+    if(gateEl){
+      gateEl.addEventListener("pointerdown", e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        gateTap();
+      });
+      gateEl.addEventListener("click", e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        gateTap();
+      });
+    }
+    function holdBtn(btn, down, up){
+      if(!btn) return;
+      let held = false;
+      const start = (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        ensureFsFromGesture();
+        if(held) return;
+        held = true;
+        btn.classList.add("is-held");
+        try{ btn.setPointerCapture(e.pointerId); }catch(err){}
+        down();
+      };
+      const end = (e)=>{
+        if(!held) return;
+        held = false;
+        btn.classList.remove("is-held");
+        if(e && e.preventDefault) e.preventDefault();
+        up();
+      };
+      btn.addEventListener("pointerdown", start);
+      btn.addEventListener("pointerup", end);
+      btn.addEventListener("pointercancel", end);
+      btn.addEventListener("lostpointercapture", end);
+    }
+    cv.addEventListener("pointerdown", e=>{
+      if(phonePlay() && !fsOn) return;
+      e.preventDefault();
+      ensureFsFromGesture();
+      doPress();
+    });
+    cv.addEventListener("pointerup", e=>{
+      if(phonePlay() && !fsOn) return;
+      e.preventDefault();
+      doRelease();
+    });
+    cv.addEventListener("pointercancel", ()=>{ if(!(phonePlay() && !fsOn)) doRelease(); });
+    if(tapBtn) tapBtn.addEventListener("click", e=>{ e.preventDefault(); enterFs(); });
+    if(exitBtn) exitBtn.addEventListener("click", e=>{ e.preventDefault(); exitFs(); });
+    holdBtn(jumpBtn, doPress, doRelease);
+    holdBtn(duckBtn, ()=>doDuck(true), ()=>doDuck(false));
+    function refresh2dHud(){
+      document.getElementById("kd-level").textContent = "LVL "+(level+1)+" · "+LEVELS[level].name;
+      document.getElementById("kd-score").textContent = String(shown()).padStart(3,"0")+" m";
+      paintGems({rings, charm: charm > 0});
+      syncTheme();
+    }
+    let loading3d = false;
+    async function toggle3d(){
+      if(!wrap || loading3d) return;
+      if(view==="2d"){
+        view = "3d";
+        wrap.classList.add("is-3d");
+        document.body.classList.toggle("kd-view-3d", fsOn);
+        wrap.classList.toggle("is-3d-hud", fsOn);
+        setModeUi(true, "Classic mode", false);
+        if(!k3){
+          loading3d = true;
+          setModeUi(true, "Loading 3D…", true);
+          try{
+            const mod = await import("./games/kiko-dash-3d.js");
+            k3 = mod.createKiko3D(wrap, {
+              onScore(s, info){
+                document.getElementById("kd-score").textContent = String(s).padStart(3,"0")+" m";
+                paintGems(info);
+              },
+              onLevel(i, name){ document.getElementById("kd-level").textContent = "LVL "+(i+1)+" · "+name; },
+              onCheer: cheers,
+              onBest(s){ document.getElementById("kd-best").textContent = String(s).padStart(3,"0"); },
+              best(){ return best; },
+              onFinish(s){ recordScore(s); },
+              onError(){ toast("3D mode couldn't start on this device."); }
+            });
+          }catch(err){
+            console.error(err);
+            view = "2d";
+            wrap.classList.remove("is-3d", "is-3d-hud");
+            document.body.classList.remove("kd-view-3d");
+            setModeUi(false, "3D mode", false);
+            toast("3D mode couldn't start on this device.");
+            return;
+          }finally{
+            loading3d = false;
+            setModeUi(view==="3d", view==="3d" ? "Classic mode" : "3D mode", false);
+          }
+          if(view !== "3d" || !k3) return;
+        }
+        if(view==="3d") k3.show();
+      } else {
+        view = "2d";
+        wrap.classList.remove("is-3d");
+        document.body.classList.remove("kd-view-3d");
+        wrap.classList.remove("is-3d-hud");
+        setModeUi(false, "3D mode", false);
+        if(k3) k3.hide();
+        refresh2dHud();
+        paint();
+      }
+    }
+    if(modeBtn) modeBtn.addEventListener("click", ()=>{ toggle3d(); });
+    if(modeBtnFs) modeBtnFs.addEventListener("click", e=>{ e.preventDefault(); e.stopPropagation(); toggle3d(); });
+    onGamesVisibility = (on)=>{
+      if(!on) exitFs();
+      if(!k3) return;
+      if(on && view==="3d") k3.show();
+      else k3.hide();
+    };
     addEventListener("keydown", e=>{
       const gamesOn = document.getElementById("page-games").classList.contains("visible");
       if(!gamesOn) return;
+      const ae = document.activeElement;
+      const typing = ae && (ae.tagName==="INPUT" || ae.tagName==="TEXTAREA" || ae.tagName==="SELECT" || ae.isContentEditable);
+      if(typing) return;                                 /* not while in the crossword */
+      if(e.key==="Escape" && fsOn){ e.preventDefault(); exitFs(); return; }
       if(e.key===" "||e.key==="ArrowUp"){
-        if(document.activeElement && document.activeElement.tagName==="INPUT") return;   /* not while in the crossword */
         e.preventDefault();
-        if(!e.repeat) press();
+        if(!e.repeat) doPress();
+      } else if(e.key==="ArrowDown"){
+        /* On this page Down is for Kiko — never let it scroll, even after a crash. */
+        e.preventDefault();
+        if(!duckHeld){ duckHeld = true; doDuck(true); }
       }
-    });
+    }, true);
     addEventListener("keyup", e=>{
-      if(e.key===" "||e.key==="ArrowUp") release();
-    });
+      const gamesOn = document.getElementById("page-games").classList.contains("visible");
+      if(!gamesOn) return;
+      if(e.key===" "||e.key==="ArrowUp") doRelease();
+      if(e.key==="ArrowDown"){ duckHeld = false; doDuck(false); }
+    }, true);
     /* live cloud leaderboard: personal bests submit themselves */
-    function kdCloudSubmit(){
-      if(!CLOUD || !score || NAME==="Guest") return;
+    function kdCloudSubmit(finalScore){
+      const s = finalScore == null ? score : finalScore;
+      if(!CLOUD || !s || NAME==="Guest") return;
       const sent = +(lstore.get("km-kd-sent")||0);
-      if(score <= sent) return;
-      cloudPost({action:"score", name: NAME, score: score})
-        .then(()=>{ lstore.set("km-kd-sent", score); kdLiveBoard(); })
+      if(s <= sent) return;
+      cloudPost({action:"score", name: NAME, score: s})
+        .then(()=>{ lstore.set("km-kd-sent", s); kdLiveBoard(); })
         .catch(()=>{});
     }
     function kdLiveBoard(){

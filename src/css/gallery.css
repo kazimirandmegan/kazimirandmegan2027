@@ -18,6 +18,7 @@
 .gal-feat-tile img.gal-loaded{opacity:1;transition:opacity .4s ease,transform .45s ease}
 @media (hover:hover) and (pointer:fine){.gal-feat-tile:hover img{transform:scale(1.07)}}
 .gal-feat-over{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(32,38,59,.6));color:#fff;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem .6rem .4rem;opacity:0;transition:opacity .25s ease}
+@media (hover:none){.gal-feat-over{opacity:1}}
 .gal-feat-tile:hover .gal-feat-over,.gal-feat-tile:focus-visible .gal-feat-over{opacity:1}
 .gal-feat-tile:focus-visible{outline:2px solid var(--peri-deep);outline-offset:2px}
 
@@ -31,7 +32,7 @@
 /* ---------- Category filters ---------- */
 .gal-filters{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin:0 0 1.2rem}
 .gal-filter-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink);flex:none;margin-right:.2rem}
-.gal-filter{font-family:inherit;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;padding:.42rem .95rem;background:transparent;border:1px solid var(--rule);color:var(--ink-soft);cursor:pointer;transition:all .18s;min-height:36px}
+.gal-filter{font-family:inherit;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;padding:.42rem .95rem;background:transparent;border:1px solid var(--rule);color:var(--ink-soft);cursor:pointer;transition:all .18s;min-height:44px}
 .gal-filter.active{background:var(--peri-deep);border-color:var(--peri-deep);color:#fff}
 .gal-filter:hover:not(.active){border-color:var(--peri);color:var(--peri-deep)}
 
@@ -96,7 +97,7 @@
 .gb-upload-section{background:var(--ivory);border:1px solid var(--rule);padding:1rem 1.1rem;margin:0 0 1.4rem;border-radius:2px}
 .gb-upload-title{margin:0 0 .6rem;font-size:1rem;font-weight:600}
 .gb-upload-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
-.gb-upload-sel{font-family:inherit;font-size:.88rem;padding:.38rem .6rem;border:1px solid var(--rule);background:#fff;color:var(--ink);min-height:36px;flex:none}
+.gb-upload-sel{font-family:inherit;font-size:16px;padding:.5rem .6rem;border:1px solid var(--rule);background:#fff;color:var(--ink);min-height:44px;flex:none}
 .gb-upload-filebtn{position:relative;flex:none;font-size:.82rem;cursor:pointer}
 .gb-upload-status{margin:.5rem 0 0;font-size:.85rem;color:var(--ink-soft);font-style:italic;min-height:1.2em}
 
