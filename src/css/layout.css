@@ -247,7 +247,7 @@ header.scrolled{box-shadow:0 8px 30px -18px rgba(65,80,122,.35)}
 /* festivities week ribbon */
 .fest{position:relative;margin:1.6rem 0;padding-left:86px}
 .fest::before{content:"";position:absolute;left:34px;top:10px;bottom:10px;width:2px;background:linear-gradient(var(--peri) 0,var(--gold-soft) 50%,var(--sage) 100%);opacity:.6}
-.fest-day{position:relative;margin:0 0 1.6rem}
+.fest-day{position:relative;margin:0 0 1.6rem;scroll-margin-top:5rem}
 .fest-day .medal{position:absolute;left:-86px;top:0;width:68px;height:68px;border-radius:50%;background:#fff;border:1px solid var(--gold-soft);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center}
 .fest-day .medal .dw{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-ink)}
 .fest-day .medal .dn{font-family:"Cormorant Garamond",serif;font-size:1.5rem;color:var(--peri-deep);line-height:1}
