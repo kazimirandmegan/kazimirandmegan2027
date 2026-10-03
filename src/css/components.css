@@ -28,18 +28,27 @@ body.disco{animation:disco 1.2s linear 3}
 #chat-veil{position:fixed;inset:0;z-index:1290;background:rgba(65,80,122,.35);display:none;-webkit-tap-highlight-color:transparent}
 #chat-veil.show{display:block}
 /* Above mobile header (1160) / nav drawer (1200) so Close stays tappable */
-#chat-panel{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:1300;width:min(370px,calc(100vw - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));max-height:min(540px,calc(100vh - 120px - env(safe-area-inset-bottom,0px)),calc(100dvh - 120px - env(safe-area-inset-bottom,0px)));background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);display:none;flex-direction:column;overscroll-behavior:contain}
+#chat-panel{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:1300;width:min(370px,calc(100vw - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));max-height:min(540px,calc(100vh - 120px - env(safe-area-inset-bottom,0px)),calc(100dvh - 120px - env(safe-area-inset-bottom,0px)));background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);display:none;flex-direction:column;overscroll-behavior:none;min-height:0;will-change:transform}
 #chat-panel.open{display:flex}
 #chat-head{padding:.8rem 1rem;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;background:#fff;flex-shrink:0;gap:.5rem;position:relative;z-index:2}
 #chat-head .ch-t{font-family:"Cormorant Garamond",serif;font-size:1.15rem;color:var(--peri-deep);min-width:0}
 #chat-close{background:none;border:1px solid var(--rule);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;color:var(--ink);min-width:44px;min-height:44px;padding:.45rem .75rem;flex:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #chat-close:hover{border-color:var(--gold-soft);color:var(--peri-deep)}
-#chat-log{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;min-height:180px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+#chat-log{flex:1 1 auto;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;min-height:180px;-webkit-overflow-scrolling:touch;overscroll-behavior:none;touch-action:pan-y;overflow-anchor:none}
 .msg{max-width:85%;padding:.6rem .85rem;font-size:.93rem;line-height:1.5}
-.msg.bot{background:#fff;border:1px solid var(--rule);align-self:flex-start}
+.msg.bot{background:#fff;border:1px solid var(--rule);align-self:flex-start;position:relative;padding-bottom:.75rem}
 .msg.bot.pending{color:var(--ink-soft);font-style:italic}
 .msg.bot a.chat-link{color:var(--peri-deep);font-weight:500;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
 .msg.bot a.chat-link:hover{color:var(--ink)}
+/* Quiet cue: ✦ = live AI, · = local keyword fallback */
+.msg.bot .msg-source{
+  position:absolute;right:.35rem;bottom:.1rem;line-height:1;
+  font-size:.62rem;letter-spacing:0;opacity:.28;color:var(--ink-soft);
+  pointer-events:none;user-select:none;
+}
+.msg.bot.msg-ai .msg-source{color:var(--peri-deep);opacity:.34}
+.msg.bot.msg-local .msg-source{opacity:.22}
+.msg.bot.pending .msg-source{display:none}
 .msg.user{background:var(--peri-deep);color:#fff;align-self:flex-end}
 #chat-chips{display:flex;gap:.4rem;flex-wrap:wrap;padding:0 1rem .6rem;flex-shrink:0}
 #chat-chips button{font-family:inherit;font-size:.85rem;padding:.55rem .85rem;min-height:44px;border:1px solid var(--peri);background:#fff;color:var(--peri-deep);cursor:pointer;border-radius:999px;touch-action:manipulation}
@@ -49,24 +58,36 @@ body.disco{animation:disco 1.2s linear 3}
 #chat-send{border:none;background:var(--peri-deep);color:#fff;padding:0 1.1rem;cursor:pointer;font-size:1.05rem;min-width:48px}
 #chat-send:hover{background:var(--ink)}
 @media (max-width:700px), (max-height:500px){
-  /* Full-screen chat on phones — keyboard height handled via visualViewport in JS */
+  /* Full-screen chat on phones — JS sizes to visualViewport; veil hides the site */
+  #chat-veil.show{
+    background:var(--card);
+    /* Stay pinned to the layout viewport so keyboard gaps never show the site */
+  }
   #chat-panel{
-    inset:0;width:100%;max-width:none;height:100%;
-    height:100dvh;max-height:none;
+    top:0;left:0;right:0;bottom:auto;width:100%;max-width:none;
+    height:100%;height:100dvh;max-height:none;
     border:none;border-radius:0;box-shadow:none;
     padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
+    padding-bottom:0;
     padding-left:env(safe-area-inset-left,0px);
     padding-right:env(safe-area-inset-right,0px);
+    background:var(--card);
   }
   body.chat-open #chat-fab,
   body.chat-open #chat-nudge{visibility:hidden;pointer-events:none}
-  body.chat-open #chat-veil{display:none}
-  #chat-log{min-height:0}
-  #chat-head{padding:.65rem .75rem}
+  body.chat-open main,
+  body.chat-open header,
+  body.chat-open #garland,
+  body.chat-open #site-footer,
+  body.chat-open #bus-run{visibility:hidden !important;pointer-events:none !important}
+  #chat-log{min-height:0;flex:1 1 0}
+  #chat-head,#chat-chips,#chat-input-row{flex-shrink:0}
+  #chat-head{padding:.65rem .75rem;background:#fff}
+  #chat-input-row{background:#fff}
   #chat-close{min-width:72px;font-size:.72rem;letter-spacing:.12em}
   #chat-chips{
     flex-wrap:nowrap;gap:.3rem;padding:0 .55rem .45rem;
+    background:transparent;border:none;
   }
   #chat-chips button{
     flex:1 1 0;min-width:0;min-height:36px;padding:.35rem .3rem;
