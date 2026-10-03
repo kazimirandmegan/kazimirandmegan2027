@@ -607,11 +607,27 @@ export function boot() {
     if(who === "user") el.textContent = text;
     else el.appendChild(renderBotMessage(text));
   }
+  function markMsgSource(el, ai){
+    if(!el || !el.classList.contains("bot")) return;
+    el.classList.remove("msg-ai", "msg-local");
+    el.classList.add(ai ? "msg-ai" : "msg-local");
+    el.title = ai ? "Answered with Connie AI" : "Answered from saved site notes";
+    let mark = el.querySelector(".msg-source");
+    if(!mark){
+      mark = document.createElement("span");
+      mark.className = "msg-source";
+      mark.setAttribute("aria-hidden", "true");
+      el.appendChild(mark);
+    }
+    mark.textContent = ai ? "✦" : "·";
+  }
   function addMsg(text, who){
     const d = document.createElement("div");
     d.className = "msg "+who;
     setMsgContent(d, text, who);
-    log.appendChild(d); log.scrollTop = log.scrollHeight;
+    log.appendChild(d);
+    chatPinBottom = true;
+    scrollLogToBottom(true);
     return d;
   }
   async function send(qText){
@@ -619,20 +635,26 @@ export function boot() {
     const q = (qText !== undefined ? qText : input.value).trim();
     if(!q) return;
     chatBusy = true;
+    chatPinBottom = true;
     addMsg(q, "user"); input.value = "";
     input.disabled = true;
     const pending = addMsg("One moment…", "bot");
     pending.classList.add("pending");
     try {
-      setMsgContent(pending, await connie.reply(q), "bot");
+      const got = await connie.reply(q);
+      setMsgContent(pending, got.text, "bot");
+      markMsgSource(pending, got.ai);
     } catch (e) {
       setMsgContent(pending, answer(q), "bot");
+      markMsgSource(pending, false);
     } finally {
       pending.classList.remove("pending");
       chatBusy = false;
       input.disabled = false;
-      log.scrollTop = log.scrollHeight;
-      try { input.focus(); } catch (e) {}
+      chatPinBottom = true;
+      scrollLogToBottom(true);
+      schedulePlaceChatSheet();
+      try { input.focus({preventScroll:true}); } catch (e) { try { input.focus(); } catch (e2) {} }
     }
   }
   function isPhoneChat(){
@@ -646,48 +668,120 @@ export function boot() {
     panel.style.width = "";
     panel.style.height = "";
     panel.style.maxHeight = "";
+    panel.style.paddingTop = "";
     panel.style.paddingBottom = "";
+    panel.style.transform = "";
+  }
+  let chatScrollY = 0;
+  let chatTouchY = 0;
+  let chatPinBottom = true; /* stick message log to newest when keyboard resizes */
+  let chatPlaceRaf = 0;
+  let chatLastVvH = 0;
+  function isLogNearBottom(){
+    return !log || (log.scrollTop + log.clientHeight >= log.scrollHeight - 56);
+  }
+  function scrollLogToBottom(force){
+    if(!log) return;
+    if(force || chatPinBottom) log.scrollTop = log.scrollHeight;
   }
   function placeChatSheet(){
-    if(!panel.classList.contains("open") || !window.visualViewport) return;
+    if(!panel.classList.contains("open")) return;
     const vv = window.visualViewport;
-    if(isPhoneChat()){
-      /* Pin the panel to the visual viewport so the iOS keyboard shrinks the chat, not covers it */
-      const keyboardOpen = (window.innerHeight - vv.height) > 80;
-      panel.style.top = vv.offsetTop + "px";
-      panel.style.left = vv.offsetLeft + "px";
+    if(isPhoneChat() && vv){
+      /* Fill the visual viewport via height + transform. Do NOT call
+         window.scrollTo here — fighting iOS keyboard pan is what glitches
+         the page. The opaque veil covers any layout-viewport gap. */
+      const x = Math.round(vv.offsetLeft || 0);
+      const y = Math.round(vv.offsetTop || 0);
+      const w = Math.round(vv.width);
+      const h = Math.round(vv.height);
+      const heightChanged = h !== chatLastVvH;
+      chatLastVvH = h;
+      panel.style.top = "0px";
+      panel.style.left = "0px";
       panel.style.right = "auto";
       panel.style.bottom = "auto";
-      panel.style.width = vv.width + "px";
-      panel.style.height = vv.height + "px";
+      panel.style.width = w + "px";
+      panel.style.height = h + "px";
       panel.style.maxHeight = "none";
-      panel.style.paddingBottom = keyboardOpen ? "0px" : "";
-      log.scrollTop = log.scrollHeight;
+      panel.style.paddingTop = y > 1 ? "0px" : "";
+      panel.style.paddingBottom = "0px";
+      panel.style.transform = "translate(" + x + "px," + y + "px)";
+      if(heightChanged && (chatPinBottom || isLogNearBottom())){
+        chatPinBottom = true;
+        requestAnimationFrame(()=>scrollLogToBottom(true));
+      }
       return;
     }
+    if(!vv) return;
     const gap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
     panel.style.bottom = gap ? gap + "px" : "";
     panel.style.maxHeight = Math.min(vv.height * 0.88, vv.height - 12) + "px";
   }
-  let chatScrollY = 0;
+  function schedulePlaceChatSheet(){
+    if(chatPlaceRaf) return;
+    chatPlaceRaf = requestAnimationFrame(()=>{
+      chatPlaceRaf = 0;
+      placeChatSheet();
+    });
+  }
+  function onChatTouchStart(e){
+    if(!panel.classList.contains("open") || !e.touches || !e.touches.length) return;
+    chatTouchY = e.touches[0].clientY;
+  }
+  function onChatTouchMove(e){
+    if(!panel.classList.contains("open") || !e.touches || !e.touches.length) return;
+    const t = e.target;
+    /* Allow vertical pan only inside the message log; block everything else so
+       iOS cannot rubber-band / pan the page underneath the sheet. */
+    if(log && (t === log || log.contains(t))){
+      const dy = e.touches[0].clientY - chatTouchY;
+      const atTop = log.scrollTop <= 0;
+      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 1;
+      if((atTop && dy > 0) || (atBottom && dy < 0) || log.scrollHeight <= log.clientHeight){
+        e.preventDefault();
+      }
+      return;
+    }
+    e.preventDefault();
+  }
+  function onChatLogScroll(){
+    chatPinBottom = isLogNearBottom();
+  }
+  function onChatComposerFocus(){
+    chatPinBottom = true;
+    schedulePlaceChatSheet();
+    /* Remeasure after the keyboard finishes animating — resize only, no scroll fights */
+    setTimeout(schedulePlaceChatSheet, 100);
+    setTimeout(()=>{ schedulePlaceChatSheet(); scrollLogToBottom(true); }, 350);
+  }
+  function onChatComposerBlur(){
+    setTimeout(schedulePlaceChatSheet, 100);
+    setTimeout(schedulePlaceChatSheet, 350);
+  }
   function setChatOpen(on){
     panel.classList.toggle("open", on);
     fab.setAttribute("aria-expanded", on ? "true" : "false");
-    if(veil) veil.classList.toggle("show", on && !isPhoneChat());
+    /* Keep the veil up on phones too — opaque fill hides any keyboard gap */
+    if(veil) veil.classList.toggle("show", on);
     if(on){
       chatScrollY = window.scrollY || 0;
+      chatPinBottom = true;
+      chatLastVvH = 0;
+      document.documentElement.classList.add("chat-open");
       document.body.classList.add("chat-open");
       document.body.style.top = "-" + chatScrollY + "px";
       document.getElementById("chat-nudge").classList.remove("show");
       store.set("km-nudge","seen");
       seedChat();
       placeChatSheet();
-      /* Delay focus on phone so the fullscreen layout settles before the keyboard rises */
-      setTimeout(()=>{ try{ if(!isPhoneChat()) input.focus(); }catch(e){} }, 50);
+      scrollLogToBottom(true);
     } else {
+      document.documentElement.classList.remove("chat-open");
       document.body.classList.remove("chat-open");
       document.body.style.top = "";
       clearChatSheetStyles();
+      chatLastVvH = 0;
       window.scrollTo(0, chatScrollY);
     }
   }
@@ -737,7 +831,8 @@ export function boot() {
     store.set("km-nudge","seen");
   });
   document.getElementById("chat-close").addEventListener("click", closeChat);
-  if(veil) veil.addEventListener("click", closeChat);
+  /* Desktop: tap outside closes. Phone: veil is only a solid underlay for keyboard gaps. */
+  if(veil) veil.addEventListener("click", ()=>{ if(!isPhoneChat()) closeChat(); });
   document.getElementById("chat-send").addEventListener("click", ()=>send());
   input.addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
   addEventListener("keydown", e=>{
@@ -754,11 +849,23 @@ export function boot() {
     if(route) location.hash = route;
   });
   if(window.visualViewport){
-    visualViewport.addEventListener("resize", placeChatSheet);
-    visualViewport.addEventListener("scroll", placeChatSheet);
+    visualViewport.addEventListener("resize", schedulePlaceChatSheet);
+    visualViewport.addEventListener("scroll", schedulePlaceChatSheet);
   }
-  addEventListener("resize", placeChatSheet);
-  addEventListener("orientationchange", ()=>setTimeout(placeChatSheet, 150));
+  addEventListener("resize", schedulePlaceChatSheet);
+  addEventListener("orientationchange", ()=>setTimeout(schedulePlaceChatSheet, 150));
+  log.addEventListener("scroll", onChatLogScroll, {passive:true});
+  input.addEventListener("focus", onChatComposerFocus);
+  input.addEventListener("blur", onChatComposerBlur);
+  if(typeof ResizeObserver !== "undefined"){
+    const chatLogRo = new ResizeObserver(()=>{
+      if(!panel.classList.contains("open")) return;
+      if(chatPinBottom) scrollLogToBottom(true);
+    });
+    chatLogRo.observe(log);
+  }
+  document.addEventListener("touchstart", onChatTouchStart, {passive:true, capture:true});
+  document.addEventListener("touchmove", onChatTouchMove, {passive:false, capture:true});
 
   /* (storage wrappers `store` and `lstore` live near the top, by the router) */
 

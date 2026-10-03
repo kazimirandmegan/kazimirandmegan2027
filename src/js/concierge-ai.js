@@ -227,6 +227,7 @@ export function createConnie({ getTier, getName, localAnswer }) {
   }
 
   return {
+    /** @returns {Promise<{text:string, ai:boolean}>} */
     async reply(question) {
       let text = null;
       const canTry = stillTrying(sameOrigin) || (CLOUD && stillTrying(cloudAi));
@@ -237,9 +238,10 @@ export function createConnie({ getTier, getName, localAnswer }) {
           text = null;
         }
       }
+      const ai = !!text;
       if (!text) text = localAnswer(question);
       remember(question, text);
-      return text;
+      return { text, ai };
     },
   };
 }

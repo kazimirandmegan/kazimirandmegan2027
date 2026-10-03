@@ -42,7 +42,20 @@ body.nav-locked{overflow:hidden}
   body.on-games #chat-fab, body.on-games #chat-nudge{visibility:hidden;pointer-events:none}
 }
 /* Lock page scroll under the chat; keep pan-y on #chat-log so messages still scroll */
-body.chat-open{overflow:hidden;position:fixed;inset:0;width:100%}
+html.chat-open,
+html.chat-open body{
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+  touch-action:none;
+}
+html.chat-open{height:100%;height:100dvh}
+body.chat-open{
+  position:fixed;inset:0;width:100%;height:100%;height:100dvh;
+  /* Solid fill so any keyboard gap never reveals page chrome */
+  background:var(--card);
+}
+body.chat-open #chat-panel{touch-action:manipulation}
+body.chat-open #chat-log{touch-action:pan-y}
 body.chat-open header,
 body.chat-open #nav-veil,
 body.chat-open nav.links{visibility:hidden;pointer-events:none}
