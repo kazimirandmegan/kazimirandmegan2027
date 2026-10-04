@@ -37,6 +37,10 @@ const SHEET_SONGS     = "Songs";
 const SHEET_RSVPS     = "RSVPs";
 const PHOTO_FOLDER    = "Wedding Website Photos";
 
+/* NOTE: if you have an existing RSVPs sheet from the old structure, the
+   script will add any missing columns automatically on the next save.
+   No data will be lost; old rows simply won't have values in the new columns. */
+
 /* Basic hygiene limits */
 const MAX_TEXT   = 1200;      /* characters per guestbook note        */
 const MAX_NAME   = 80;
@@ -170,15 +174,17 @@ function connieSystem_(tier) {
 /* Guestbook                                                   */
 /* ---------------------------------------------------------- */
 function addGuestbook_(b) {
-  const who  = clean_(b.who,  MAX_NAME) || "Anonymous";
-  const type = ["memory","advice","wish","photo"].indexOf(b.type) >= 0 ? b.type : "memory";
-  const text = clean_(b.text, MAX_TEXT);
+  const who      = clean_(b.who, MAX_NAME) || "Anonymous";
+  const fileWho  = clean_(b.who, MAX_NAME) || "Unnamed";
+  const type     = ["memory","advice","wish","photo"].indexOf(b.type) >= 0 ? b.type : "memory";
+  const text     = clean_(b.text, MAX_TEXT);
+  const cat      = String(b.cat || "");
 
   let imgUrl = "";
   const photo = String(b.photo || "");
   if (photo.indexOf("data:image/") === 0) {
     if (photo.length > MAX_PHOTO) throw new Error("photo too large");
-    imgUrl = savePhoto_(photo, who);
+    imgUrl = savePhoto_(photo, fileWho, cat);
   }
   /* need SOMETHING to pin: words, a photo, or both */
   if (!text && !imgUrl) throw new Error("empty entry");
@@ -200,20 +206,41 @@ function readGuestbook_() {
   });
 }
 
-function savePhoto_(dataUrl, who) {
+function savePhoto_(dataUrl, who, cat) {
   const m = dataUrl.match(/^data:(image\/[a-z+]+);base64,(.+)$/);
   if (!m) throw new Error("bad image data");
-  /* name the file by its real type (the site sends jpeg, but be honest
-     if a png/webp ever arrives) */
-  const ext = (m[1].split("/")[1] || "jpg").replace("jpeg", "jpg");
-  const blob = Utilities.newBlob(Utilities.base64Decode(m[2]), m[1],
-    "guestbook-" + Date.now() + "-" + who.replace(/[^\w-]+/g, "_").slice(0, 24) + "." + ext);
-  const file = folder_().createFile(blob);
-  /* anyone WITH THE LINK can view — that's what lets the website
-     display it; the folder itself stays private to you */
+  const ext  = (m[1].split("/")[1] || "jpg").replace("jpeg", "jpg");
+  const safe = (who || "Unnamed").replace(/[^\w\s]/g, "").trim() || "Unnamed";
+  const n    = countPhotosBy_(who) + 1;
+  const name = safe + "_" + n + "." + ext;
+  const blob = Utilities.newBlob(Utilities.base64Decode(m[2]), m[1], name);
+  const dest = catFolder_(cat);
+  const file = dest.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  /* this googleusercontent form serves the raw image reliably in <img> tags */
   return "https://lh3.googleusercontent.com/d/" + file.getId();
+}
+
+/* Count photos already saved for this person (to generate sequential names). */
+function countPhotosBy_(who) {
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_GUESTBOOK);
+  if (!sh || sh.getLastRow() < 2) return 0;
+  const data = sh.getDataRange().getValues();
+  const head = data.shift().map(function(h){ return String(h).toLowerCase(); });
+  const iWho = head.indexOf("who"), iImg = head.indexOf("img");
+  if (iWho < 0 || iImg < 0) return 0;
+  const norm = String(who || "").toLowerCase().trim();
+  return data.filter(function(r){
+    return String(r[iWho]||"").toLowerCase().trim() === norm && String(r[iImg]||"").trim();
+  }).length;
+}
+
+/* Get (or create) a category subfolder inside the main photo folder. */
+function catFolder_(cat) {
+  const valid = ["Wedding Week","Vinkopletyny","Ceremony","Reception"];
+  const root  = folder_();
+  if (valid.indexOf(cat) < 0) return root;
+  const it = root.getFoldersByName(cat);
+  return it.hasNext() ? it.next() : root.createFolder(cat);
 }
 
 /* ---------------------------------------------------------- */
@@ -260,41 +287,32 @@ function readSongs_() {
 /* ---------------------------------------------------------- */
 /* RSVPs — one row per household, upserted by lead-guest name  */
 /* ---------------------------------------------------------- */
-const RSVP_HEADERS = ["updated","name","key","attending","party_size",
-  "email","mobile","city","country","lat","lng","pre_wedding","ceremony",
-  "breakfast","evening","afterparty","activities","travelling_after","guests_json",
-  "full_address","details_json"];
 
-/* Street, postcode, activity ticks and the decline note are not sheet
-   columns. Keep them in details_json, and build full_address from street
-   plus postcode when the client did not send a single address string.
-   Accepts either the nested `details` object or the same fields flat. */
-function rsvpDetails_(b) {
+/* Each column is explicit so you can read the sheet at a glance.
+   guests_json is kept at the end for form prefill when a guest
+   returns to edit — it is NOT needed for human reading.          */
+const RSVP_HEADERS = [
+  "updated","name","key","attending","party_size",
+  "email","mobile",
+  "street","postcode","city","country","lat","lng",
+  "pre_wedding","ceremony","breakfast","evening","afterparty",
+  "activities","activity_interests",
+  "travelling_after","travel_interests",
+  "decline_message",
+  "guest1_name","guest1_child","guest1_dietary",
+  "guest2_name","guest2_child","guest2_dietary",
+  "guest3_name","guest3_child","guest3_dietary",
+  "guest4_name","guest4_child","guest4_dietary",
+  "guest5_name","guest5_child","guest5_dietary",
+  "guest6_name","guest6_child","guest6_dietary",
+  "full_address","guests_json"
+];
+
+/* Pull a value from either the flat payload or a nested details object. */
+function rsvpFlat_(b, key, max) {
   var src = (b.details && typeof b.details === "object") ? b.details : {};
-  function keep(key, max) {
-    var fromDetails = src[key] != null ? String(src[key]).trim() : "";
-    var fromFlat = b[key] != null ? String(b[key]).trim() : "";
-    var raw = fromDetails || fromFlat;
-    return raw ? clean_(raw, max) : "";
-  }
-  var out = {};
-  var street = keep("street", 200);
-  var postcode = keep("postcode", 40);
-  var decline = keep("decline_message", 2000);
-  var acts = keep("activity_interests", 400);
-  var travel = keep("travel_interests", 200);
-  if (street) out.street = street;
-  if (postcode) out.postcode = postcode;
-  if (decline) out.decline_message = decline;
-  if (acts) out.activity_interests = acts;
-  if (travel) out.travel_interests = travel;
-  return out;
-}
-
-function rsvpAddress_(b, details) {
-  var addr = clean_(b.address, 400);
-  if (addr) return addr;
-  return [details.street, details.postcode].filter(Boolean).join(", ").slice(0, 400);
+  var raw = (b[key] != null ? String(b[key]) : "") || (src[key] != null ? String(src[key]) : "");
+  return raw ? clean_(raw.trim(), max) : "";
 }
 
 function saveRsvp_(b) {
@@ -302,59 +320,106 @@ function saveRsvp_(b) {
   if (!name) throw new Error("missing lead name");
   const key = normKey_(name);
 
-  /* geocode the address to a rough lat/lng + tidy city/country, so the
-     atlas can place a pin and measure distance. We deliberately keep
-     ONLY city + country for public display; the full address stays in
-     its own column for the couple. Street and postcode are not their own
-     columns — they travel in `address`, with a copy inside details_json
-     so the website can put them back in the right boxes on edit. */
-  var city = clean_(b.city, 120), country = clean_(b.country, 120);
+  var city     = clean_(b.city, 120) || "";
+  var country  = clean_(b.country, 120) || "";
+  var street   = rsvpFlat_(b, "street", 200);
+  var postcode = rsvpFlat_(b, "postcode", 40);
+  var actInt   = rsvpFlat_(b, "activity_interests", 400);
+  var travInt  = rsvpFlat_(b, "travel_interests", 200);
+  var decline  = rsvpFlat_(b, "decline_message", 2000);
   var lat = "", lng = "";
-  const details = rsvpDetails_(b);
-  const addr = rsvpAddress_(b, details);
-  if (addr || city || country) {
+
+  /* Geocode for atlas pins — city/country for public display only. */
+  const fullAddr = [street, postcode, city, country].filter(Boolean).join(", ").slice(0, 400);
+  if (fullAddr) {
     try {
-      const q = [addr, city, country].filter(String).join(", ");
-      const geo = Maps.newGeocoder().geocode(q);
+      const geo = Maps.newGeocoder().geocode(fullAddr);
       if (geo && geo.results && geo.results.length) {
         const r0 = geo.results[0];
         lat = r0.geometry.location.lat;
         lng = r0.geometry.location.lng;
-        /* fill city/country from the geocoder if the guest left them blank */
         (r0.address_components || []).forEach(function(c){
-          if (!city && c.types.indexOf("locality") >= 0) city = c.long_name;
-          if (!city && c.types.indexOf("postal_town") >= 0) city = c.long_name;
-          if (!country && c.types.indexOf("country") >= 0) country = c.long_name;
+          if (!city && c.types.indexOf("locality") >= 0)    city    = c.long_name;
+          if (!city && c.types.indexOf("postal_town") >= 0) city    = c.long_name;
+          if (!country && c.types.indexOf("country") >= 0)  country = c.long_name;
         });
       }
-    } catch (e) { /* geocode is best-effort; RSVP still saves without it */ }
+    } catch (e) { /* geocode is best-effort */ }
   }
 
-  const sh = sheet_(SHEET_RSVPS, RSVP_HEADERS);
+  /* Per-guest columns — up to 6 guests, 3 columns each. */
+  var guests = Array.isArray(b.guests) ? b.guests.slice(0, 6) : [];
+  var guestCols = [];
+  for (var i = 0; i < 6; i++) {
+    var g = guests[i] || {};
+    var gName  = clean_(g.name || "", MAX_NAME);
+    var gChild = gName ? (g.child ? "Yes" : "No") : "";
+    var diets  = [];
+    if (Array.isArray(g.diet)) g.diet.forEach(function(d){ if (d) diets.push(String(d)); });
+    if (g.dietOther && String(g.dietOther).trim()) diets.push(String(g.dietOther).trim());
+    guestCols.push(gName, gChild, diets.join("; "));
+  }
+
   const row = [
     new Date(), name, key,
-    clean_(b.attending, 40), (parseInt(b.party_size,10)||0),
+    clean_(b.attending, 40), (parseInt(b.party_size, 10) || 0),
     clean_(b.email, 160), clean_(b.mobile, 60),
-    city, country, lat, lng,
+    street, postcode, city, country, lat, lng,
     yesno_(b.pre_wedding), yesno_(b.ceremony), yesno_(b.breakfast), yesno_(b.evening),
     yesno_(b.afterparty),
-    yesno_(b.activities), yesno_(b.travelling_after),
-    JSON.stringify(b.guests || []).slice(0, 8000),
-    addr,
-    JSON.stringify(details).slice(0, 4000)
-  ];
+    yesno_(b.activities), actInt,
+    yesno_(b.travelling_after), travInt,
+    decline
+  ].concat(guestCols).concat([
+    fullAddr,
+    JSON.stringify(b.guests || []).slice(0, 8000)
+  ]);
 
-  /* upsert: find an existing row with this key and overwrite it */
+  /* Ensure sheet exists with all columns (adds any missing headers for
+     existing sheets that were created with the old structure).           */
+  const sh = ensureRsvpSheet_();
+
+  /* Upsert by key — write by column name so column order doesn't matter. */
+  const allHeaders = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0]
+                       .map(function(h){ return String(h).toLowerCase(); });
+  const namedRow = {};
+  RSVP_HEADERS.forEach(function(h, i){ namedRow[h.toLowerCase()] = row[i]; });
+
+  const writeRow = allHeaders.map(function(h){ return namedRow.hasOwnProperty(h) ? namedRow[h] : ""; });
+
   const data = sh.getDataRange().getValues();
-  const keyCol = RSVP_HEADERS.indexOf("key");
+  const keyCol = allHeaders.indexOf("key");
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][keyCol]) === key) {
-      sh.getRange(i + 1, 1, 1, row.length).setValues([row]);
+      sh.getRange(i + 1, 1, 1, writeRow.length).setValues([writeRow]);
       return "updated";
     }
   }
-  sh.appendRow(row);
+  sh.appendRow(writeRow);
   return "saved";
+}
+
+/* Ensure the RSVPs sheet exists and has every column in RSVP_HEADERS.
+   Missing columns are appended to the right — existing data is untouched. */
+function ensureRsvpSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName(SHEET_RSVPS);
+  if (!sh) {
+    sh = ss.insertSheet(SHEET_RSVPS);
+    sh.appendRow(RSVP_HEADERS);
+    sh.setFrozenRows(1);
+    return sh;
+  }
+  /* Expand columns if any are missing */
+  var existing = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0]
+                   .map(function(h){ return String(h).toLowerCase().trim(); });
+  RSVP_HEADERS.forEach(function(h) {
+    if (existing.indexOf(h.toLowerCase()) < 0) {
+      sh.getRange(1, sh.getLastColumn() + 1).setValue(h);
+      existing.push(h.toLowerCase());
+    }
+  });
+  return sh;
 }
 
 function readOneRsvp_(name) {
@@ -365,7 +430,7 @@ function readOneRsvp_(name) {
   const data = sh.getDataRange().getValues();
   const H = data.shift().map(function(h){ return String(h).toLowerCase(); });
   const keyCol = H.indexOf("key");
-  for (var i = data.length - 1; i >= 0; i--) {   /* latest wins */
+  for (var i = data.length - 1; i >= 0; i--) {
     if (String(data[i][keyCol]) === key) return rsvpRowToObj_(H, data[i]);
   }
   return null;
@@ -374,18 +439,43 @@ function readOneRsvp_(name) {
 function rsvpRowToObj_(H, r) {
   const o = {};
   H.forEach(function(h, i){ o[h] = r[i]; });
-  var guests = [], details = {};
+  /* guests_json is the ground truth for form prefill */
+  var guests = [];
   try { guests = JSON.parse(o.guests_json || "[]"); } catch (e) {}
-  try { details = JSON.parse(o.details_json || "{}"); } catch (e) {}
+  /* fall back to rebuilding from explicit columns if json is absent */
+  if (!guests.length) {
+    for (var i = 1; i <= 6; i++) {
+      var gn = o["guest" + i + "_name"] || "";
+      if (!gn) break;
+      var dietStr = o["guest" + i + "_dietary"] || "";
+      guests.push({
+        name: gn,
+        child: String(o["guest" + i + "_child"] || "") === "Yes",
+        diet: dietStr ? dietStr.split(";").map(function(s){ return s.trim(); }).filter(Boolean) : [],
+        dietOther: ""
+      });
+    }
+  }
   return {
     name: o.name, attending: o.attending, party_size: o.party_size,
-    email: o.email, mobile: o.mobile, address: o.full_address,
+    email: o.email, mobile: o.mobile,
+    street: o.street || "", postcode: o.postcode || "",
     city: o.city, country: o.country,
+    address: o.full_address,
     pre_wedding: o.pre_wedding === "Yes", ceremony: o.ceremony === "Yes",
     breakfast: o.breakfast === "Yes", evening: o.evening === "Yes",
     afterparty: o.afterparty === "Yes",
     activities: o.activities === "Yes", travelling_after: o.travelling_after === "Yes",
-    guests: guests, details: details
+    activity_interests: o.activity_interests || "",
+    travel_interests: o.travel_interests || "",
+    decline_message: o.decline_message || "",
+    guests: guests,
+    details: {
+      street: o.street || "", postcode: o.postcode || "",
+      activity_interests: o.activity_interests || "",
+      travel_interests: o.travel_interests || "",
+      decline_message: o.decline_message || ""
+    }
   };
 }
 

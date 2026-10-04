@@ -172,7 +172,7 @@ export function boot() {
   function matchTier(input){
     const p = SETTINGS.passwords, n = norm(input);
     if(!n) return null;                       /* empty input never unlocks */
-    for(const t of ["full","vinko","afterparty"]){
+    for(const t of ["full","vinko"]){
       if(norm(p[t]) && n === norm(p[t])) return t;   /* blank setting = tier disabled */
     }
     return null;
@@ -408,20 +408,20 @@ export function boot() {
 
   /* 5. the button that says not to press it */
   const myst = document.getElementById("mystery-btn");
-  if(myst){
-    let pressed = 0;
+  const mystConfirm = document.getElementById("mystery-confirm");
+  if(myst && mystConfirm){
     myst.addEventListener("click", ()=>{
-      pressed++;
-      if(pressed === 1){
-        document.body.classList.add("disco");
-        emojiBurst(["🪩","💃","🕺"], 54);
-        toast("You had ONE job. 🪩 Welcome to the (very brief) disco.");
-        setTimeout(()=>document.body.classList.remove("disco"), 2200);
-        myst.textContent = "You pressed the button";
-      } else {
-        emojiBurst(["🪩"], 24);
-        toast("The button forgives you. The button always knew.");
-      }
+      myst.textContent = "You were warned.";
+      myst.disabled = true;
+      mystConfirm.style.display = "";
+    });
+    mystConfirm.addEventListener("click", ()=>{
+      mystConfirm.style.display = "none";
+      document.body.classList.add("disco");
+      emojiBurst(["🪩","💃","🕺"], 54);
+      toast("You had TWO chances. 🪩 Welcome to the (very brief) disco.");
+      setTimeout(()=>document.body.classList.remove("disco"), 2200);
+      mystConfirm.textContent = "You pressed both buttons";
     });
   }
 
@@ -518,8 +518,8 @@ export function boot() {
     home:"Home", rsvp:"RSVP", about:"About Us", party:"Bridal Party",
     generations:"Generations of Love", memory:"In Loving Memory", bts:"Behind the Scenes",
     thankyous:"Thank Yous", week:"Wedding Week", vinko:"Vinkopletyny", bigday:"The Big Day",
-    ceremony:"Ceremony", breakfast:"Wedding Breakfast", reception:"Evening Reception",
-    afterparty:"After Party", registry:"Registry", guestbook:"Guestbook",
+    ceremony:"Ceremony", reception:"Evening Reception",
+    registry:"Registry", guestbook:"Guestbook",
     "expl-sta":"Explore St Albans", "expl-ldn":"Explore London", "expl-day":"England Day Trips",
     "expl-eur":"Explore Europe", playlists:"Playlists", games:"In-Flight Entertainment",
     faqs:"FAQs", stay:"Where to Stay", americans:"For Americans", ukraine:"For Ukrainians",
@@ -529,11 +529,9 @@ export function boot() {
     {re:/\b(?:the\s+)?(?:Where to )?Stay page\b/gi, route:"stay"},
     {re:/\b(?:the\s+)?FAQs? page\b/gi, route:"faqs"},
     {re:/\b(?:the\s+)?Contact page\b/gi, route:"contact"},
-    {re:/\b(?:the\s+)?After Party page\b/gi, route:"afterparty"},
     {re:/\b(?:the\s+)?RSVP page\b/gi, route:"rsvp"},
     {re:/\b(?:the\s+)?Registry page\b/gi, route:"registry"},
     {re:/\b(?:the\s+)?Ceremony page\b/gi, route:"ceremony"},
-    {re:/\b(?:the\s+)?Wedding Breakfast page\b/gi, route:"breakfast"},
     {re:/\b(?:the\s+)?Evening Reception page\b/gi, route:"reception"},
     {re:/\b(?:the\s+)?Bridal Party page\b/gi, route:"party"},
     {re:/\b(?:the\s+)?Guestbook\b/gi, route:"guestbook"},
@@ -573,7 +571,7 @@ export function boot() {
         best = {index:m.index, len:m[0].length, href:"#"+route, label:m[0]};
       }
     }
-    const hashRe = /#(home|rsvp|about|party|generations|memory|bts|thankyous|week|vinko|bigday|ceremony|breakfast|reception|afterparty|registry|guestbook|expl-sta|expl-ldn|expl-day|expl-eur|playlists|games|faqs|stay|americans|ukraine|workouts|atlas|contact)\b/g;
+    const hashRe = /#(home|rsvp|about|party|generations|memory|bts|thankyous|week|vinko|bigday|ceremony|reception|registry|guestbook|expl-sta|expl-ldn|expl-day|expl-eur|playlists|games|faqs|stay|americans|ukraine|workouts|atlas|contact)\b/g;
     let hm;
     while((hm = hashRe.exec(text))){
       if(!best || hm.index < best.index){
@@ -792,13 +790,7 @@ export function boot() {
     addMsg("Hello"+(NAME && NAME!=="Guest" ? ", "+NAME : "")+"! I'm Connie 🌸 — your Concierge for Nuptials, Networking, Itineraries & Events. I know this whole website inside out, so ask me anything: trains, hotels, timings, dress codes, the Ukrainian traditions, day trips, even what a 'Spoons' is. When a page helps, I'll drop you a clickable link — try [Stay](#stay), [FAQs](#faqs) or [Contact](#contact).", "bot");
     const chips = document.getElementById("chat-chips");
     /* Short labels so all three fit on one phone row; full question still sent to Connie */
-    const starters = TIER==="afterparty"
-      ? [
-          {label:"Last trains?", q:"Last trains home?"},
-          {label:"After party?", q:"Where's the after party?"},
-          {label:"What to wear?", q:"What should I wear?"}
-        ]
-      : TIER==="vinko"
+    const starters = TIER==="vinko"
       ? [
           {label:"Vinkopletyny?", q:"What is the Vinkopletyny?"},
           {label:"What to wear?", q:"What should I wear?"},
@@ -1390,7 +1382,6 @@ export function boot() {
         const box = evWrap.querySelector('[data-ev="'+ev.k+'"]');
         if(box) box.checked = !!d[ev.k];
       });
-      const apAftEl = document.getElementById("r-afterparty"); if(apAftEl) apAftEl.checked = !!d.afterparty;
       document.getElementById("r-activities").checked = !!d.activities;
       if(actSub) actSub.style.display = !!d.activities ? "" : "none";
       const actInterests = d.activity_interests || extra.activity_interests || "";
@@ -1472,8 +1463,6 @@ export function boot() {
           const box = evWrap.querySelector('[data-ev="'+ev.k+'"]');
           payload[ev.k] = !!(box && box.checked);
         });
-        const apEl = document.getElementById("r-afterparty");
-        payload.afterparty = !!(apEl && apEl.checked);
         payload.activities = document.getElementById("r-activities").checked;
         const actSubs = document.querySelectorAll('[name="r-act-sub"]:checked');
         payload.activity_interests = Array.from(actSubs).map(c=>c.value).join(",");
@@ -1530,7 +1519,7 @@ export function boot() {
   function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
   function rsvpObjFromPayload(p){
     const o = Object.assign({}, p);
-    ["pre_wedding","ceremony","breakfast","evening","activities","travelling_after","afterparty"].forEach(k=>{ o[k]=!!p[k]; });
+    ["pre_wedding","ceremony","evening","activities","travelling_after"].forEach(k=>{ o[k]=!!p[k]; });
     return o;
   }
   function rsvpSummaryHtml(d, events){
@@ -1540,7 +1529,6 @@ export function boot() {
       return '<p class="rsvp-summary">You\'ve let us know you sadly can\'t make it. We\'ll miss you — thank you for replying.'+(note ? '<br>'+esc(note) : '')+'</p>';
     }
     const evList = (events||RSVP_EVENTS.full).filter(ev=>d[ev.k]).map(ev=>ev.label.split(" — ")[0]);
-    if(d.afterparty) evList.push("After party");
     const g = (d.guests||[]).filter(x=>x && x.name);
     let s = '<div class="rsvp-summary">';
     s += '<strong>'+esc(d.name)+'</strong> — joyfully attending 💛<br>';
@@ -1843,8 +1831,6 @@ export function boot() {
   /* submit to the wall: Google Form when configured, otherwise mailto */
   if(CLOUD){
     document.getElementById("gb-mail").style.display = "none";
-    const note = document.getElementById("gb-form-help");
-    if(note) note.innerHTML = "How the wall works: pin words or photos and they appear here for <em>every</em> guest, live — before the wedding and long after. Photos are tucked safely away for the couple too.";
   }
   if(SETTINGS.guestbookFormUrl) document.getElementById("gb-mail").textContent = "Submit to the wall";
   document.getElementById("gb-mail").addEventListener("click", ()=>{
@@ -1869,8 +1855,7 @@ export function boot() {
     if(shared){
       const emb = spotifyEmbed(SETTINGS.sharedPlaylist);
       shared.innerHTML = emb
-        ? '<div class="pl-embed"><iframe src="'+emb+'" loading="lazy" allow="encrypted-media" title="Shared playlist"></iframe></div>'+
-          '<div class="btn-row" style="justify-content:flex-start"><a class="btn primary" target="_blank" rel="noopener" href="'+SETTINGS.sharedPlaylist+'">Open in Spotify to add songs</a></div>'
+        ? '<div class="pl-embed"><iframe src="'+emb+'" loading="lazy" allow="encrypted-media" title="Shared playlist"></iframe></div>'
         : '<div class="pl-embed"><div class="pl-placeholder">The collaborative playlist link goes in SETTINGS.sharedPlaylist —<br>make one in Spotify (⋯ → Invite collaborators) and paste it in.</div></div>';
     }
     const grid = document.getElementById("pl-grid");
@@ -1878,11 +1863,15 @@ export function boot() {
       grid.innerHTML = "";
       (SETTINGS.playlists||[]).forEach(p=>{
         const emb = spotifyEmbed(p.url);
+        const wrap = document.createElement("div"); wrap.className = "pl-item";
+        if(p.title){ const h = document.createElement("h4"); h.textContent = p.title; wrap.appendChild(h); }
         const d = document.createElement("div"); d.className = "pl-embed";
         d.innerHTML = emb
-          ? '<iframe src="'+emb+'" loading="lazy" allow="encrypted-media" title="'+p.title+'"></iframe>'
-          : '<div class="pl-placeholder"><strong>'+p.title+'</strong>coming soon — paste a Spotify link into SETTINGS.playlists</div>';
-        grid.appendChild(d);
+          ? '<iframe src="'+emb+'" loading="lazy" allow="encrypted-media" title="'+(p.title||'Playlist')+'"></iframe>'
+          : '<div class="pl-placeholder"><strong>'+(p.title||'')+'</strong> coming soon — paste a Spotify link into SETTINGS.playlists</div>';
+        wrap.appendChild(d);
+        if(p.caption){ const c = document.createElement("p"); c.className = "note"; c.textContent = p.caption; wrap.appendChild(c); }
+        grid.appendChild(wrap);
       });
     }
   })();
@@ -1980,6 +1969,8 @@ export function boot() {
     const b = document.getElementById("bus-run");
     b.classList.remove("go"); void b.offsetWidth; b.classList.add("go");
     toast("🚌 Beep beep! All aboard for Hatfield House.");
+    const hd = document.getElementById("bus-head-emoji");
+    if(hd){ hd.classList.remove("honk"); void hd.offsetWidth; hd.classList.add("honk"); hd.addEventListener("animationend",()=>hd.classList.remove("honk"),{once:true}); }
   }
   if(busEgg){
     busEgg.addEventListener("click", busGo);
@@ -2095,13 +2086,24 @@ export function boot() {
     });
   })();
 
-  /* shared photo album slot (Guestbook → After the day) */
+  /* shared photo albums per category (Guestbook → After the day) */
   (function(){
-    const slot = document.getElementById("album-slot"); if(!slot) return;
-    if(SETTINGS.photoAlbum)
-      slot.innerHTML = '<a class="btn primary" style="margin-top:.3rem" target="_blank" rel="noopener" href="'+SETTINGS.photoAlbum+'">Open the shared album</a>';
-    else
-      slot.innerHTML = '<span class="placeholder">[the shared album link appears here after the wedding — SETTINGS.photoAlbum]</span>';
+    const container = document.getElementById("album-slots"); if(!container) return;
+    const albums = SETTINGS.photoAlbums || {};
+    const cats = [
+      { key:"weddingWeek",  label:"Wedding Week" },
+      { key:"vinkopletyny", label:"Vinkopletyny" },
+      { key:"ceremony",     label:"Ceremony" },
+      { key:"reception",    label:"Reception" }
+    ];
+    container.innerHTML = cats.map(c => {
+      const url = albums[c.key];
+      return '<div class="album-row"><span class="album-row-label">'+c.label+'</span>'
+        + (url
+            ? '<a class="btn ghost" style="padding:.35rem .9rem;font-size:.85rem" target="_blank" rel="noopener" href="'+url+'">Open album</a>'
+            : '<span style="font-size:.85rem;color:var(--ink-soft)">Link coming soon</span>')
+        + '</div>';
+    }).join('');
   })();
 
   /* ---- BTS gallery lightbox ---- */
@@ -2434,6 +2436,8 @@ export function boot() {
       /* a tossed bouquet clears a duck and still catches a standing jump */
       if(k==="hyd" && Math.random() < 0.58){ foot = 26; h = 30; w = 36; }
       obs.push({k, x: W+20, w, h, foot});
+      /* two more hydrangeas stacked above a flying one — forces a duck */
+      if(foot === 26){ obs.push({k, x: W+20, w, h, foot: foot + h}); obs.push({k, x: W+20, w, h, foot: foot + h*2}); }
       /* a spare ring just past the obstacle, or a rare glowing barvinok */
       if(Math.random() < 0.08) gems.push({k:"charm", x: W+96, y: GY - (62 + Math.random()*36)});
       else if(Math.random() < 0.55) gems.push({k:"ring", x: W+64 + Math.random()*36, y: GY - (62 + Math.random()*36)});
@@ -2735,7 +2739,7 @@ export function boot() {
             if(g.k === "charm"){ charm = 145; award(12, "Barvinok"); }
             else {
               rings++; streak++;
-              if(streak >= 3){ streak = 0; award(24, "The set!"); }
+              if(streak >= 5){ streak = 0; award(24, "The set!"); }
               else award(8, "✦ +8");
             }
           } else if(g.k === "ring" && g.x < 48 && !g.missed){

@@ -30,7 +30,7 @@ export const PARTY = [
   {role:"Bridesmaid", name:"Anna Mercier-Game", img:"images_party-anna-mg.jpg",
    stats:[["Airport navigation",93],["Apple pie baking",92],["Sex and the City recall",83],["Psychoanalysis skills",97]],
    connection:"Megan's airport bestie", weddingRole:"Musician"},
-  {role:"Bridesmaid", name:"Jenni Edwards", img:"images_party-jenni.jpg",
+  {role:"Bridesmaid", name:"Jenni Edwards", img:"images_party-jenni.jpg", imgPos:"center 0%",
    stats:[["Slumber party vibes",92],["Event planning skills",92],["Back art creativity",88],["Emotional support",93]],
    connection:"Cousin of the Bride", weddingRole:""},
   {role:"Bridesmaid", name:"Alli Webb", img:"images_party-alli.jpg",
@@ -82,11 +82,11 @@ export const PARTY = [
    stats:[["Prosecco Pint Chop",78],["Karaoke Confidence",91],["Flirting skills",91],["Shock at being invited to this wedding",87]],
    connection:"Kazimir Uni Bestie", weddingRole:"Videographer"},
   {role:"Dog of Honour", name:"Kiko", img:"images_party-kiko.jpg",
-   stats:[["Tail-wag RPM",98],["Treat detection range",100],["Obedience",34],["Red-carpet charm",96]],
-   connection:"Supervising every planning meeting from the sofa",
-   weddingRole:"Has personally approved all floral arrangements by sniffing them"},
-  {role:"Dog of Honour", name:"Ollie", img:"images_party-ollie.jpg",
-   stats:[["Tail-wag RPM",0],["Treat detection range",0],["Obedience",0],["Good boy factor",0]],
+   stats:[["Squirrel chasing ability",45],["Lap sitting capacity",98],["Houdini Factor",93],["Cuddleability",98]],
    connection:"",
-   weddingRole:""}
+   weddingRole:"Supervisor every planning meeting from our laps"},
+  {role:"Dog of Honour", name:"Ollie", img:"images_party-ollie.jpg",
+   stats:[["Tail-wag RPM",96],["Taxidermy poses",93],["Obedience",42],["Good boy factor",97]],
+   connection:"",
+   weddingRole:"Barks and love from afar"}
 ];

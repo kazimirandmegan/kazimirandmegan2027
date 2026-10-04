@@ -7,7 +7,4 @@ export const RSVP_EVENTS = {
     vinko: [
       {k:"pre_wedding", label:"Pre-wedding Ukrainian celebration — Thu 27 May"}
     ],
-    afterparty: [
-      {k:"evening",    label:"Evening Reception — Hatfield House, Sat 29 May"}
-    ]
   };

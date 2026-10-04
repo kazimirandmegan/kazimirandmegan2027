@@ -31,12 +31,9 @@ export const ACCESS = {
     "week",
     "vinko",
     "ceremony",
-    "breakfast",
     "reception",
-    "afterparty",
   ]),
   vinko: SHARED.concat(["vinko"]),
-  afterparty: SHARED.concat(["reception", "afterparty"]),
 };
 
 export function tierHasCatering(tier) {

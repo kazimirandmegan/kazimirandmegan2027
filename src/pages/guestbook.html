@@ -13,22 +13,25 @@
 
     <!-- BEFORE panel: just intro -->
     <div class="fg-panel on" id="gbtab-before">
-      <p style="margin:0 0 .4rem">Wishes for the day, advice for married life, and photos of us at our most embarrassing — pin them below.</p>
+      <p style="margin:0 0 .4rem">Wishes for the day, advice for married life, and fun photos. The hope is that these could make up photo albums &amp; scrapbooks of our times together.</p>
     </div>
 
     <!-- AFTER panel: photo upload + filters + masonry gallery + notes -->
     <div class="fg-panel" id="gbtab-after">
-      <p style="margin:0 0 1rem">The morning-after wall. Add your snaps from the day — they join a living gallery everyone can explore. Prefer full quality and bulk upload? The shared album is here too: <span id="album-slot"></span></p>
+      <p style="margin:0 0 1rem">The morning-after wall. Add your snaps from the day — they join a living gallery everyone can explore.</p>
+
+      <!-- Shared album links per category -->
+      <div id="album-slots" style="margin-bottom:1.2rem"></div>
 
       <!-- Photo upload section -->
       <div class="gb-upload-section">
         <h4 class="gb-upload-title">Share your photos from the day</h4>
         <div class="gb-upload-row">
           <select id="gb-upload-cat" aria-label="Photo category" class="gb-upload-sel">
+            <option value="Wedding Week">Wedding Week</option>
+            <option value="Vinkopletyny">Vinkopletyny</option>
             <option value="Ceremony">Ceremony</option>
             <option value="Reception">Reception</option>
-            <option value="Guests">Guests</option>
-            <option value="Photo Booth">Photo Booth</option>
           </select>
           <label class="btn ghost gb-upload-filebtn">
             Choose photos
@@ -43,10 +46,10 @@
       <div class="gal-filters" role="group" aria-label="Filter by category">
         <span class="gal-filter-label">Show:</span>
         <button class="gal-filter active" data-cat="all" type="button">All</button>
+        <button class="gal-filter" data-cat="Wedding Week" type="button">Wedding Week</button>
+        <button class="gal-filter" data-cat="Vinkopletyny" type="button">Vinkopletyny</button>
         <button class="gal-filter" data-cat="Ceremony" type="button">Ceremony</button>
         <button class="gal-filter" data-cat="Reception" type="button">Reception</button>
-        <button class="gal-filter" data-cat="Guests" type="button">Guests</button>
-        <button class="gal-filter" data-cat="Photo Booth" type="button">Photo Booth</button>
       </div>
 
       <!-- Today's Memories featured strip -->
@@ -94,7 +97,7 @@
 
     <!-- BEFORE wall: notes + photos combined -->
     <div class="gb-wallwrap on" id="gbwall-before">
-      <h3>Notes &amp; wishes <button class="hunt-token" data-hunt="5" aria-label="A hidden petal">❀</button></h3>
+      <h3>Notes &amp; wishes</h3>
       <div class="gb-notes" id="gb-notes-before"></div>
       <div class="gal-masonry gal-masonry--before" id="gal-masonry-before" aria-label="Before-day photos"></div>
     </div>

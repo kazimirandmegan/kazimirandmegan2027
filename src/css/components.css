@@ -333,10 +333,13 @@ nav.links{align-items:center}
 .about-hero-photos .bio-photo img{aspect-ratio:4/3}
 
 /* ---------- runaway bus ---------- */
-#bus-run{position:fixed;bottom:16vh;left:-15vw;font-size:3.2rem;z-index:1150;pointer-events:none;opacity:0}
+#bus-run{position:fixed;bottom:16vh;left:-15vw;z-index:1150;pointer-events:none;opacity:0;line-height:1}
 #bus-run.go{animation:busgo 4.2s ease-in-out forwards}
-@keyframes busgo{0%{left:-15vw;opacity:1}25%{transform:translateY(-7px)}50%{transform:translateY(0)}75%{transform:translateY(-7px)}100%{left:112vw;opacity:1}}
+@keyframes busgo{0%{left:-15vw;opacity:1;transform:translateY(0)}25%{transform:translateY(-7px)}50%{transform:translateY(0)}75%{transform:translateY(-7px)}100%{left:112vw;opacity:1;transform:translateY(0)}}
 .bus-egg{cursor:pointer}
+#bus-head-emoji{display:inline-block}
+#bus-head-emoji.honk{animation:busHonk 0.6s ease-in-out}
+@keyframes busHonk{0%{transform:translateX(0)}15%{transform:translateX(-6px) rotate(8deg)}35%{transform:translateX(5px) rotate(-6deg)}55%{transform:translateX(-4px) rotate(4deg)}75%{transform:translateX(2px) rotate(-2deg)}100%{transform:translateX(0) rotate(0)}}
 
 
 /* ---------- extra florals ---------- */
@@ -351,6 +354,9 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .fg-tabs button.on{background:var(--peri-deep);color:#fff;border-color:var(--peri-deep)}
 .fg-panel{display:none;border:1px solid var(--rule);background:#fff;padding:1.2rem 1.3rem;margin-bottom:1rem}
 .fg-panel.on{display:block}
+.album-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.45rem 0;border-bottom:1px solid var(--rule)}
+.album-row:last-child{border-bottom:none}
+.album-row-label{font-family:"Cormorant Garamond",serif;font-size:1rem;letter-spacing:.06em}
 .euro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1rem 0}
 .euro-card{border:1px solid var(--rule);border-top:3px solid var(--peri);padding:1rem 1.1rem;background:#FFFDF6}
 .euro-card h4{margin:0}
@@ -378,7 +384,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .xw .xc.bad input{background:#F4E3DC}
 .xw-clues{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1rem;font-size:.95rem}
 .xw-clues h4{margin-top:0}
-#dash-canvas-wrap{position:relative;border:1px solid var(--rule);background:linear-gradient(#FBF9F2,#EFF3FB);overflow:hidden;touch-action:none}
+#dash-canvas-wrap{position:relative;border:3px solid #1a1a2e;background:linear-gradient(#FBF9F2,#EFF3FB);overflow:hidden;touch-action:none}
 #kiko-canvas{display:block;width:100%;height:auto;aspect-ratio:800/220;touch-action:none;user-select:none;-webkit-user-select:none}
 #kiko-canvas-3d{position:absolute;inset:0;width:100%;height:100%;display:none;touch-action:none;user-select:none}
 #dash-canvas-wrap.is-3d{aspect-ratio:16/10;min-height:320px;background:#121624}
