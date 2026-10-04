@@ -25,14 +25,14 @@ export const KB = [
      a:"Timings live on each event's page (some are still being confirmed — placeholders will fill in as we lock things down): [Wedding Week](#week), [Ceremony](#ceremony), [Evening Reception](#reception). Golden rule for the ceremony: be seated 30 minutes early.",
      t:["full"]},
     {k:["time","when","start","arrive","schedule","timing"],
-     a:"Timings are on your event's page — a couple are still being finalised and will appear there the moment they're locked in. Try [Vinkopletyny](#vinko). The week-of WhatsApp group (on [Contact](#contact)) gets the final word.",
+     a:"Timings are on your event's page — a couple are still being finalised and will appear there the moment they're locked in. Try [Vinkopletyny](#vinko). The week-of WhatsApp group details are on the [FAQs](#faqs) page.",
      t:["vinko"]},
     {k:["park","parking","drive","driving","car","m25","m1"],
      a:"Parking details are on each venue's page ([Ceremony](#ceremony), [Evening Reception](#reception)). General note: St Albans city car parks fill fast on Saturdays, and the UK drives on the left — roundabouts are a way of life."},
     {k:["gift","registry","present","honeymoon"],
      a:"Your presence is honestly the greatest gift — but the [Registry page](#registry) has links if you'd like to give something more."},
     {k:["weather","rain","cold","temperature","umbrella"],
-     a:"Late May: usually 12–20°C (55–68°F), light until after 9pm, one-in-three chance of a shower. Bring layers and a compact umbrella. The [Contact page](#contact) has our painfully honest weather meter; [For Americans](#americans) has more climate honesty."},
+     a:"Late May: usually 12–20°C (55–68°F), light until after 9pm, one-in-three chance of a shower. Bring layers and a compact umbrella. [For Americans](#americans) has our full climate honesty."},
     {k:["visa","eta","passport","entry","plug","adapter","card","cash","currency","money","tip","tipping"],
      a:"US and most non-European visitors need a UK ETA (quick online authorisation via gov.uk). Plugs are three-pin Type G. Contactless cards work everywhere, including trains. Tipping: ~10–12.5% in restaurants, nothing at the bar. More in the [FAQs](#faqs) and [For Americans](#americans)."},
     {k:["kids","children","child","baby","family"],
@@ -42,11 +42,11 @@ export const KB = [
      a:"[Explore → St Albans](#expl-sta) has a section for little ones — splash parks, farms, and ducks of distinction.",
      t:["vinko"]},
     {k:["password","locked","login","access"],
-     a:"Lost a password? Email us ([Contact](#contact)) and we'll sort you out. Capitals and spaces don't matter when typing it."},
+     a:"Lost a password? Email us and we'll sort you out — our email is on the [FAQs](#faqs) page. Capitals and spaces don't matter when typing it."},
     {k:["email","contact","whatsapp","reach","phone"],
-     a:"The [Contact page](#contact) has our joint wedding inbox and the link to the week-of WhatsApp group for live updates."},
+     a:"The [FAQs page](#faqs) has our contact details and the link to the week-of WhatsApp group for live updates."},
     {k:["spotify","playlist","music","song","request"],
-     a:"There's a wedding playlist card on the [Contact page](#contact) — and the full [Playlists page](#playlists) for requests. We make no promises about the Macarena."},
+     a:"Head to the [Playlists page](#playlists) for requests. We make no promises about the Macarena."},
     {k:["st albans","verulamium","market","cathedral","museum","do","see","visit","explore","recommend"],
      a:"The Field Guide is your friend: [St Albans](#expl-sta) highlights (Roman ruins, the 1553 market, England's arguably-oldest pub), [London](#expl-ldn) 20 minutes away, [day trips](#expl-day), and even [Eurostar ideas](#expl-eur) for making a holiday of it."},
     {k:["match","buddy","room","spare","lift","pickup","local","host"],
@@ -67,13 +67,11 @@ export const KB = [
     {k:["hunt","easter egg","petal","secret","codeword","hidden"],
      a:"Hunt? What hunt? I know nothing about six hidden petals. (…The first clue is in the [In-Flight Entertainment](#games) lounge.)"},
     {k:["seat","seating","table","where do i sit","my table"],
-     a:"Seating is arranged nearer the day — there'll be a plan displayed at the reception, and we'll share table details with your household directly. Any access or seating needs, mention them in your [RSVP](#rsvp) or on the [Contact page](#contact) and we'll sort it."},
+     a:"Seating is arranged nearer the day — there'll be a plan displayed at the reception, and we'll share table details with your household directly. Any access or seating needs, mention them in your [RSVP](#rsvp) and we'll sort it."},
     {k:["map","pins","nearby","around","explore","things to do","day trip","london","europe","paris","tube","bus map"],
      a:"Explore has four pages, each with its own colour-coded map: [St Albans](#expl-sta), [London](#expl-ldn), [England Day Trips](#expl-day) and [Europe](#expl-eur). The London page also covers getting there (20-min Thameslink to St Pancras) and around. The continent starts at the end of our branch line."},
     {k:["american","americans","tipping","currency","plug","homesick","phrasebook","weather"],
      a:"The [For Americans page](#americans) (menu → For Guests) has the local intelligence, the painfully honest weather guide, the phrasebook, and — in case of acute homesickness — a red button. Press it."},
-    {k:["workout","yoga","run","gym","exercise","fitness","morning"],
-     a:"[Wedding Workouts](#workouts) (menu → For Guests): early-morning sessions through wedding week led by the bridal community — run club, High-Tea HIIT, and Vinko Vinyasa with the bride herself. Coffee after, always."},
     {k:["atlas","world","where from","furthest","travelled"],
      a:"The [Guest Atlas](#atlas) (menu → For Guests) maps where everyone's travelling from — and there's a prize for the furthest-travelled guest, awarded with full ceremony at the reception."},
     {k:["bridal","best man","maid","bridesmaid","groomsman","kiko","dog","top trumps"],
@@ -99,14 +97,14 @@ export const KB = [
      t:["full"]},
 
     {k:["diet","dietary","vegan","vegetarian","gluten","allergy","allergies","halal","kosher","nut"],
-     a:"We cater for dietary needs — please list them for each person in your [RSVP](#rsvp) (tick-boxes plus an 'other' field). If anything's missed or changes, drop us a line on the [Contact page](#contact) and we'll make sure the kitchen knows.",
+     a:"We cater for dietary needs — please list them for each person in your [RSVP](#rsvp) (tick-boxes plus an 'other' field). If anything's missed or changes, drop us an email (details on [FAQs](#faqs)) and we'll make sure the kitchen knows.",
      t:["full"]},
     {k:["pierogi","varenyky","ukrainian food","cake","catering"],
      a:"Expect a blend of British and Ukrainian touches across the celebrations. The exact menu firms up nearer the day — dietary needs are gathered in your [RSVP](#rsvp) so nobody goes hungry.",
      t:["full","vinko"]},
 
     {k:["access","accessible","wheelchair","disabled","mobility","step free","buggy","pram"],
-     a:"Both the Cathedral and Hatfield House are broadly step-free, and there's on-site parking at Hatfield. If you have specific access needs — seating, ramps, a quiet space — tell us in your [RSVP](#rsvp) or via the [Contact page](#contact) and we'll arrange it personally. Block heels beat stilettos on old stone."},
+     a:"Both the Cathedral and Hatfield House are broadly step-free, and there's on-site parking at Hatfield. If you have specific access needs — seating, ramps, a quiet space — tell us in your [RSVP](#rsvp) and we'll arrange it personally. Block heels beat stilettos on old stone."},
 
     {k:["health","hospital","doctor","pharmacy","chemist","emergency","ill","sick","999","111"],
      a:"In a UK emergency, dial 999 (free). For non-urgent medical advice, dial 111. There are pharmacies ('chemists') in St Albans city centre. Bring any regular medication with you — pharmacies keep normal shop hours. Practical notes also live on the [FAQs](#faqs)."},
@@ -126,7 +124,7 @@ export const KB = [
      a:"Kiko is the very good dog — a Japanese Chin who has supervised every planning meeting from the sofa. She has her own Top Trumps card on the [Bridal Party page](#party), and stars in [Kiko Dash](#games)."},
 
     {k:["arrive","arriving","early","how early","get there"],
-     a:"For the ceremony, aim to be seated 30 minutes before it starts. Other timings are on each event's page ([Ceremony](#ceremony), [Wedding Week](#week)), and the week-of WhatsApp group on [Contact](#contact) gets the final word. Trains from St Albans are frequent, so you needn't cut it fine.",
+     a:"For the ceremony, aim to be seated 30 minutes before it starts. Other timings are on each event's page ([Ceremony](#ceremony), [Wedding Week](#week)). Trains from St Albans are frequent, so you needn't cut it fine.",
      t:["full"]},
     {k:["language","ukrainian phrase","speak","translate","hej"],
      a:"You'll hear both English and Ukrainian across the week. The one toast to learn: 'Budmo!' (roughly 'let us be!') — the reply is 'Hej!'. [For Americans](#americans) has a light British phrasebook too; [For Ukrainians](#ukraine) has more."},
@@ -135,7 +133,7 @@ export const KB = [
      a:"The [Europe page](#expl-eur) shows rough budget-airline return fares for early June next to each destination's travel time — Luton, Stansted or Gatwick, all reachable from St Albans. Book two to three months ahead and travel light for the low end; always check live prices."},
 
     {k:["menu","navigation","pages","sections","where is","find"],
-     a:"Everything's under five menus: Our Story ([About Us](#about), [Bridal Party](#party), [Thank Yous](#thankyous)), Celebrations ([Wedding Week](#week), [Ceremony](#ceremony), [Evening Reception](#reception)), Explore ([St Albans](#expl-sta), [London](#expl-ldn), [day trips](#expl-day), [Europe](#expl-eur)), For Guests ([RSVP](#rsvp), [Atlas](#atlas), [Workouts](#workouts), [Games](#games)) and Keepsakes ([Guestbook](#guestbook), [Playlists](#playlists)). Tell me a topic and I'll point you to the exact page."}
+     a:"Everything's under five menus: Our Story ([About Us](#about), [Bridal Party](#party), [Thank Yous](#thankyous)), Celebrations ([Wedding Week](#week), [Ceremony](#ceremony), [Evening Reception](#reception)), Explore ([St Albans](#expl-sta), [London](#expl-ldn), [day trips](#expl-day), [Europe](#expl-eur)), For Guests ([RSVP](#rsvp), [Atlas](#atlas), [Games](#games)) and Keepsakes ([Guestbook](#guestbook), [Playlists](#playlists)). Tell me a topic and I'll point you to the exact page."}
   ];
 
 export const SYN = {

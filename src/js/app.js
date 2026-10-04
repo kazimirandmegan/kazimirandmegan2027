@@ -251,9 +251,6 @@ export function boot() {
   });
 
   /* ---------- settings wiring ---------- */
-  const em = document.getElementById("contact-email");
-  em.textContent = SETTINGS.contactEmail; em.href = "mailto:"+SETTINGS.contactEmail;
-  document.getElementById("whatsapp-link").href = SETTINGS.whatsappLink;
   /* faqs page contact cards */
   const faqEmail = document.getElementById("contact-email-link");
   const faqEmailVal = document.getElementById("contact-email-val");
@@ -269,7 +266,7 @@ export function boot() {
   if(vy) vy.textContent = SETTINGS.vyshyvankaCode;
   if(SETTINGS.spotifyLink){
     const sc = document.getElementById("spotify-card"); if(sc) sc.style.display = "";
-    document.getElementById("spotify-link").href = SETTINGS.spotifyLink;
+    const sl = document.getElementById("spotify-link"); if(sl) sl.href = SETTINGS.spotifyLink;
   }
 
   /* ---------- live clock on the departure board ---------- */
@@ -450,7 +447,7 @@ export function boot() {
      context when Connie is answering with the model.
      ============================================================ */
   
-  const FALLBACK = "I'm Connie, and I only know what's written on this website — but I know all of it. Try me on trains, taxis, airports, hotels, parking, timings, what to wear, the food, the Ukrainian celebration, day trips to London or Europe, the [Guestbook](#guestbook), or [In-Flight Entertainment](#games). For anything I can't answer, the humans check their email ([Contact](#contact)) more often than they'd like to admit.";
+  const FALLBACK = "I'm Connie, and I only know what's written on this website — but I know all of it. Try me on trains, taxis, airports, hotels, parking, timings, what to wear, the food, the Ukrainian celebration, day trips to London or Europe, the [Guestbook](#guestbook), or [In-Flight Entertainment](#games). For anything I can't answer, the [FAQs](#faqs) have the couple's contact details.";
 
   /* light synonym map so guests' phrasing matches the keywords. Each line:
      if the question contains the term on the left, we also test the ones
@@ -506,12 +503,11 @@ export function boot() {
     "expl-sta":"Explore St Albans", "expl-ldn":"Explore London", "expl-day":"England Day Trips",
     "expl-eur":"Explore Europe", playlists:"Playlists", games:"In-Flight Entertainment",
     faqs:"FAQs", stay:"Where to Stay", americans:"For Americans", ukraine:"For Ukrainians",
-    workouts:"Wedding Workouts", atlas:"Guest Atlas", contact:"Contact"
+    atlas:"Guest Atlas"
   };
   const CHAT_PHRASES = [
     {re:/\b(?:the\s+)?(?:Where to )?Stay page\b/gi, route:"stay"},
     {re:/\b(?:the\s+)?FAQs? page\b/gi, route:"faqs"},
-    {re:/\b(?:the\s+)?Contact page\b/gi, route:"contact"},
     {re:/\b(?:the\s+)?RSVP page\b/gi, route:"rsvp"},
     {re:/\b(?:the\s+)?Registry page\b/gi, route:"registry"},
     {re:/\b(?:the\s+)?Ceremony page\b/gi, route:"ceremony"},
@@ -522,7 +518,6 @@ export function boot() {
     {re:/\b(?:the\s+)?(?:For )?Americans page\b/gi, route:"americans"},
     {re:/\b(?:the\s+)?Thank Yous page\b/gi, route:"thankyous"},
     {re:/\b(?:the\s+)?Guest Atlas\b/gi, route:"atlas"},
-    {re:/\bWedding Workouts\b/gi, route:"workouts"},
     {re:/\bIn-Flight Entertainment(?:\s+(?:page|lounge))?\b/gi, route:"games"},
     {re:/\b(?:the\s+)?Europe page\b/gi, route:"expl-eur"},
     {re:/\b(?:the\s+)?(?:Pre-Wedding Celebration|Vinkopletyny) page\b/gi, route:"vinko"},
@@ -554,7 +549,7 @@ export function boot() {
         best = {index:m.index, len:m[0].length, href:"#"+route, label:m[0]};
       }
     }
-    const hashRe = /#(home|rsvp|about|party|generations|memory|bts|thankyous|week|vinko|bigday|ceremony|reception|registry|guestbook|expl-sta|expl-ldn|expl-day|expl-eur|playlists|games|faqs|stay|americans|ukraine|workouts|atlas|contact)\b/g;
+    const hashRe = /#(home|rsvp|about|party|generations|memory|bts|thankyous|week|vinko|bigday|ceremony|reception|registry|guestbook|expl-sta|expl-ldn|expl-day|expl-eur|playlists|games|faqs|stay|americans|ukraine|atlas)\b/g;
     let hm;
     while((hm = hashRe.exec(text))){
       if(!best || hm.index < best.index){
@@ -770,7 +765,7 @@ export function boot() {
   function closeChat(){ setChatOpen(false); }
   function seedChat(){
     if(log.childElementCount) return;
-    addMsg("Hello"+(NAME && NAME!=="Guest" ? ", "+NAME : "")+"! I'm Connie 🌸 — your Concierge for Nuptials, Networking, Itineraries & Events. I know this whole website inside out, so ask me anything: trains, hotels, timings, dress codes, the Ukrainian traditions, day trips, even what a 'Spoons' is. When a page helps, I'll drop you a clickable link — try [Stay](#stay), [FAQs](#faqs) or [Contact](#contact).", "bot");
+    addMsg("Hello"+(NAME && NAME!=="Guest" ? ", "+NAME : "")+"! I'm Connie 🌸 — your Concierge for Nuptials, Networking, Itineraries & Events. I know this whole website inside out, so ask me anything: trains, hotels, timings, dress codes, the Ukrainian traditions, day trips, even what a 'Spoons' is. When a page helps, I'll drop you a clickable link — try [Stay](#stay), [FAQs](#faqs) or [In-Flight Entertainment](#games).", "bot");
     const chips = document.getElementById("chat-chips");
     /* Short labels so all three fit on one phone row; full question still sent to Connie */
     const starters = TIER==="vinko"

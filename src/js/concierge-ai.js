@@ -91,9 +91,7 @@ const PAGE_LINKS = [
   ["stay", "Where to Stay"],
   ["americans", "For Americans"],
   ["ukraine", "For Ukrainians"],
-  ["workouts", "Wedding Workouts"],
   ["atlas", "Guest Atlas"],
-  ["contact", "Contact"],
 ];
 
 function pageLinksText() {

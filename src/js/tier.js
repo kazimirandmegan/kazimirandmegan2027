@@ -14,7 +14,6 @@ export const SHARED = [
   "americans",
   "ukraine",
   "stay",
-  "workouts",
   "atlas",
   "games",
   "rsvp",
@@ -22,7 +21,6 @@ export const SHARED = [
   "guestbook",
   "playlists",
   "faqs",
-  "contact",
 ];
 
 export const ACCESS = {
