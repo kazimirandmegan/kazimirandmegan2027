@@ -325,6 +325,10 @@ nav.links{align-items:center}
 /* ---------- about-us bio photos ---------- */
 .bio-photos{display:flex;gap:1rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
 .bio-photo{flex:1 1 200px;max-width:280px;background:#fff;border:1px solid var(--rule);padding:8px;box-shadow:var(--shadow)}
+@media(max-width:640px){
+  .bio-photos{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:.75rem;-webkit-overflow-scrolling:touch}
+  .bio-photo{flex:0 0 82vw;max-width:82vw;scroll-snap-align:center}
+}
 .bio-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--rule)}
 .bio-photo figcaption{text-align:center;font-style:italic;font-size:.95rem;color:var(--ink-soft);padding-top:.45rem}
 .bio-photos:not(:has(figure)){display:none}

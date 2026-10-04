@@ -1,0 +1,173 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Kazimir and Megan Wedding 2027
+X-WR-TIMEZONE:Europe/London
+X-WR-CALDESC:Wedding Week Calendar
+BEGIN:VEVENT
+DTSTART:20270526T170000Z
+DTEND:20270526T220000Z
+DTSTAMP:20261004T221843Z
+UID:75iv1ovh2psi7v98nash9cika3@google.com
+CLASS:PUBLIC
+CREATED:20261002T174119Z
+DESCRIPTION:Location tbc
+LAST-MODIFIED:20261004T165539Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:KM27 - St Albans Pub Crawl
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270526T080000Z
+DTEND:20270526T160000Z
+DTSTAMP:20261004T221843Z
+UID:10me0o04cceiid94vim3onhjuh@google.com
+CLASS:PUBLIC
+CREATED:20261002T174023Z
+DESCRIPTION:Location/Timing tbc
+LAST-MODIFIED:20261004T165543Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:KM27- St Albans Day
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270531T090000Z
+DTEND:20270531T160000Z
+DTSTAMP:20261004T221843Z
+UID:3tq86ms51l0u423enensq7jips@google.com
+CREATED:20261002T174338Z
+LAST-MODIFIED:20261004T165601Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:KM27 - London Day
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270525T070000Z
+DTEND:20270525T080000Z
+DTSTAMP:20261004T221843Z
+UID:5cm75279lke162sro5as8k2b1p@google.com
+CLASS:PUBLIC
+CREATED:20261002T173907Z
+DESCRIPTION:Location/Timing tbc
+LAST-MODIFIED:20261004T165531Z
+SEQUENCE:4
+STATUS:CONFIRMED
+SUMMARY:KM27- Wedding Workout
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270526T070000Z
+DTEND:20270526T080000Z
+DTSTAMP:20261004T221843Z
+UID:5t67o8l23c7mcbdotf8s3pggrq@google.com
+CLASS:PUBLIC
+CREATED:20261002T173948Z
+DESCRIPTION:Location/Timing tbc
+LAST-MODIFIED:20261004T165440Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:Wedding Workout
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270525T160000Z
+DTEND:20270525T170000Z
+DTSTAMP:20261004T221843Z
+UID:6206FE74-8E46-469B-97A7-B28419DAB35C
+CREATED:20261004T165203Z
+LAST-MODIFIED:20261004T165535Z
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:KM27- Evensong St Albans Cathedral
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+BEGIN:VALARM
+ACTION:NONE
+TRIGGER;VALUE=DATE-TIME:19760401T005545Z
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270530T090000Z
+DTEND:20270530T160000Z
+DTSTAMP:20261004T221843Z
+UID:3keais98iftaelkni2olirg5lm@google.com
+CREATED:20261002T174323Z
+DESCRIPTION:Location/timing tbc
+LAST-MODIFIED:20261004T165558Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:KM27 - Brunch & Picnic
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270527T170000Z
+DTEND:20270527T220000Z
+DTSTAMP:20261004T221843Z
+UID:6ptbiff9lqajimhddbpgbhdeid@google.com
+CLASS:PUBLIC
+CREATED:20261002T174214Z
+DESCRIPTION:Please see the Vinkopletyny page for full details. Key informat
+ ion:\n\nTimings: We will meet at Kazimir's family home (28 Beaconsfield Roa
+ d\, St Albans\, AL1 3RB\; 5 minutes from St Albans Station) to process to S
+ t Saviour's Church (a 12-minute walk away) at 18:00. If you cannot join the
+  procession\, or if the weather is poor\, please meet at St Saviour's Churc
+ h (AL1 4DF) at 18:30. Taxis from St Michael's Manor take around 5 minutes a
+ nd cost approximately £5.\nWhat to wear: Traditional or national dress from
+  your own culture is warmly welcome\; alternatively we welcome Ukrainian cl
+ othing in support of Ukraine. Otherwise\, please wear whatever is smart\, c
+ omfortable and easy to dance in. See the Vinkopletyny page for more details
+ .\nWhat to bring: Please bring a small\, meaningful ornament or decoration 
+ to hang on the Ukrainian wedding tree (Hiltse).\nGetting home: Vinkopletyny
+  will finish at 23:00. St Saviour's Church is a 10-minute walk from the tow
+ n centre and St Albans Station\, or a 5-minute taxi journey (Uber/Bolt).
+LAST-MODIFIED:20261004T165549Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:KM27 - Vinkopletyny
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20270529T120000Z
+DTEND:20270529T230000Z
+DTSTAMP:20261004T221843Z
+UID:3v2q5dbshse1d8hsi37nl4k2ga@google.com
+CLASS:PUBLIC
+CREATED:20261002T174254Z
+DESCRIPTION:Please see the Ceremony page for full details. Key information:
+ \n\nTimings: The ceremony begins at 13:30. Please arrive by 13:00 so all gu
+ ests can be seated by 13:15.\nGetting to the ceremony: St Albans Cathedral 
+ is a 20-minute walk from St Albans City Station or a 5-minute taxi ride. Pa
+ rking at the Cathedral is limited.\nWhat to wear: Formal attire. We recomme
+ nd suits\, cocktail dresses\, or equivalent formal wear. If your shoes are 
+ not made for dancing\, you may wish to bring a more comfortable pair for th
+ e evening.\nWill any part be outdoors? Yes. Part of the reception will take
+  place outdoors.
+LAST-MODIFIED:20261004T165553Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:KM27 - Kazimir & Megan Wedding
+TRANSP:OPAQUE
+X-APPLE-CREATOR-IDENTITY:com.apple.calendar
+X-APPLE-CREATOR-TEAM-IDENTITY:0000000000
+END:VEVENT
+END:VCALENDAR

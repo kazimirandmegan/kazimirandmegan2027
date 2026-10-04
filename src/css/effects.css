@@ -19,7 +19,12 @@ body.patriot{animation:patriot .4s linear 8}
 
 /* ---------- memory & generations ---------- */
 .mem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1.3rem;margin:1.4rem 0}
+.mem-grid-6{grid-template-columns:repeat(3,1fr)}
 .mem-frame{background:#fff;border:1px solid var(--rule);padding:10px 10px 0;box-shadow:var(--shadow);text-align:center}
+@media(max-width:640px){
+  .mem-grid{display:flex;flex-direction:row;overflow-x:auto;scroll-snap-type:x mandatory;gap:1rem;padding-bottom:.75rem;-webkit-overflow-scrolling:touch}
+  .mem-frame{flex:0 0 82vw;scroll-snap-align:center}
+}
 .mem-frame .mem-ph{position:relative;aspect-ratio:4/5;background:linear-gradient(160deg,#EDE9DC,#E3E7F2);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .mem-frame .mem-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .mem-frame .ph-hint{font-style:italic;font-size:.75rem;color:var(--peri-deep);padding:.5rem}

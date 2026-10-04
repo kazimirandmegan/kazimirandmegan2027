@@ -250,23 +250,6 @@ export function boot() {
     toast("That's " + sleeps + " sleeps. 😴 Not that anyone's counting.");
   });
 
-  /* ---------- add-to-calendar (.ics) ---------- */
-  document.getElementById("ics-btn").addEventListener("click", ()=>{
-    function dt(y,mo,d,h,mi){ return y+pad(mo)+pad(d)+"T"+pad(h)+pad(mi)+"00"; }
-    const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//KM Wedding//EN",
-      "BEGIN:VEVENT","UID:km-wedding-2027@stalbans",
-      "DTSTART;TZID=Europe/London:"+dt(W.year,W.month,W.day,W.hour,W.minute),
-      "DTEND;TZID=Europe/London:"+dt(W.year,W.month,W.day,23,30),
-      "SUMMARY:Kazimir & Megan — May 2027",
-      "LOCATION:St Albans\\, England",
-      "DESCRIPTION:Celebrations in St Albans — details at the wedding website.",
-      "END:VEVENT","END:VCALENDAR"].join("\r\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));
-    a.download = "Kazimir-and-Megan.ics";
-    a.click(); URL.revokeObjectURL(a.href);
-  });
-
   /* ---------- settings wiring ---------- */
   const em = document.getElementById("contact-email");
   em.textContent = SETTINGS.contactEmail; em.href = "mailto:"+SETTINGS.contactEmail;
@@ -1928,13 +1911,22 @@ export function boot() {
         '<div class="tp-role"></div><h4></h4>';
       c.querySelector(".tp-role").textContent = m.role;
       c.querySelector("h4").textContent = m.name;
-      c.addEventListener("click", ()=>tpOpen(m));
+      c.addEventListener("click", ()=>{
+        if(c.hasAttribute("data-tpactive")){ tpDoClose(); return; }
+        tpOpen(m, c);
+      });
       const isDog = m.role === "Dog of Honour";
       (isDog && gridDogs ? gridDogs : grid).appendChild(c);
     });
   })();
   const tpOv = document.getElementById("tp-overlay");
-  function tpOpen(m){
+  function tpDoClose(){
+    tpOv.classList.remove("open");
+    document.querySelectorAll(".tp-card[data-tpactive]").forEach(b=>b.removeAttribute("data-tpactive"));
+  }
+  function tpOpen(m, btn){
+    document.querySelectorAll(".tp-card[data-tpactive]").forEach(b=>b.removeAttribute("data-tpactive"));
+    if(btn) btn.setAttribute("data-tpactive","1");
     document.getElementById("tpb-role").textContent = m.role;
     document.getElementById("tpb-name").textContent = m.name;
     const face = document.getElementById("tpb-face");
@@ -1957,9 +1949,9 @@ export function boot() {
       st.querySelectorAll(".fill").forEach(f=>f.style.width = f.dataset.w+"%");
     }));
   }
-  document.getElementById("tp-close").addEventListener("click", ()=>tpOv.classList.remove("open"));
-  tpOv.addEventListener("click", e=>{ if(e.target===tpOv) tpOv.classList.remove("open"); });
-  addEventListener("keydown", e=>{ if(e.key==="Escape") tpOv.classList.remove("open"); });
+  document.getElementById("tp-close").addEventListener("click", tpDoClose);
+  tpOv.addEventListener("click", e=>{ if(e.target===tpOv) tpDoClose(); });
+  addEventListener("keydown", e=>{ if(e.key==="Escape") tpDoClose(); });
 
   /* ============================================================
      THE RUNAWAY BUS 🚌 (click the bus in the day-of timeline)

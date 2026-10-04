@@ -178,5 +178,5 @@ export const SETTINGS = {
   songFormUrl:     "",  /* pre-filled link containing {song} & {name}   */
   guestMapCsv:     "",  /* Guest Atlas pins — name,place,lat,lng        */
 
-  googleCalendarUrl: "https://calendar.google.com/calendar/ical/eccd8f4109e6569d58de955f799ca83e461628dd907e86d9ee03e4e8a23da091%40group.calendar.google.com/public/basic.ics"  /* Google Calendar subscribe link — set to enable the button in Wedding Week */
+  googleCalendarUrl: "https://calendar.google.com/calendar/r?cid=eccd8f4109e6569d58de955f799ca83e461628dd907e86d9ee03e4e8a23da091%40group.calendar.google.com"  /* Google Calendar subscribe link — set to enable the button in Wedding Week */
 };
