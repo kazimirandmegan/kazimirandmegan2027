@@ -328,6 +328,8 @@ nav.links{align-items:center}
 @media(max-width:640px){
   .bio-photos{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:.75rem;-webkit-overflow-scrolling:touch}
   .bio-photo{flex:0 0 82vw;max-width:82vw;scroll-snap-align:center}
+  .about-hero-photos{flex-direction:column;overflow-x:visible;scroll-snap-type:none;padding-bottom:0}
+  .about-hero-photos .bio-photo{flex:none;max-width:100%;scroll-snap-align:none}
 }
 .bio-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--rule)}
 .bio-photo figcaption{text-align:center;font-style:italic;font-size:.95rem;color:var(--ink-soft);padding-top:.45rem}
@@ -337,9 +339,9 @@ nav.links{align-items:center}
 .about-hero-photos .bio-photo img{aspect-ratio:4/3}
 
 /* ---------- runaway bus ---------- */
-#bus-run{position:fixed;bottom:16vh;left:-15vw;z-index:1150;pointer-events:none;opacity:0;line-height:1}
+#bus-run{position:fixed;bottom:16vh;left:112vw;z-index:1150;pointer-events:none;opacity:0;line-height:1;transform:scaleX(-1)}
 #bus-run.go{animation:busgo 4.2s ease-in-out forwards}
-@keyframes busgo{0%{left:-15vw;opacity:1;transform:translateY(0)}25%{transform:translateY(-7px)}50%{transform:translateY(0)}75%{transform:translateY(-7px)}100%{left:112vw;opacity:1;transform:translateY(0)}}
+@keyframes busgo{0%{left:112vw;opacity:1;transform:scaleX(-1) translateY(0)}25%{transform:scaleX(-1) translateY(-7px)}50%{transform:scaleX(-1) translateY(0)}75%{transform:scaleX(-1) translateY(-7px)}100%{left:-15vw;opacity:1;transform:scaleX(-1) translateY(0)}}
 .bus-egg{cursor:pointer}
 #bus-head-emoji{display:inline-block}
 #bus-head-emoji.honk{animation:busHonk 0.6s ease-in-out}
@@ -349,8 +351,9 @@ nav.links{align-items:center}
 /* ---------- extra florals ---------- */
 .sheet h3::before{content:"❀ ";color:var(--peri);opacity:.55;font-size:.72em;vertical-align:.18em}
 ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
-#garland{display:flex;justify-content:center;padding:1.2rem 0 0;opacity:.9}
+#garland{display:flex;justify-content:center;padding:0;opacity:.9}
 #garland .garland-img{width:min(400px,100%);height:auto;object-fit:contain}
+@media(max-width:1024px){#garland{margin-top:-3.5rem}}
 
 /* ---------- field guide tabs ---------- */
 .fg-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 0}
@@ -424,19 +427,18 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 .kd-fs-exit,.kd-fs-3d{position:absolute;top:max(.55rem,env(safe-area-inset-top,.55rem));z-index:13;min-height:48px;min-width:48px;padding:.55rem .85rem;letter-spacing:.16em;text-transform:uppercase;font-size:.78rem;font-family:inherit;border:0;background:transparent;color:rgba(65,80,122,.9);text-shadow:0 1px 2px rgba(251,249,242,.85);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .kd-fs-exit{left:max(.55rem,env(safe-area-inset-left,.55rem))}
 .kd-fs-3d{right:max(.55rem,env(safe-area-inset-right,.55rem))}
-/* Jump/Duck sit on the playfield — fully clear, no layout reserved for them */
-.kd-fs-pad{position:absolute;left:0;right:0;bottom:0;z-index:9;display:none;grid-template-columns:1fr 1fr;gap:0;height:min(52%,280px);padding:0 0 env(safe-area-inset-bottom,0px);pointer-events:none;background:transparent}
-.kd-fs-pad button{pointer-events:auto;min-height:0;height:100%;border:0;background:transparent;color:rgba(65,80,122,.9);font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(1.7rem,6.5vw,2.6rem);letter-spacing:.16em;text-transform:uppercase;touch-action:none;-webkit-user-select:none;user-select:none;text-shadow:0 1px 2px rgba(251,249,242,.9);-webkit-tap-highlight-color:transparent;-webkit-appearance:none;appearance:none;display:flex;align-items:flex-start;justify-content:center;padding-top:8%}
-.kd-fs-pad .kd-fs-label{display:block;opacity:0;pointer-events:none}
-#dash-canvas-wrap.is-fs.show-fs-labels .kd-fs-pad .kd-fs-label{animation:kdFsLabel 1.15s ease forwards}
+/* Jump/Duck arrows — right-side vertical strip: top half = ↑ jump, bottom half = ↓ duck */
+.kd-fs-pad{position:absolute;right:0;top:0;bottom:0;left:auto;width:72px;z-index:9;display:none;grid-template-columns:1fr;grid-template-rows:1fr 1fr;gap:0;padding:0;pointer-events:none;background:transparent}
+.kd-fs-pad button{pointer-events:auto;min-height:0;height:100%;border:0;background:transparent;color:rgba(65,80,122,.55);font-size:clamp(2.2rem,8vw,3.2rem);touch-action:none;-webkit-user-select:none;user-select:none;text-shadow:0 1px 3px rgba(251,249,242,.95);-webkit-tap-highlight-color:transparent;-webkit-appearance:none;appearance:none;display:flex;align-items:center;justify-content:center;padding:0}
 @keyframes kdFsLabel{0%,62%{opacity:1}100%{opacity:0}}
-.kd-fs-exit:active,.kd-fs-3d:active,.kd-fs-pad button:active,
-.kd-fs-pad button.is-held{background:transparent;color:rgba(65,80,122,.9);text-shadow:0 1px 2px rgba(251,249,242,.9)}
+.kd-fs-exit:active,.kd-fs-3d:active{background:transparent;color:rgba(65,80,122,.9);text-shadow:0 1px 2px rgba(251,249,242,.9)}
+.kd-fs-pad button:active,
+.kd-fs-pad button.is-held{background:rgba(65,80,122,.1);color:rgba(65,80,122,.9);text-shadow:0 1px 2px rgba(251,249,242,.9)}
 #dash-canvas-wrap.is-3d .kd-fs-exit,#dash-canvas-wrap.is-3d .kd-fs-3d{background:transparent;color:#F4C64D;text-shadow:0 1px 3px rgba(0,0,0,.65);border:0}
 #dash-canvas-wrap.is-3d .kd-fs-pad button{background:transparent;color:rgba(244,198,77,.95);text-shadow:0 1px 3px rgba(0,0,0,.65);border:0}
-#dash-canvas-wrap.is-3d .kd-fs-exit:active,#dash-canvas-wrap.is-3d .kd-fs-3d:active,
+#dash-canvas-wrap.is-3d .kd-fs-exit:active,#dash-canvas-wrap.is-3d .kd-fs-3d:active{background:transparent;color:rgba(244,198,77,.95);text-shadow:0 1px 3px rgba(0,0,0,.65)}
 #dash-canvas-wrap.is-3d .kd-fs-pad button:active,
-#dash-canvas-wrap.is-3d .kd-fs-pad button.is-held{background:transparent;color:rgba(244,198,77,.95);text-shadow:0 1px 3px rgba(0,0,0,.65)}
+#dash-canvas-wrap.is-3d .kd-fs-pad button.is-held{background:rgba(244,198,77,.12);color:rgba(244,198,77,.95);text-shadow:0 1px 3px rgba(0,0,0,.65)}
 #dash-canvas-wrap.is-3d .kd-tap{background:rgba(14,18,34,.7);color:#F4C64D}
 /* One gate for rotate + reclaim — covers the stage until landscape fullscreen sticks */
 .kd-gate{display:none;position:absolute;inset:0;z-index:30;margin:0;border:0;padding:1.5rem;align-items:center;justify-content:center;background:rgba(251,249,242,.98);text-align:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
@@ -458,7 +460,7 @@ ul.tidy li::marker{content:"❀  ";color:var(--peri);font-size:.85em}
 #dash-canvas-wrap.is-3d .kd-gate-title{color:#E7E9F6}
 #dash-canvas-wrap.is-3d .kd-gate-note{color:rgba(231,233,246,.7)}
 @media (max-width:700px), (hover:none) and (pointer:coarse){
-  .kd-controls{display:none}
+  body.kd-fs .kd-controls{display:none}
   .kd-tap{display:block}
   #dash-canvas-wrap.is-fs .kd-tap{display:none}
   #dash-canvas-wrap.is-fs .kd-fs-exit,
@@ -496,9 +498,9 @@ body.kd-fs #dash-canvas-wrap.is-fs.is-3d #kiko-canvas-3d,
 #dash-canvas-wrap.is-fs.is-3d:-webkit-full-screen #kiko-canvas-3d{display:block}
 #dash-canvas-wrap.is-fs .kd-hud{
   position:absolute;left:50%;transform:translateX(-50%);
-  top:max(3.35rem,calc(env(safe-area-inset-top,0px) + 3rem));
+  top:max(.55rem,env(safe-area-inset-top,.55rem));
   z-index:8;margin:0;padding:.2rem .7rem;gap:.55rem;
-  justify-content:center;background:rgba(251,249,242,.28);border:1px solid rgba(179,148,92,.5);
+  justify-content:center;align-items:center;background:rgba(251,249,242,.28);border:1px solid rgba(179,148,92,.5);
   max-width:min(92vw,520px);pointer-events:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
 }
 #dash-canvas-wrap.is-fs .kd-hud #kd-mail{display:none}
@@ -599,7 +601,7 @@ body.kd-fs #dash-canvas-wrap.is-fs.is-3d #kiko-canvas-3d,
   .info-grid{grid-template-columns:1fr}
   .euro-grid{grid-template-columns:1fr}
   .tp-card{flex:0 0 140px}
-  .sheet{margin:1.2rem .6rem 2.5rem;padding:4.6rem clamp(.9rem,4vw,1.4rem) 2.6rem}
+  .sheet{margin:1.2rem .6rem 0;padding:4.6rem clamp(.9rem,4vw,1.4rem) 1rem}
   .hero-date .hd-rule{flex:0 1 48px}
   header{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 }

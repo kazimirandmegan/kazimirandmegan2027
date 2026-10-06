@@ -281,6 +281,12 @@ export function boot() {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=>t.classList.remove("show"), 3200);
   }
+  function toastHtml(html){
+    const t = document.getElementById("toast");
+    t.innerHTML = html; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>t.classList.remove("show"), 3200);
+  }
 
   /* ---------- petals & emoji confetti ---------- */
   const canvas = document.getElementById("petals"), ctx = canvas.getContext("2d");
@@ -1019,11 +1025,11 @@ export function boot() {
     const allMarkers = [], catMarkers = {};
     function drop(p){
       const photo = (p.img && /^images[_\/][\w.\-]+$/.test(p.img))
-        ? "<img src='"+esc(p.img)+"' alt='"+esc(p.n)+"' loading='lazy' onerror='this.remove()' style='width:100%;max-width:220px;margin:.45rem 0 .2rem;border:1px solid #D8D2C2;display:block'>"
+        ? "<img src='"+esc(p.img)+"' alt='"+esc(p.n)+"' loading='lazy' onerror='this.remove()' style='width:100%;max-width:160px;max-height:130px;object-fit:cover;margin:.45rem 0 .2rem;border:1px solid #D8D2C2;display:block'>"
         : "";
       const m = L.circleMarker([p.lat,p.lng],{radius:9,color:"#fff",weight:2,fillColor:MAP_COLS[p.cat]||"#6B82B8",fillOpacity:.95})
         .addTo(map)
-        .bindPopup("<strong>"+esc(p.n)+"</strong>"+photo+"<br>"+esc(p.d||"")+"<br><a target=_blank rel=noopener href='https://maps.google.com/?q="+encodeURIComponent(p.n)+"'>Google Maps →</a>");
+        .bindPopup("<strong>"+esc(p.n)+"</strong>"+photo+"<br>"+esc(p.d||"")+"<br><a target=_blank rel=noopener href='https://maps.google.com/?q="+encodeURIComponent(p.n)+"'>Google Maps →</a>",{maxWidth:200});
       allMarkers.push({m,p});
       if(!catMarkers[p.cat]) catMarkers[p.cat]=[];
       catMarkers[p.cat].push({m,p});
@@ -1108,12 +1114,18 @@ export function boot() {
       atlasDrop = drop;
       atlasCloudRefresh();
     }
+    if(cfg.atlasRsvp){
+      atlasRsvpMap = map;
+      atlasRsvpDrop = drop;
+      atlasCloudRefresh();
+    }
     mapRefs[route] = map;
   }
 
   /* ---- Guest Atlas: live from RSVP addresses (cloud) ---- */
   const ST_ALBANS = {lat:51.7527, lng:-0.3394};
   let atlasMap = null, atlasDrop = null, atlasMarkers = [];
+  let atlasRsvpMap = null, atlasRsvpDrop = null, atlasRsvpMarkers = [];
   function haversineKm(a, b){
     const R = 6371, toR = x=>x*Math.PI/180;
     const dLat = toR(b.lat-a.lat), dLng = toR(b.lng-a.lng);
@@ -1169,11 +1181,46 @@ export function boot() {
         tbl.appendChild(tr);
       });
     }
+
+    /* RSVP-page mini atlas — same pins + top-5 leaderboard */
+    const rsvpEmpty = document.getElementById("atlas-rsvp-empty");
+    const rsvpBoardWrap = document.getElementById("atlas-rsvp-board-wrap");
+    if(atlasRsvpMap && atlasRsvpDrop){
+      atlasRsvpMarkers.forEach(m=>{ try{ atlasRsvpMap.removeLayer(m); }catch(e){} });
+      atlasRsvpMarkers = [];
+      if(rsvpEmpty) rsvpEmpty.style.display = "none";
+      people.forEach((p,i)=>{
+        const leader = i===0 ? " 🏆 furthest so far" : "";
+        const m = L.circleMarker([p.lat,p.lng],{radius:9,color:"#fff",weight:2,
+          fillColor: i===0 ? "#B3945C" : "#6B82B8", fillOpacity:.95})
+          .addTo(atlasRsvpMap)
+          .bindPopup("<strong>"+esc(p.name)+"</strong>"+leader+"<br>"+esc(p.place)+
+                     "<br>"+p.km.toLocaleString()+" km to St Albans");
+        atlasRsvpMarkers.push(m);
+      });
+    } else if(rsvpEmpty && !people.length){
+      rsvpEmpty.style.display = "";
+    }
+    const rsvpTbl = document.getElementById("atlas-rsvp-board");
+    if(rsvpTbl && rsvpBoardWrap && people.length){
+      rsvpBoardWrap.style.display = "";
+      rsvpTbl.querySelectorAll("tr:not(:first-child)").forEach(r=>r.remove());
+      people.slice(0,5).forEach((p,i)=>{
+        const tr = document.createElement("tr");
+        [i+1, p.name, p.place, p.km.toLocaleString()+" km"].forEach(v=>{
+          const td=document.createElement("td"); td.textContent=v; tr.appendChild(td);
+        });
+        if(i===0) tr.style.fontWeight = "600";
+        rsvpTbl.appendChild(tr);
+      });
+    }
   }
   function atlasCloudRefresh(){
     if(!CLOUD){
       const empty = document.getElementById("atlas-empty");
       if(empty){ empty.textContent = "The live map switches on once the site's cloud is connected."; empty.style.display=""; }
+      const rsvpEmpty = document.getElementById("atlas-rsvp-empty");
+      if(rsvpEmpty){ rsvpEmpty.textContent = "The live map switches on once the site's cloud is connected."; rsvpEmpty.style.display=""; }
       return Promise.resolve();
     }
     return cloudGet("atlas").then(rows=>{ if(Array.isArray(rows)) atlasRenderRows(rows); }).catch(()=>{});
@@ -1287,7 +1334,7 @@ export function boot() {
         row.innerHTML =
           '<h5>Guest '+(i+1)+(i===0?' (lead)':'')+'</h5>'+
           '<div class="rsvp-guest-top">'+
-            '<label class="rsvp-child"><input type="checkbox" data-gchild'+(g.child?" checked":"")+'> Child</label>'+
+            (i>0?'<label class="rsvp-child"><input type="checkbox" data-gchild'+(g.child?" checked":"")+'> Child</label>':'')+
             '<label class="rsvp-l">Full name<input type="text" data-gname value="'+esc(g.name||(i===0?document.getElementById("r-name").value:""))+'" placeholder="Name"></label>'+
           '</div>'+ diet;
         host.appendChild(row);
@@ -1488,6 +1535,11 @@ export function boot() {
       document.getElementById("rsvp-fields").style.display = "none";
       const box = document.getElementById("rsvp-saved"); box.style.display = "";
       document.getElementById("rsvp-saved-body").innerHTML = rsvpSummaryHtml(d, events);
+      const atlasSection = document.getElementById("rsvp-atlas-section");
+      if(atlasSection){
+        atlasSection.style.display = "";
+        setTimeout(()=>{ try{ initMapFor("atlas-rsvp"); }catch(e){} }, 80);
+      }
     }
   }
 
@@ -1906,6 +1958,7 @@ export function boot() {
         '<div class="tp-role"></div><h4></h4>';
       c.querySelector(".tp-role").textContent = m.role;
       c.querySelector("h4").textContent = m.name;
+      if(m.imgPos){ const si = c.querySelector(".tp-face img"); if(si) si.style.objectPosition = m.imgPos; }
       c.addEventListener("click", ()=>{
         if(c.hasAttribute("data-tpactive")){ tpDoClose(); return; }
         tpOpen(m, c);
@@ -1946,6 +1999,7 @@ export function boot() {
   }
   document.getElementById("tp-close").addEventListener("click", tpDoClose);
   tpOv.addEventListener("click", e=>{ if(e.target===tpOv) tpDoClose(); });
+  tpOv.querySelector(".tp-big").addEventListener("click", tpDoClose);
   addEventListener("keydown", e=>{ if(e.key==="Escape") tpDoClose(); });
 
   /* ============================================================
@@ -1955,7 +2009,7 @@ export function boot() {
   function busGo(){
     const b = document.getElementById("bus-run");
     b.classList.remove("go"); void b.offsetWidth; b.classList.add("go");
-    toast("🚌 Beep beep! All aboard for Hatfield House.");
+    toastHtml('<img src="images_bus.gif" alt="🚌" style="height:1.1em;vertical-align:middle"> Beep beep! All aboard for Hatfield House.');
     const hd = document.getElementById("bus-head-emoji");
     if(hd){ hd.classList.remove("honk"); void hd.offsetWidth; hd.classList.add("honk"); hd.addEventListener("animationend",()=>hd.classList.remove("honk"),{once:true}); }
   }
@@ -2407,10 +2461,10 @@ export function boot() {
     lbRender();
     /* ---- levels: a new scene every 250 metres ------------------ */
     const LEVELS = [
-      {name:"ST ALBANS",     sky:["#FBF9F2","#EFE9D8"], deco:"cathedral", obstacles:["seal","envelope","hyd"]},
-      {name:"PALACE GARDENS",sky:["#EAF1E4","#D9E6CF"], deco:"topiary",   obstacles:["cake","gift","hyd","seal"]},
-      {name:"VINKOPLENTINNA",sky:["#E8E2F0","#CFC3E0"], deco:"wreaths",   obstacles:["wreath","flute","envelope"]},
-      {name:"AFTER PARTY",   sky:["#252B44","#171C30"], deco:"disco",     obstacles:["flute","cake","gift","seal"]}
+      {name:"ST ALBANS",     sky:["#FBF9F2","#EFE9D8"], deco:"cathedral", obstacles:["seal","envelope","hyd","hang"]},
+      {name:"PALACE GARDENS",sky:["#EAF1E4","#D9E6CF"], deco:"topiary",   obstacles:["cake","gift","hyd","seal","hang"]},
+      {name:"VINKOPLENTINNA",sky:["#E8E2F0","#CFC3E0"], deco:"wreaths",   obstacles:["wreath","flute","envelope","hang"]},
+      {name:"AFTER PARTY",   sky:["#252B44","#171C30"], deco:"disco",     obstacles:["flute","cake","gift","seal","hang"]}
     ];
     let level = 0;
     function levelFor(sc){ return Math.min(LEVELS.length-1, Math.floor(sc/250)); }
@@ -2420,11 +2474,8 @@ export function boot() {
       let w = k==="cake" ? 46 : k==="envelope" ? 52 : k==="flute" ? 18 : k==="wreath" ? 40 : k==="gift" ? 34 : 34;
       let h = k==="flute" ? 52 : k==="cake" ? 48 : k==="wreath" ? 40 : 34;
       let foot = 0;
-      /* a tossed bouquet clears a duck and still catches a standing jump */
-      if(k==="hyd" && Math.random() < 0.58){ foot = 26; h = 30; w = 36; }
+      if(k==="hang"){ const cb=157; obs.push({k:"hang",ceil:true,x:W+20,w:42,h:cb,ceilBottom:cb,foot:0}); return; }
       obs.push({k, x: W+20, w, h, foot});
-      /* two more hydrangeas stacked above a flying one — forces a duck */
-      if(foot === 26){ obs.push({k, x: W+20, w, h, foot: foot + h}); obs.push({k, x: W+20, w, h, foot: foot + h*2}); }
       /* a spare ring just past the obstacle, or a rare glowing barvinok */
       if(Math.random() < 0.08) gems.push({k:"charm", x: W+96, y: GY - (62 + Math.random()*36)});
       else if(Math.random() < 0.55) gems.push({k:"ring", x: W+64 + Math.random()*36, y: GY - (62 + Math.random()*36)});
@@ -2546,15 +2597,22 @@ export function boot() {
       cx.beginPath(); cx.arc(14+sway,-11.6,.8,0,7); cx.fill();
       cx.restore();
     }
+    /* ---- ceiling hang obstacle — hydrangea cluster from above ---- */
+    function drawCeil(o){
+      cx.save();
+      cx.strokeStyle = "#7C8B6E";
+      cx.lineWidth = 2;
+      cx.beginPath(); cx.moveTo(o.x+o.w/2, 0); cx.lineTo(o.x+o.w/2, o.ceilBottom-30); cx.stroke();
+      cx.fillStyle = level===3 ? "#F4C64D" : "#93A8D8";
+      [[o.x+12,o.ceilBottom-10],[o.x+24,o.ceilBottom-8],[o.x+18,o.ceilBottom-20],[o.x+30,o.ceilBottom-18],[o.x+24,o.ceilBottom-30]].forEach(([px,py])=>{
+        cx.beginPath(); cx.arc(px,py,7,0,7); cx.fill();
+      });
+      cx.restore();
+    }
     /* ---- wedding-flavoured obstacles ---------------------------- */
     function drawObs(o){
-      if(o.foot){
-        cx.save();
-        cx.fillStyle = level===3 ? "rgba(244,198,77,.2)" : "rgba(65,80,122,.16)";
-        cx.beginPath(); cx.ellipse(o.x+o.w*0.45, GY+3, Math.max(8, o.w*0.28), 3.2, 0, 0, 7); cx.fill();
-        cx.restore();
-      }
-      cx.save(); cx.translate(o.x, GY - (o.foot||0));
+      if(o.ceil){ drawCeil(o); return; }
+      cx.save(); cx.translate(o.x, GY);
       const dark = level===3;
       if(o.k==="seal"){
         cx.fillStyle="#B3945C"; cx.beginPath(); cx.arc(17,-17,16,0,7); cx.fill();
@@ -2675,7 +2733,6 @@ export function boot() {
       drawScene();
       obs.forEach(drawObs); gems.forEach(drawGem); drawKiko();
       cx.fillStyle = level===3 ? "#C9D2F0" : "#5B6788"; cx.font="12px Georgia"; cx.textAlign="left";
-      if(!run && !over) cx.fillText("Jump the admin · catch the rings · down ducks.", 16, 24);
       if(banner && banner.t > 0){                          /* the level card, fading out */
         const a = Math.min(1, banner.t / 28);
         cx.save(); cx.globalAlpha = a; cx.textAlign = "center";
@@ -2709,7 +2766,7 @@ export function boot() {
           }
         }
         if(banner){ banner.t -= dt; if(banner.t <= 0) banner = null; }
-        speed = 4.4 + score/50;
+        speed = 4.4 + 25.6 * (1 - Math.exp(-score / 667));
         const falling = ducking && ky < GY-1 && kvy > 0;
         kvy += (falling ? 1.45 : 0.58)*dt; ky = Math.min(GY, ky + kvy*dt);
         if(jumpBuf > 0){ jumpBuf -= dt; if(ky >= GY-0.5) doJump(); }
@@ -2723,7 +2780,7 @@ export function boot() {
           if(g.got) continue;
           if(Math.abs(g.x - 70) < 26 && Math.abs(g.y - chestY) < 30){
             g.got = true;
-            if(g.k === "charm"){ charm = 145; award(12, "Barvinok"); }
+            if(g.k === "charm"){ charm = 180; award(12, "Barvinok"); }
             else {
               rings++; streak++;
               if(streak >= 5){ streak = 0; award(24, "The set!"); }
@@ -2739,20 +2796,22 @@ export function boot() {
         if(lv !== level) enterLevel(lv);                  /* new scene, new card, safe stretch */
         const mark = Math.floor(score / 100) * 100;
         if(mark >= 100 && mark > milestone){ milestone = mark; cheers(mark + " m"); }
-        if(grace <= 0 && charm <= 0){
+        if(grace <= 0){
           const ducked = duckedNow;
           const kikoH = ducked ? 17 : 40;
           const kikoTop = ky - kikoH;
           for(const o of obs){
-            const obsBottom = GY - (o.foot||0);
-            const obsTop = obsBottom - o.h;
+            const obsBottom = o.ceil ? o.ceilBottom : GY;
+            const obsTop = o.ceil ? 0 : obsBottom - o.h;
             const xHit = 70+12 > o.x+5 && 70-12 < o.x+o.w-5;
             const yHit = ky > obsTop + 4 && kikoTop < obsBottom - 2;
-            if(xHit && yHit){ gameOver(); break; }
-            if(xHit && !o.near){
+            if(xHit && yHit && !o.absorbed){
+              if(charm > 0){ o.absorbed = true; charm = 0; break; }
+              gameOver(); break;
+            }
+            if(xHit && !o.near && charm <= 0){
               const closeOver = ky <= obsTop + 4 && ky >= obsTop - 16;
-              const closeUnder = (o.foot||0) > 0 && kikoTop >= obsBottom - 2 && kikoTop <= obsBottom + 16;
-              if(closeOver || closeUnder){ o.near = true; award(5, "Close!"); }
+              if(closeOver){ o.near = true; award(5, "Close!"); }
             }
           }
         }
@@ -2935,6 +2994,8 @@ export function boot() {
       }
       document.body.classList.toggle("kd-view-3d", view === "3d");
       wrap.classList.toggle("is-3d-hud", view === "3d");
+      /* On phones: hide the mode toggle so it can't be hit accidentally mid-game. */
+      if(phonePlay() && modeBtnFs) modeBtnFs.hidden = true;
       /* Native FS only from the landscape gate tap — premature FS drops on rotate and hid the reclaim UI */
       syncGate();
       flashFsLabels();
@@ -2959,6 +3020,7 @@ export function boot() {
       doDuck(false);
       if(jumpBtn) jumpBtn.classList.remove("is-held");
       if(duckBtn) duckBtn.classList.remove("is-held");
+      if(modeBtnFs) modeBtnFs.hidden = false;
       unlockOrientation();
       leaveNativeFs().finally(()=>{ fsLock = false; });
     }
