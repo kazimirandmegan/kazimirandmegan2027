@@ -70,5 +70,12 @@ export function buildMaps(storyPins, storyLines) {
       pins: [],
       atlas: true,
     },
+    "atlas-rsvp": {
+      el: "map-atlas-rsvp",
+      center: [30, -20],
+      zoom: 2,
+      pins: [],
+      atlasRsvp: true,
+    },
   };
 }

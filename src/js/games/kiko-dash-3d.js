@@ -302,11 +302,12 @@ export function createKiko3D(wrap, hooks){
   scene.add(blob);
 
   const fur = new THREE.MeshPhysicalMaterial({
-    color: 0xfffaf3, roughness: 0.7, sheen: 1, sheenRoughness: 0.4,
-    sheenColor: new THREE.Color(0xfff0dc)
+    color: 0xffffff, roughness: 0.7, sheen: 1, sheenRoughness: 0.4,
+    sheenColor: new THREE.Color(0xffffff),
+    emissive: new THREE.Color(0xffffff), emissiveIntensity: 0.18
   });
   const ink = new THREE.MeshPhysicalMaterial({
-    color: 0x1b2032, roughness: 0.55, sheen: 0.3, sheenColor: new THREE.Color(0x3a4464)
+    color: 0x000000, roughness: 0.55, sheen: 0.0, sheenColor: new THREE.Color(0x000000)
   });
   const goldMat = new THREE.MeshPhysicalMaterial({
     color: 0xf4d58a, metalness: 1, roughness: 0.16,

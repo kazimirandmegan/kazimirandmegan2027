@@ -984,7 +984,7 @@ export function boot() {
   function initMapFor(route){
     const cfg = MAPS[route]; if(!cfg) return;
     /* the atlas re-pulls live data every visit so new RSVPs show up */
-    if(cfg.atlas && (mapRefs[route]!==undefined)){ try{ atlasCloudRefresh(); }catch(e){} }
+    if((cfg.atlas || cfg.atlasRsvp) && (mapRefs[route]!==undefined)){ try{ atlasCloudRefresh(); }catch(e){} }
     if(mapRefs[route]){ mapRefs[route].invalidateSize(); return; }
     const el = document.getElementById(cfg.el); if(!el) return;
     if(typeof L === "undefined"){
@@ -1138,10 +1138,10 @@ export function boot() {
       .filter(r=>isFinite(r.lat) && isFinite(r.lng) && r.attending!=="no")
       .map(r=>{
         const place = [r.city, r.country].filter(Boolean).join(", ") || "Somewhere lovely";
-        const km = haversineKm(ST_ALBANS, {lat:r.lat, lng:r.lng});
-        return {name:r.name||"Guests", place, lat:r.lat, lng:r.lng, km};
+        const miles = Math.round(haversineKm(ST_ALBANS, {lat:r.lat, lng:r.lng}) * 0.621371);
+        return {name:r.name||"Guests", place, lat:r.lat, lng:r.lng, miles};
       })
-      .sort((a,b)=>b.km-a.km);
+      .sort((a,b)=>b.miles-a.miles);
 
     const boardWrap = document.getElementById("atlas-board-wrap");
     const empty = document.getElementById("atlas-empty");
@@ -1162,7 +1162,7 @@ export function boot() {
           fillColor: i===0 ? "#B3945C" : "#6B82B8", fillOpacity:.95})
           .addTo(atlasMap)
           .bindPopup("<strong>"+esc(p.name)+"</strong>"+leader+"<br>"+esc(p.place)+
-                     "<br>"+p.km.toLocaleString()+" km to St Albans");
+                     "<br>"+p.miles.toLocaleString()+" miles to St Albans");
         atlasMarkers.push(m);
       });
     }
@@ -1174,7 +1174,7 @@ export function boot() {
       tbl.querySelectorAll("tr:not(:first-child)").forEach(r=>r.remove());
       people.slice(0,15).forEach((p,i)=>{
         const tr = document.createElement("tr");
-        [i+1, p.name, p.place, p.km.toLocaleString()+" km"].forEach(v=>{
+        [i+1, p.name, p.place, p.miles.toLocaleString()].forEach(v=>{
           const td=document.createElement("td"); td.textContent=v; tr.appendChild(td);
         });
         if(i===0) tr.style.fontWeight = "600";
@@ -1195,7 +1195,7 @@ export function boot() {
           fillColor: i===0 ? "#B3945C" : "#6B82B8", fillOpacity:.95})
           .addTo(atlasRsvpMap)
           .bindPopup("<strong>"+esc(p.name)+"</strong>"+leader+"<br>"+esc(p.place)+
-                     "<br>"+p.km.toLocaleString()+" km to St Albans");
+                     "<br>"+p.miles.toLocaleString()+" miles to St Albans");
         atlasRsvpMarkers.push(m);
       });
     } else if(rsvpEmpty && !people.length){
@@ -1207,7 +1207,7 @@ export function boot() {
       rsvpTbl.querySelectorAll("tr:not(:first-child)").forEach(r=>r.remove());
       people.slice(0,5).forEach((p,i)=>{
         const tr = document.createElement("tr");
-        [i+1, p.name, p.place, p.km.toLocaleString()+" km"].forEach(v=>{
+        [i+1, p.name, p.place, p.miles.toLocaleString()].forEach(v=>{
           const td=document.createElement("td"); td.textContent=v; tr.appendChild(td);
         });
         if(i===0) tr.style.fontWeight = "600";
@@ -2705,7 +2705,7 @@ export function boot() {
     /* Down cuts a rising jump and, on the ground, flattens her under bouquets. */
     function setDuck(on){
       const next = !!on;
-      if(next && !ducking && kvy < -3) kvy = -3;
+      if(next && !ducking && kvy < 0) kvy = 2;
       ducking = next;
       if(!run) paint();
     }
@@ -2766,9 +2766,9 @@ export function boot() {
           }
         }
         if(banner){ banner.t -= dt; if(banner.t <= 0) banner = null; }
-        speed = 4.4 + 25.6 * (1 - Math.exp(-score / 667));
+        speed = 4.4 + 25.6 * (1 - Math.exp(-score / 1500));
         const falling = ducking && ky < GY-1 && kvy > 0;
-        kvy += (falling ? 1.45 : 0.58)*dt; ky = Math.min(GY, ky + kvy*dt);
+        kvy += (falling ? 2.8 : 0.58)*dt; ky = Math.min(GY, ky + kvy*dt);
         if(jumpBuf > 0){ jumpBuf -= dt; if(ky >= GY-0.5) doJump(); }
         if(charm > 0) charm -= dt;
         obs.forEach(o=>o.x -= speed*dt);
@@ -3213,7 +3213,7 @@ export function boot() {
     if(CLOUD){
       document.getElementById("kd-mail").textContent = "Refresh the live tally";
       const dn = document.querySelector("#kd-lb + .devnote");
-      if(dn) dn.innerHTML = "Your best run joins the official wedding-wide tally automatically — no emailing required. <strong>Prizes at stake:</strong> highest score before 29 May wins the first slice of cake, a victory lap announced by the DJ, and a pint on Kazimir. Runner-up chooses one song — no vetoes.";
+      if(dn) dn.innerHTML = "Your best run joins the official wedding-wide tally automatically — no emailing required. <strong>Prizes at stake (before 29 May):</strong><br>🥇 <strong>Gold</strong> — Wins the first slice of cake (after the wedding couple)!<br>🥈 <strong>Silver</strong> — Chooses one song for the band — no vetoes<br>🥉 <strong>Third</strong> (poisoned prize) — Gets the last slice of cake";
     }
     if(SETTINGS.scoreFormUrl && !CLOUD) document.getElementById("kd-mail").textContent = "Submit my best score";
     document.getElementById("kd-mail").addEventListener("click", ()=>{
